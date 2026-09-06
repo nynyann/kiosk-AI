@@ -1,0 +1,47 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Kiosk API — MOCK (không cần model, không cần ffmpeg)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--reload", "--port", "8000"],
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "env": { "MOCK": "1", "PYTHONIOENCODING": "utf-8" },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Kiosk API — THẬT (cần model đã convert + ffmpeg)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["app.main:app", "--reload", "--port", "8000"],
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "env": { "MOCK": "0", "PYTHONIOENCODING": "utf-8" },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Test normalize",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/tests/test_normalize.py",
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "env": { "PYTHONIOENCODING": "utf-8" },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Bảng chuẩn hoá 10 câu (mục 4.3)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "app.normalize",
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/Scripts/python.exe",
+      "env": { "PYTHONIOENCODING": "utf-8" },
+      "console": "integratedTerminal"
+    }
+  ]
+}

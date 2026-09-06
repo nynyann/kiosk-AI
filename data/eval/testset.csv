@@ -1,0 +1,11 @@
+audio_path,transcript,speaker_id,age_group,gender,region,noise_level,procedure_id,note
+audio/s01_c01.wav,tôi muốn xin giấy xác nhận cư trú,s01,60+,nữ,bắc,yên tĩnh,xac-nhan-cu-tru,
+audio/s01_c02.wav,làm căn cước công dân cần mang những giấy tờ gì,s01,60+,nữ,bắc,yên tĩnh,can-cuoc-cong-dan,
+audio/s01_c03.wav,tôi mất sổ hộ khẩu thì xin xác nhận cư trú ở đâu,s01,60+,nữ,bắc,có tiếng ồn,xac-nhan-cu-tru,
+audio/s02_c01.wav,cho tôi hỏi đăng ký tạm trú cho cháu ngoại,s02,60+,nam,bắc,yên tĩnh,dang-ky-tam-tru,
+audio/s02_c02.wav,chứng thực chữ ký mất bao nhiêu tiền,s02,60+,nam,bắc,có tiếng ồn,chung-thuc-chu-ky,
+audio/s03_c01.wav,tôi muốn làm giấy khai sinh cho cháu,s03,45-59,nữ,trung,yên tĩnh,dang-ky-khai-sinh,
+audio/s03_c02.wav,thủ tục hưởng trợ cấp xã hội cho người cao tuổi,s03,45-59,nữ,trung,yên tĩnh,tro-cap-xa-hoi,
+audio/s04_c01.wav,sao y bản chính giấy tờ thì nộp ở đâu,s04,18-44,nam,nam,yên tĩnh,chung-thuc-chu-ky,câu đối chứng nhóm trẻ
+audio/s04_c02.wav,tôi cần đăng ký thường trú tại xã này,s04,18-44,nam,nam,có tiếng ồn,dang-ky-thuong-tru,câu đối chứng nhóm trẻ
+audio/s05_c01.wav,bảo hiểm y tế của tôi hết hạn thì gia hạn thế nào,s05,60+,nữ,bắc,rất ồn,bao-hiem-y-te,ghi ở hội trường thôn

@@ -1,0 +1,50 @@
+{
+  "id": "xac-nhan-cu-tru",
+  "name": "Xác nhận thông tin về cư trú",
+  "aliases": [
+    "giấy xác nhận cư trú",
+    "xin giấy cư trú",
+    "chứng nhận nơi ở",
+    "giấy xác nhận nơi thường trú"
+  ],
+  "keywords": [
+    "xác nhận cư trú",
+    "giấy cư trú",
+    "nơi thường trú",
+    "chứng minh chỗ ở",
+    "cư trú"
+  ],
+  "steps": [
+    {
+      "title": "Chuẩn bị giấy tờ",
+      "detail": "Bác mang theo căn cước công dân còn hạn sử dụng. Nếu nhờ người khác đi thay thì cần thêm giấy uỷ quyền."
+    },
+    {
+      "title": "Nộp hồ sơ",
+      "detail": "Bác đến công an cấp xã nơi bác đang ở và nói cần xin xác nhận thông tin về cư trú. Nếu có con cháu biết dùng máy tính thì nộp trực tuyến trên Cổng dịch vụ công quốc gia cũng được."
+    },
+    {
+      "title": "Nhận kết quả",
+      "detail": "Bác nhận giấy xác nhận tại nơi đã nộp. Nếu nộp trực tuyến thì chọn nhận qua bưu điện."
+    }
+  ],
+  "documents": [
+    "Căn cước công dân còn hạn sử dụng",
+    "Giấy uỷ quyền (chỉ khi nhờ người khác đi thay)"
+  ],
+  "where_to_submit": "Công an xã, phường nơi bác đang cư trú, hoặc Cổng dịch vụ công quốc gia.",
+  "fee": "Không mất phí.",
+  "processing_time": "Trong ngày làm việc, nếu nộp trong giờ hành chính.",
+  "validity": "Giấy xác nhận có thời hạn sử dụng, bác nên hỏi cán bộ để biết hạn cụ thể.",
+  "common_questions": [
+    "Tôi mất sổ hộ khẩu thì có xin được không",
+    "Con tôi ở tỉnh khác xin hộ được không",
+    "Giấy này dùng thay sổ hộ khẩu được không"
+  ],
+  "source": {
+    "title": "Luật Cư trú số 68/2020/QH14, Điều 17",
+    "url": "https://vanban.chinhphu.vn/"
+  },
+  "verified_by": "CHƯA KIỂM CHỨNG — Mian đối chiếu văn bản gốc rồi điền tên và ngày vào đây",
+  "verified_date": null
+}

@@ -1,0 +1,25 @@
+# Môi trường ảo Python — KHÔNG đẩy lên, mỗi máy tự tạo lại
+.venv/
+.venv-1/
+venv/
+
+__pycache__/
+*.pyc
+
+# Bí mật và cấu hình riêng của từng máy
+.env
+
+# Mô hình đã convert (~500MB) — mỗi máy tự chạy scripts/convert_phowhisper.sh
+models/
+
+# Kết quả đo và nhật ký — sinh ra lúc chạy
+results/
+data/logs/
+
+# Ghi âm — cam kết mục 4.5: không lưu, không đẩy lên
+data/eval/audio/
+*.wav
+*.webm
+
+# Công cụ phụ
+.qodo/

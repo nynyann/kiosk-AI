@@ -1,0 +1,21 @@
+# -*- coding: utf-8 -*-
+# Máy chủ
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+pydantic==2.10.4
+
+# Nhận dạng giọng nói
+faster-whisper==1.1.1
+ctranslate2==4.5.0
+# faster-whisper 1.1.1 import requests, nhưng huggingface-hub 1.x đã bỏ requests
+# nên phải khai báo tường minh, nếu không ImportError lúc nạp mô hình.
+requests==2.34.2
+
+# Chuyển mô hình PhoWhisper sang CTranslate2 (chỉ cần khi convert, chạy một lần)
+# transformers==4.48.0
+# torch==2.5.1
+
+# Tải bộ dữ liệu công khai để đối chứng (chỉ cần khi đo)
+# datasets==3.2.0
+# soundfile==0.13.0
