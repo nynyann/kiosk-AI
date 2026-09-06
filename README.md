@@ -6,7 +6,6 @@ Ai cần đọc gì:
 - **Kns** — chỉ cần `API_CONTRACT.md` và phần «Máy chủ giả» dưới đây. Không phải cài Python nếu không muốn.
 - **Mian** — chỉ cần `data/kb/_SCHEMA.md`.
 - **Kim** — `app/kb.py`, chỗ cần thay có ghi rõ trong file.
-- **Lia** — hết.
 
 ---
 
