@@ -40,6 +40,32 @@ def test_so_chu_thanh_chu_so():
     assert words_to_digits("năm nay") == "năm nay"
 
 
+def test_khong_nuot_khoang_thoi_gian():
+    """Hai chữ số trần đứng liền nhau thì không phải một con số.
+
+    Phát hiện lúc đo WER trên VIVOS: "nửa vòng trái đất hơn bảy năm" bị biến
+    thành "... hơn 5", vì "năm" vừa là 5 vừa là đơn vị thời gian. Cùng cơ chế
+    làm "tháng tám năm hai không mười một" thành "tháng 11" trên FLEURS.
+    """
+    assert words_to_digits("bảy năm") == "bảy năm"
+    assert words_to_digits("ba năm") == "ba năm"
+    assert words_to_digits("năm năm") == "năm năm"
+    # cách đọc từng chữ số cũng mơ hồ, để nguyên còn hơn đoán sai
+    assert words_to_digits("hai không mười một") == "hai không mười một"
+    assert normalize("tôi ở đây ba năm rồi") == "tôi ở đây ba năm rồi"
+    # nhưng số thật thì vẫn phải đổi
+    assert words_to_digits("ba mươi sáu") == "36"
+
+
+def test_giu_tieu_tu_cuoi_cau():
+    """"à" cuối câu là tiếng xưng hô, cùng loại với "ạ", không được bỏ."""
+    assert normalize("bác à") == "bác à"
+    assert normalize("mỗi người một số phận em à") == "mỗi người một số phận em à"
+    # nhưng "à" đầu câu vẫn là từ đệm thật
+    assert normalize("à tôi muốn hỏi") == "tôi muốn hỏi"
+    assert normalize("ờ bác à") == "bác à"
+
+
 def test_chu_so_thanh_chu_de_doc():
     assert digits_to_words("quầy số 1") == "quầy số một"
     assert digits_to_words("15 ngày") == "mười lăm ngày"
@@ -73,6 +99,11 @@ def test_term_recall_bat_dung_cum_hong():
 
 
 if __name__ == "__main__":
+    # Console Windows mặc định cp1252, in tiếng Việt là vỡ ngay dòng tổng kết.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:  # noqa: BLE001
+        pass
     fails = 0
     for name, fn in sorted(list(globals().items())):
         if name.startswith("test_") and callable(fn):

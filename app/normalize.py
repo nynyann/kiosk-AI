@@ -35,6 +35,12 @@ FILLERS = [
 # Không bao giờ bỏ: "ạ", "dạ", "vâng", "bác", "con", "cô", "chú" — đây là
 # từ xưng hô, bỏ đi thì câu mất lễ độ và log đọc lại rất khó hiểu.
 
+# "à" nằm hai chân: đầu câu là từ đệm thật ("à tôi muốn hỏi"), cuối câu là
+# tiểu từ xưng hô cùng loại với "ạ" ("bác à", "em à"). Trước đây bỏ cả hai
+# nên "bác à" thành "bác", đúng cái lỗi mà ghi chú ngay trên đây dặn tránh.
+# Chỉ bỏ khi còn từ khác đứng sau nó.
+FINAL_PARTICLES = {"à"}
+
 
 # ---------------------------------------------------------------------------
 # 2. Số viết thành chữ
@@ -57,6 +63,10 @@ def _parse_number_words(words: List[str]) -> int | None:
     """
     total, current = 0, 0
     seen = False
+    # Từ vừa đọc có phải một chữ số trần không (không phải "mười", không phải
+    # đơn vị "mươi/trăm/nghìn"). Cần biết để từ chối hai chữ số dính nhau,
+    # xem ghi chú ở nhánh UNITS bên dưới.
+    prev_unit = False
     i = 0
     while i < len(words):
         w = words[i]
@@ -67,13 +77,21 @@ def _parse_number_words(words: List[str]) -> int | None:
             if i + 1 < len(words) and words[i + 1] in UNITS:
                 current += UNITS[words[i + 1]]
                 i += 1
+            prev_unit = False
         elif w in UNITS:
+            # Hai chữ số trần đứng liền nhau thì KHÔNG phải một con số.
+            # "bảy năm" là bảy cái năm, không phải 7 rồi 5. Trước đây nhánh
+            # này ghi đè current nên "bảy năm" ra 5, "ba năm" ra 5, và
+            # "tháng tám năm hai không mười một" ra "tháng 11", nuốt sạch
+            # cả hai con số. Gặp ca mơ hồ thì trả None để giữ nguyên chữ,
+            # an toàn hơn đoán.
+            if prev_unit:
+                return None
             current = current + UNITS[w] if current % 10 == 0 and current else UNITS[w]
-            if current > 9 and current % 10 == 0:
-                pass
             seen = True
+            prev_unit = True
         elif w in ("linh", "lẻ"):
-            pass
+            prev_unit = False
         elif w in SCALES:
             scale = SCALES[w]
             if scale == 10:
@@ -88,6 +106,7 @@ def _parse_number_words(words: List[str]) -> int | None:
                 total += (current or 1) * scale
                 current = 0
             seen = True
+            prev_unit = False
         else:
             return None
         i += 1
@@ -267,8 +286,13 @@ def clean_raw(text: str) -> str:
 
 
 def drop_fillers(text: str) -> str:
+    # Cụm dài trước, nên "à" (ngắn nhất) luôn xét sau cùng. Lúc đó các từ đệm
+    # khác đã bị bỏ, nên "ờ bác à" đã thành "bác à" và "à" đúng là ở cuối.
     for f in sorted(FILLERS, key=len, reverse=True):
-        text = re.sub(rf"(?<!\S){re.escape(f)}(?!\S)", " ", text)
+        pattern = rf"(?<!\S){re.escape(f)}(?!\S)"
+        if f in FINAL_PARTICLES:
+            pattern += r"(?=\s+\S)"     # phải còn từ khác đứng sau mới bỏ
+        text = re.sub(pattern, " ", text)
     return re.sub(r"\s+", " ", text).strip()
 
 
