@@ -23,3 +23,11 @@ data/eval/audio/
 
 # Công cụ phụ
 .qodo/
+
+# Môi trường phụ để convert mô hình (torch + transformers, ~3GB)
+.venv-tools/
+
+# Bộ dữ liệu công khai tải về. Common Voice cấm re-host, xem giấy phép CC0
+# kèm điều khoản "forbidden to re-host or re-share". Không bao giờ commit.
+*.tar.gz
+data/eval/public/

@@ -18,6 +18,24 @@ Chỉ số 4 quyết định ngưỡng chuyển cán bộ có căn cứ hay khô
 cậy không tương quan với lỗi thật thì ngưỡng đặt kiểu gì cũng vô nghĩa, và
 tự điều đó là một phát hiện đáng viết vào bài.
 
+HAI CON SỐ WER, ĐO HAI THỨ KHÁC NHAU
+------------------------------------
+  wer_raw   bản chuẩn nguyên văn  so với  văn bản thô của mô hình
+            Đo riêng mô hình nghe. Không có phần nào của nhóm chen vào.
+
+  wer_norm  bản chuẩn ĐÃ chuẩn hoá  so với  văn bản mô hình ĐÃ chuẩn hoá
+            Đo cả dây chuyền, tức là văn bản cuối cùng đem đi tra cứu.
+
+Chuẩn hoá cả hai phía là bắt buộc, không phải cho đẹp. `normalize()` có khâu
+bỏ từ đệm, mà bản chuẩn của các bộ nói tự nhiên thì chép nguyên văn nên có đủ
+"thế thì", "là cái". Chỉ chuẩn hoá một phía thì mọi từ đệm bị bỏ đều bị tính
+là lỗi xoá, tức là tự bơm WER lên. Đo trên VietMed và ViMD thấy mức bơm khoảng
+0.1 đến 0.6 điểm.
+
+Ngược lại cũng phải cẩn thận: chuẩn hoá hai phía làm nhẹ đi những lỗi mà
+HARD_FIXES sửa được ở cả hai bên. Vì vậy phải LUÔN báo cáo cả hai con số, đừng
+chỉ trích một cái.
+
 CÁCH CHẠY
 ---------
     python -m eval.wer --manifest data/eval/testset.csv --model models/PhoWhisper-small-ct2
@@ -169,21 +187,30 @@ def evaluate(manifest: Path, model_path: str, tag: str,
 
         ref = row["transcript"]
         hyp_norm = admin_normalize(raw) if apply_normalize else raw
+        # Chuẩn hoá CẢ HAI PHÍA khi đo WER sau chuẩn hoá. Xem ghi chú
+        # "HAI CON SỐ WER" ở đầu file để biết vì sao.
+        ref_norm = admin_normalize(ref) if apply_normalize else ref
 
         rec = {
             **row,
             "hyp_raw": raw,
             "hyp_norm": hyp_norm,
+            "transcript_norm": ref_norm,
             "confidence": round(min(max(conf, 0.0), 1.0), 3),
             "wer_raw": round(wer(ref, raw), 4),
-            "wer_norm": round(wer(ref, hyp_norm), 4),
-            "terms": term_recall(ref, hyp_norm),
+            "wer_norm": round(wer(ref_norm, hyp_norm), 4),
+            "terms": term_recall(ref_norm, hyp_norm),
         }
         records.append(rec)
         print(f"  [{i}/{len(rows)}] WER thô {rec['wer_raw']:.2f} -> "
               f"sau chuẩn hoá {rec['wer_norm']:.2f}  | {row.get('age_group','?')}")
 
-    return summarize(records, tag)
+    res = summarize(records, tag)
+    # Luôn ghi dạng dấu gạch chuôi. Windows trả "data\eval\..." còn dòng
+    # lệnh gõ tay ra "data/eval/...", hai dạng đó khác chuỗi nên compare()
+    # sẽ tách cùng một bộ dữ liệu thành hai nhóm rồi không so được với nhau.
+    res["manifest"] = manifest.as_posix()
+    return res
 
 
 def summarize(records: List[dict], tag: str) -> dict:
@@ -258,6 +285,74 @@ def print_report(res: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
+def compare(results_dir: Path) -> None:
+    """Đọc mọi results/<tag>.json và in bảng so sánh nhiều mô hình.
+
+    Đây là bảng đưa thẳng vào mục 4.3. Cột "chuẩn hoá" cho thấy phần chuẩn hoá
+    của mình gỡ lại được bao nhiêu. Nếu con số đó nhỏ thì phải nói thật là nhỏ.
+    """
+    files = sorted(results_dir.glob("*.json"))
+    if not files:
+        raise SystemExit(f"Không có file kết quả nào trong {results_dir}")
+
+    res = []
+    for f in files:
+        try:
+            res.append(json.loads(f.read_text(encoding="utf-8")))
+        except Exception as exc:  # noqa: BLE001
+            print(f"  [bỏ qua] {f.name}: {exc}")
+    # So mô hình chỉ có nghĩa TRONG CÙNG một bộ dữ liệu. Xếp chung 4 kết quả
+    # của 2 mô hình x 2 bộ rồi so khoảng tin cậy là so nhầm bộ với bộ.
+    by_set: Dict[str, List[dict]] = defaultdict(list)
+    for r in res:
+        by_set[r.get("manifest") or "(không rõ bộ dữ liệu)"].append(r)
+
+    w = max(len(r["tag"]) for r in res)
+    for manifest_path, group in sorted(by_set.items()):
+        group.sort(key=lambda r: r["wer_norm"])
+        print()
+        print(f"BỘ DỮ LIỆU: {manifest_path}")
+        print("=" * (w + 58))
+        print(f"{'MÔ HÌNH'.ljust(w)}  {'n':>3}  {'WER thô':>8}  {'WER chuẩn hoá':>14}  "
+              f"{'KTC 95%':>17}  {'corr':>6}")
+        print("-" * (w + 58))
+        for r in group:
+            ci = f"{r['wer_ci95'][0]:.1%}-{r['wer_ci95'][1]:.1%}"
+            print(f"{r['tag'].ljust(w)}  {r['n']:>3}  {r['wer_raw']:>7.1%}  "
+                  f"{r['wer_norm']:>13.1%}  {ci:>17}  {r['conf_wer_corr']:>+6.2f}")
+        print("-" * (w + 58))
+
+        best = group[0]
+        print(f"Thấp nhất: {best['tag']}, WER {best['wer_norm']:.1%}")
+        if len(group) > 1:
+            second = group[1]
+            gap = second["wer_norm"] - best["wer_norm"]
+            overlap = best["wer_ci95"][1] >= second["wer_ci95"][0]
+            print(f"Cách {second['tag']} {gap:.1%} tuyệt đối.")
+            if overlap:
+                print("  -> Hai khoảng tin cậy CHỒNG NHAU: chưa đủ căn cứ nói mô hình")
+                print("     này tốt hơn. Viết đúng như vậy, đừng khẳng định quá.")
+            else:
+                print("  -> Hai khoảng tin cậy TÁCH RỜI: kết luận đứng được ở cỡ mẫu này.")
+
+    # nhóm nào cũng đo được thì so luôn theo nhóm
+    fields = {f for r in res for f in r.get("by_group", {})}
+    for field in sorted(fields):
+        vals = sorted({v for r in res for v in r.get("by_group", {}).get(field, {})})
+        if not vals:
+            continue
+        print()
+        print(f"  WER theo {field}")
+        print(f"    {'mô hình'.ljust(w)}  " + "  ".join(v.rjust(12) for v in vals))
+        for r in res:
+            cells = []
+            for v in vals:
+                st = r.get("by_group", {}).get(field, {}).get(v)
+                cells.append((f"{st['wer']:.1%} (n={st['n']})" if st else "-").rjust(12))
+            print(f"    {r['tag'].ljust(w)}  " + "  ".join(cells))
+
+
+# ---------------------------------------------------------------------------
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--manifest", type=Path, default=Path("data/eval/testset.csv"))
@@ -265,7 +360,13 @@ def main() -> None:
     ap.add_argument("--tag", default=None)
     ap.add_argument("--out", type=Path, default=Path("results"))
     ap.add_argument("--no-normalize", action="store_true")
+    ap.add_argument("--compare", type=Path, default=None,
+                    help="Chỉ in bảng so sánh từ các file results/*.json đã có")
     args = ap.parse_args()
+
+    if args.compare:
+        compare(args.compare)
+        return
 
     tag = args.tag or Path(args.model).name
     res = evaluate(args.manifest, args.model, tag, apply_normalize=not args.no_normalize)
