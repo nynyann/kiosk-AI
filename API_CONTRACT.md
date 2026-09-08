@@ -89,7 +89,17 @@ Lỗi thường gặp:
 { "ok": false, "error": "File âm thanh dài quá 60 giây.", "code": "audio_too_long" }
 ```
 
-Mã lỗi: `audio_too_long`, `audio_too_large`, `audio_unreadable`, `asr_not_ready`, `internal_error`.
+Mã lỗi: `audio_too_long`, `audio_too_large`, `audio_unreadable`, `asr_not_ready`,
+`bad_request`, `internal_error`.
+
+`bad_request` (HTTP 422) là khi yêu cầu gửi lên thiếu trường hoặc sai kiểu dữ
+liệu. Nó có thêm trường `detail` ghi rõ trường nào sai, bằng tiếng Anh, để gỡ
+lỗi. `error` vẫn là câu tiếng Việt hiển thị được cho người dân như mọi lỗi khác.
+
+```json
+{ "ok": false, "error": "Máy chưa nhận được câu hỏi của bác. Bác thử lại giúp con.",
+  "code": "bad_request", "detail": "audio: Field required" }
+```
 
 ---
 

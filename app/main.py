@@ -16,7 +16,8 @@ import time
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from fastapi import FastAPI, File, Form, UploadFile
+from fastapi import FastAPI, File, Form, Request, UploadFile
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -57,6 +58,38 @@ app.add_middleware(
 def _err(message: str, code: str, status: int = 400) -> JSONResponse:
     return JSONResponse(status_code=status,
                         content={"ok": False, "error": message, "code": code})
+
+
+# Câu hiển thị cho người dân khi giao diện gửi lên sai định dạng. Cố ý không
+# nói gì về kỹ thuật: người đứng trước kiosk không sửa được lỗi lập trình,
+# chỉ cần biết máy chưa nhận được câu hỏi.
+BAD_REQUEST_TEXT = "Máy chưa nhận được câu hỏi của bác. Bác thử lại giúp con."
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_handler(request: Request,
+                                   exc: RequestValidationError) -> JSONResponse:
+    """Ép lỗi kiểm tra dữ liệu về đúng định dạng đã cam kết trong giao kèo.
+
+    Mặc định FastAPI trả `{"detail": [...]}`, không có `ok`, không có `error`,
+    và `msg` bằng tiếng Anh. Trong khi API_CONTRACT.md hứa MỌI phản hồi đều có
+    `ok`, và khi `ok = false` thì `error` là câu tiếng Việt hiển thị thẳng cho
+    người dân được. Giao diện làm đúng theo giao kèo mà đọc `data.error` sẽ ra
+    `undefined`, và người dân nhìn thấy chữ đó trên màn hình kiosk.
+
+    Phần kỹ thuật không vứt đi, chuyển sang trường `detail` để Kns gỡ lỗi.
+    """
+    parts = []
+    for e in exc.errors():
+        # loc thường là ("body", "audio"). Bỏ phần "body" cho gọn.
+        field = ".".join(str(x) for x in e.get("loc", ()) if x != "body")
+        parts.append(f"{field or '?'}: {e.get('msg', '')}")
+
+    return JSONResponse(
+        status_code=422,
+        content={"ok": False, "error": BAD_REQUEST_TEXT, "code": "bad_request",
+                 "detail": "; ".join(parts)},
+    )
 
 
 def _log_turn(payload: dict) -> None:
