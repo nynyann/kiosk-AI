@@ -245,9 +245,12 @@ Tóm tắt:
 **HuggingFace Spaces bản Docker không dùng được** — cần gói trả phí, chỉ
 Static Spaces mới miễn phí. Kho model thì vẫn miễn phí, hai thứ khác nhau.
 
-Trên máy chủ miễn phí (ít hơn 1 nhân CPU) mỗi câu hỏi mất **10–15 giây** thay
-vì 2–3 giây như máy nhà — đo thật, 1 luồng CPU chậm gấp đôi 8 luồng. Link đó
-để gửi các bạn xem trước, **hôm chấm nên chạy trên máy nhà**.
+**Bản triển khai chạy PhoWhisper-base, máy ở nhà chạy small.** Đã thử small
+trên Render và nó tràn 512 MB rồi chết giữa lượt thứ hai (đỉnh 371 MB); base
+chỉ 244 MB và nhanh gấp 8 lần ở 1 luồng CPU. **Số đo WER trong bài là của
+small** — nói rõ chỗ này, đừng để người đọc tưởng hai cái là một.
+
+Hôm chấm nên chạy trên máy nhà cho nhanh và cho đúng model đã đo.
 
 **Micro chỉ chạy trên https**, hoặc trên đúng chữ `localhost`. Gửi nhau địa chỉ
 `192.168.x.x` cùng Wi-Fi là nút micro hỏng — đo rồi, `navigator.mediaDevices`

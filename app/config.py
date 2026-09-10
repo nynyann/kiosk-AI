@@ -21,6 +21,11 @@ ASR_MODEL_LABEL = os.getenv("ASR_MODEL_LABEL", "PhoWhisper-small")
 ASR_DEVICE = os.getenv("ASR_DEVICE", "cpu")           # cpu | cuda
 ASR_COMPUTE_TYPE = os.getenv("ASR_COMPUTE_TYPE", "int8")  # int8 cho CPU, float16 cho GPU
 ASR_BEAM_SIZE = int(os.getenv("ASR_BEAM_SIZE", "5"))
+# Số luồng CPU cho ctranslate2. 0 = để nó tự quyết theo số nhân nhìn thấy.
+# TRÊN MÁY CHỦ CONTAINER PHẢI ĐẶT TAY, thường là 1. Container nhìn thấy đủ số
+# nhân của máy vật lý nhưng chỉ được cấp một phần nhỏ của một nhân, nên nó
+# sinh ra cả đống luồng giành nhau mẩu CPU đó, vừa chậm vừa tốn thêm bộ nhớ.
+ASR_CPU_THREADS = int(os.getenv("ASR_CPU_THREADS", "0"))
 ASR_LANGUAGE = "vi"
 
 # Nạp mô hình ngay khi máy chủ khởi động hay đợi lần gọi đầu.

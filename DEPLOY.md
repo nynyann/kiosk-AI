@@ -32,8 +32,9 @@ Ba đường có https:
 
 | Khoản | Đo được | Ghi chú |
 |---|---|---|
-| RAM lúc chạy thật | **320–380 MB** | đã nạp model, sau 5 lượt nhận dạng |
-| Kích thước model | 250 MB | `models/PhoWhisper-small-ct2/model.bin` |
+| RAM lúc chạy thật, bản base | **244 MB** | bản đem triển khai |
+| RAM lúc chạy thật, bản small | **371 MB** | quá sát 512 MB, đã bị giết thật |
+| Kích thước model | base 76 MB, small 237 MB | |
 | Nạp model từ đĩa | 0,5 giây | model nằm sẵn trên máy |
 | Nạp model từ HuggingFace | ~40 giây (bản tiny) | bản small lâu hơn, lần đầu thôi |
 | Một lượt hỏi–đáp trọn vẹn | 2,1–2,8 giây | gồm cả nhận dạng và tra cứu |
@@ -44,6 +45,23 @@ Gói miễn phí 512 MB RAM là **vừa khít, hơi rủi ro**. Có gói 1 GB th
 
 ---
 
+## Hai model, đừng lẫn
+
+| | Máy ở nhà, hôm chấm | Bản triển khai |
+|---|---|---|
+| Model | **PhoWhisper-small** | **PhoWhisper-base** |
+| Vì sao | nghe chuẩn hơn | nhẹ hơn, small tràn 512 MB rồi chết thật |
+| RAM đỉnh | 371 MB | 244 MB |
+| Một câu, 1 luồng CPU | 12,6 giây | 1,5 giây |
+
+**Số đo WER trong bài là của small.** Link Render chạy base nên nghe kém hơn
+một chút — nói rõ chỗ này trong bài, đừng để người đọc tưởng hai cái là một.
+
+Mặc định trong `app/config.py` vẫn là small nên máy ở nhà không đổi gì.
+`Dockerfile` ghi đè sang base cho bản triển khai.
+
+---
+
 ## Bước 1 — Model: XONG rồi
 
 Model 250 MB bị `.gitignore` chặn nên không đi theo repo — cố ý, vì GitHub
@@ -51,7 +69,8 @@ chặn file trên 100 MB mà `model.bin` nặng 237 MB.
 
 Đã đưa lên đây, công khai, không cần khoá gì để tải:
 
-**`owmeowmeownyny/PhoWhisper-small-ct2`** — 5 file, 240 MB.
+- **`owmeowmeownyny/PhoWhisper-small-ct2`** — 240 MB, dùng ở máy nhà.
+- **`owmeowmeownyny/PhoWhisper-base-ct2`** — 76 MB, `Dockerfile` tải bản này.
 
 Lệnh đã dùng, ghi lại phòng khi cần convert lại rồi đẩy bản mới:
 
@@ -168,6 +187,18 @@ Cách tự kiểm nếu sau này gặp lại — đọc cờ `PT_GNU_STACK` tron
 
 Nguồn: OpenNMT/CTranslate2 issue #1849, sửa ở PR #1852, có từ bản 4.6.
 
+### Máy chủ chạy được một lượt rồi trả 502, `uptime` tụt về 0
+
+Hết bộ nhớ. Gặp thật: lượt nhận dạng đầu mất **130 giây** rồi lượt thứ hai
+làm dịch vụ chết và tự khởi động lại. Nguyên nhân là chạy PhoWhisper-**small**
+với đỉnh 371 MB trên gói 512 MB — cộng FastAPI và bộ đệm tiếng là tràn.
+
+**Trả $7/tháng KHÔNG cứu được**: gói Starter cũng đúng 512 MB RAM, chỉ hơn ở
+chỗ 0,5 nhân CPU và không bị ngủ.
+
+Sửa bằng cách đổi sang PhoWhisper-**base** và đặt `ASR_CPU_THREADS=1` —
+`Dockerfile` đã ghi sẵn cả hai.
+
 ### `asr_ready: false` mà không biết vì sao
 
 Nhìn trường `asr_error` trong `/health`: `null` là chưa thử nạp lần nào, đợi
@@ -183,7 +214,7 @@ Gửi đúng mấy dòng này:
 > Mở link bằng Chrome trên điện thoại, bấm nút micro rồi hỏi
 > "tôi muốn xin giấy xác nhận cư trú".
 > Lần đầu vào có thể chờ 1 phút cho máy chủ tỉnh, và mỗi câu hỏi máy nghĩ
-> khoảng 10-15 giây vì đang chạy trên máy chủ miễn phí.
+> vài giây vì đang chạy trên máy chủ miễn phí.
 > Link: https://<dia-chi-render>
 
 Nhắc thêm: hiện kho mới có **1 thủ tục** (xác nhận cư trú), hỏi thủ tục khác

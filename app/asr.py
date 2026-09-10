@@ -73,12 +73,17 @@ def load_model(retry: bool = False):
     try:
         from faster_whisper import WhisperModel
         t0 = time.time()
+        kw = {}
+        if config.ASR_CPU_THREADS > 0:
+            kw["cpu_threads"] = config.ASR_CPU_THREADS
         _model = WhisperModel(
             config.ASR_MODEL,
             device=config.ASR_DEVICE,
             compute_type=config.ASR_COMPUTE_TYPE,
+            **kw,
         )
-        print(f"[asr] Đã nạp {config.ASR_MODEL} trong {time.time() - t0:.1f}s")
+        print(f"[asr] Đã nạp {config.ASR_MODEL} trong {time.time() - t0:.1f}s"
+              f" (luồng CPU: {config.ASR_CPU_THREADS or 'tự quyết'})")
     except Exception as exc:  # noqa: BLE001
         _model_error = str(exc)
         print(f"[asr] KHÔNG nạp được mô hình: {exc}")
