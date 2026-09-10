@@ -20,6 +20,7 @@ from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from . import config, kb
 from .asr import AsrError, is_ready, load_model, transcribe_bytes
@@ -213,3 +214,20 @@ async def turn_endpoint(
 
     return TurnResult(asr=a, answer=ans,
                       total_latency_seconds=round(time.time() - t0, 2))
+
+
+# --- Giao diện kiosk --------------------------------------------------------
+# Chính máy chủ này phục vụ luôn trang kiosk ở "/". Nhờ vậy giao diện và API
+# nằm cùng một origin: không vướng CORS, giao diện không phải ghi cứng địa chỉ
+# máy chủ, và lúc triển khai chỉ có một dịch vụ phải dựng thay vì hai.
+#
+# Mount đặt ở CUỐI file, sau khi đã khai báo hết các đường dẫn API. FastAPI dò
+# route theo thứ tự khai báo, nên /health /asr /answer /turn /docs /openapi.json
+# vẫn được khớp trước; chỉ những đường dẫn còn lại mới rơi vào thư mục web/.
+#
+# html=True để "/" trả về index.html.
+WEB_DIR = config.BASE_DIR / "web"
+if WEB_DIR.is_dir():
+    app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")
+else:
+    print(f"[main] không thấy thư mục {WEB_DIR}, chỉ chạy API, không có giao diện.")

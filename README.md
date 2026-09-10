@@ -1,6 +1,15 @@
-# Backend kiosk hướng dẫn thủ tục hành chính
+# Kiosk hướng dẫn thủ tục hành chính
 
-Phần máy chủ và nhận dạng giọng nói. Tương ứng bước 1–8 trong sheet «Demo kiosk».
+Cả giao diện lẫn máy chủ nằm chung một repo. Chạy một lệnh là có trọn bộ:
+máy chủ FastAPI phục vụ luôn trang kiosk ở `/`, còn API nằm ở `/health`,
+`/asr`, `/answer`, `/turn`. Tương ứng bước 1–8 trong sheet «Demo kiosk».
+
+| Phần        | Ở đâu               | Ghi chú                                   |
+| ----------- | ------------------- | ----------------------------------------- |
+| Giao diện   | `web/index.html`    | Một file HTML, không cần build, không npm |
+| Máy chủ     | `app/`              | FastAPI + PhoWhisper                      |
+| Nội dung    | `data/kb/`          | Mỗi thủ tục một file JSON                 |
+| Giao kèo API| `API_CONTRACT.md`   | Chốt rồi, đổi phải tăng phiên bản         |
 
 ## Phạm vi hỗ trợ
 
@@ -25,7 +34,7 @@ tiếng.
 ---
 
 Ai cần đọc gì:
-- **Kns** — chỉ cần `API_CONTRACT.md` và phần «Máy chủ giả» dưới đây. Không phải cài Python nếu không muốn.
+- **Kns** — `web/index.html` và `API_CONTRACT.md`. Muốn xem giao diện chạy thật thì bật máy chủ giả ở phần dưới, khỏi cài mô hình.
 - **Mian** — chỉ cần `data/kb/_SCHEMA.md`.
 - **Kim** — `app/kb.py`, chỗ cần thay có ghi rõ trong file.
 
@@ -79,7 +88,14 @@ Chạy:
 uvicorn app.main:app --reload
 ```
 
-Mở http://localhost:8000/docs để bấm thử.
+- http://localhost:8000 — giao diện kiosk.
+- http://localhost:8000/docs — trang bấm thử từng đường dẫn API.
+
+Giao diện gọi API cùng địa chỉ với trang đang mở, nên không phải sửa địa chỉ
+máy chủ ở đâu cả, kể cả sau khi triển khai lên tên miền thật. Cần trỏ sang máy
+chủ khác lúc gỡ lỗi thì thêm `?base=` vào địa chỉ, ví dụ
+`http://localhost:8000/?base=https://may-chu-that`, hoặc chạm ba lần vào chữ
+«Kiosk thủ tục» để mở bảng gỡ lỗi.
 
 ---
 
@@ -90,7 +106,8 @@ MOCK=1 uvicorn app.main:app --reload
 ```
 
 Không nạp mô hình, không cần ffmpeg, khởi động dưới 2 giây. Cả ba đường dẫn
-trả dữ liệu mẫu đúng định dạng thật, có độ trễ giả 0.4 giây.
+trả dữ liệu mẫu đúng định dạng thật, có độ trễ giả 0.4 giây. Mở
+http://localhost:8000 là thấy giao diện chạy đầy đủ trên dữ liệu mẫu đó.
 
 Câu trả lời mẫu xoay vòng, nên gọi vài lần là thấy được cả nhánh trả lời bình
 thường, nhánh chuyển cán bộ và nhánh không nghe rõ — thử đủ ba màn hình mà
@@ -179,8 +196,13 @@ Vài giây thay vì vài chục phút. Nó in WER cũ cạnh WER mới của t�
 
 1. Đẩy repo lên GitHub.
 2. Tạo dịch vụ Docker mới trên một nền tảng container miễn phí, trỏ vào repo này.
-3. Đặt biến môi trường: `ASR_MODEL`, `ALLOWED_ORIGINS` (tên miền trang của Kns), `MOCK=0`.
-4. Đợi build xong, mở `/health` kiểm tra.
+3. Đặt biến môi trường: `ASR_MODEL`, `MOCK=0`.
+4. Đợi build xong, mở `/health` kiểm tra, rồi mở `/` xem giao diện.
+
+Chỉ một dịch vụ duy nhất, vì giao diện và API cùng một tên miền. Cũng vì cùng
+tên miền nên trình duyệt không hỏi CORS: để `ALLOWED_ORIGINS` mặc định cũng
+không sao. Chỉ khi nào có trang khác ở tên miền khác gọi vào API này thì mới
+phải điền tên miền đó.
 
 **Máy chủ miễn phí ngủ sau 15 phút.** Chạy cái này trên máy một bạn trong nhóm
 từ hôm nộp đến hôm chấm:
