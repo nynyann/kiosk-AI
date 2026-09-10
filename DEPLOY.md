@@ -144,6 +144,38 @@ python scripts/keepalive.py https://<dia-chi-render>
 
 ---
 
+## Lỗi đã gặp thật khi triển khai
+
+### `cannot enable executable stack`
+
+```
+[asr] KHÔNG nạp được mô hình: libctranslate2-bc15bf3f.so.4.5.0:
+      cannot enable executable stack as shared object requires: Invalid argument
+```
+
+Máy chủ vẫn sống, `/health` trả về nhanh, nhưng `asr_ready` mãi là `false`.
+Thư viện của `ctranslate2` 4.5.0 xin executable stack, nhân Linux mới từ chối.
+**Trên Windows không lộ ra**, nên đừng tin "máy em chạy tốt mà".
+
+Sửa: `requirements.txt` đã ghim `ctranslate2==4.8.2`. Đừng hạ xuống.
+
+Cách tự kiểm nếu sau này gặp lại — đọc cờ `PT_GNU_STACK` trong file `.so`:
+
+| Bản | PT_GNU_STACK | |
+|---|---|---|
+| 4.5.0 | 7 = RWX | có executable stack, hỏng |
+| 4.8.2 | 6 = RW | chạy được |
+
+Nguồn: OpenNMT/CTranslate2 issue #1849, sửa ở PR #1852, có từ bản 4.6.
+
+### `asr_ready: false` mà không biết vì sao
+
+Nhìn trường `asr_error` trong `/health`: `null` là chưa thử nạp lần nào, đợi
+thêm; có chữ là đã thử và hỏng. Hỏng rồi thì gọi `POST /warmup` để thử lại,
+nó trả kèm câu lỗi.
+
+---
+
 ## Gửi cho các bạn
 
 Gửi đúng mấy dòng này:

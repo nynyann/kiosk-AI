@@ -7,7 +7,14 @@ pydantic==2.10.4
 
 # Nhận dạng giọng nói
 faster-whisper==1.1.1
-ctranslate2==4.5.0
+# KHÔNG hạ xuống 4.5.0. Bản đó có cờ executable stack trong thư viện .so
+# (PT_GNU_STACK = RWX), nhân Linux mới từ chối nạp, và máy chủ chết đúng câu:
+#   libctranslate2-bc15bf3f.so.4.5.0: cannot enable executable stack as
+#   shared object requires: Invalid argument
+# Gặp thật lúc triển khai lên Render. Trên Windows không lộ ra nên đừng tin
+# "máy em chạy tốt mà". Sửa ở PR OpenNMT/CTranslate2#1852, có từ bản 4.6.
+# Kiểm lại bằng cách đọc PT_GNU_STACK trong wheel: 4.5.0 ra 7 (RWX), 4.8.2 ra 6 (RW).
+ctranslate2==4.8.2
 # faster-whisper 1.1.1 import requests, nhưng huggingface-hub 1.x đã bỏ requests
 # nên phải khai báo tường minh, nếu không ImportError lúc nạp mô hình.
 requests==2.34.2
