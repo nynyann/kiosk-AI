@@ -44,57 +44,81 @@ Gói miễn phí 512 MB RAM là **vừa khít, hơi rủi ro**. Có gói 1 GB th
 
 ---
 
-## Bước 1 — Đưa model lên HuggingFace
+## Bước 1 — Model: XONG rồi
 
-Model 250 MB bị `.gitignore` chặn (cố ý), nên không đi theo repo. Máy chủ phải
-lấy được nó từ đâu đó. Cách gọn nhất: đẩy lên HuggingFace rồi trỏ tên kho vào
-biến `ASR_MODEL` — đã thử và chạy được, `faster-whisper` tự tải về.
+Model 250 MB bị `.gitignore` chặn nên không đi theo repo — cố ý, vì GitHub
+chặn file trên 100 MB mà `model.bin` nặng 237 MB.
 
-Kho **model** trên HuggingFace miễn phí (chỉ phần Spaces mới cần trả tiền).
+Đã đưa lên đây, công khai, không cần khoá gì để tải:
+
+**`owmeowmeownyny/PhoWhisper-small-ct2`** — 5 file, 240 MB.
+
+Lệnh đã dùng, ghi lại phòng khi cần convert lại rồi đẩy bản mới:
 
 ```bash
-pip install huggingface_hub
-huggingface-cli login          # dán token lấy ở huggingface.co/settings/tokens
-huggingface-cli upload <ten-tai-khoan>/PhoWhisper-small-ct2 models/PhoWhisper-small-ct2 .
+hf upload owmeowmeownyny/PhoWhisper-small-ct2 models/PhoWhisper-small-ct2 . --no-private
 ```
 
-Rồi trên máy chủ đặt `ASR_MODEL=<ten-tai-khoan>/PhoWhisper-small-ct2`.
+Chạy trong thư mục `kiosk-backend` và thay đúng tên tài khoản vào, **không có
+dấu ngoặc nhọn** — PowerShell coi `<` là toán tử nên dán nguyên chỗ điền vào
+là báo lỗi "The '<' operator is reserved for future use".
 
-**Đừng dùng bản người khác đã convert sẵn** (`diepho/...`, `mad1999/...`).
-Nhóm đo WER trên bản mình tự convert; đổi sang bản khác là số đo trong bài
-không còn đúng với thứ đang chạy nữa.
+**Đừng đổi sang bản người khác đã convert sẵn** (`diepho/...`, `mad1999/...`).
+Nhóm đo WER trên bản mình tự convert; đổi model là số đo trong bài không còn
+đúng với thứ đang chạy nữa.
 
 ---
 
-## Bước 2 — Chọn chỗ đặt
+## Bước 2 — Chỗ đặt
 
-Repo đã có sẵn `Dockerfile` và `.dockerignore`, đẩy vào nền tảng nào nhận
-Docker cũng được.
+**HuggingFace Spaces bản Docker KHÔNG dùng được.** Tài liệu của họ ghi Gradio
+và Docker Spaces cần gói trả phí, chỉ Static Spaces mới miễn phí. Đã kiểm tra
+tài khoản `owmeowmeownyny`: `isPro = False`. Kho **model** thì vẫn miễn phí —
+hai thứ khác nhau, đừng nhầm.
 
-**HuggingFace Spaces giờ KHÔNG còn miễn phí cho bản Docker.** Trang tài liệu
-của họ ghi rõ: Gradio và Docker Spaces cần gói trả phí (PRO cho tài khoản cá
-nhân), chỉ Static Spaces mới miễn phí. Chỗ này README cũ của nhóm ghi sai, đã
-sửa. Nếu ai trong nhóm có sẵn PRO thì vẫn là lựa chọn tốt: 2 vCPU, 16 GB RAM.
+Dùng **Render** gói Free. Tra ngày 10/09/2026, đây là điều họ ghi:
 
-Chọn nền tảng khác thì nhìn theo bảng RAM ở trên mà xét. Hạn mức miễn phí của
-các nơi thay đổi liên tục, kiểm tra lại lúc đăng ký chứ đừng tin bài viết cũ.
+| Khoản | Gói Free của Render | Nhóm cần |
+|---|---|---|
+| RAM | **512 MB** | đo được 320–380 MB → vừa khít |
+| CPU | **ít hơn 1 nhân** | xem cảnh báo dưới |
+| Ngủ khi vắng khách | sau **15 phút** không ai vào | có `scripts/keepalive.py` chống |
+| Thức dậy mất | khoảng **1 phút** | Render hiện trang chờ |
+| Giờ chạy | 750 giờ/tháng mỗi workspace | một tháng đầy là 720 giờ, đủ |
+| Ổ đĩa | **xoá sạch mỗi lần ngủ dậy** | nên model nướng sẵn vào ảnh |
+| Docker | dựng thẳng từ Dockerfile trong repo | đặt Language = Docker |
+
+**Cảnh báo về tốc độ.** Đo thật trên cùng một câu, cùng model:
+
+| Số luồng CPU | Thời gian nhận dạng |
+|---|---|
+| 8 luồng | 5,6 giây |
+| 2 luồng | 6,7 giây |
+| **1 luồng** | **11,7 giây** |
+
+Render Free cho "ít hơn 1 nhân", nên trên đó mỗi câu hỏi mất khoảng **10–15
+giây** chứ không phải 2–3 giây như trên máy nhà. Đủ để các bạn test thử, nhưng
+**đừng demo trực tiếp cho giám khảo bằng link này** — hôm chấm chạy trên máy
+nhà cho nhanh, link Render chỉ để gửi trước cho mọi người xem.
 
 ---
 
-## Bước 3 — Đặt biến môi trường
+## Bước 3 — Tạo dịch vụ trên Render
 
-```
-MOCK=0
-ASR_MODEL=<ten-tai-khoan>/PhoWhisper-small-ct2
-ASR_EAGER_LOAD=1
-TTS_VOICE=vi-VN-HoaiMyNeural
-```
+1. Vào dashboard Render, **New → Web Service**, nối tới repo
+   `nynyann/kiosk-backend`. Repo đang **private** nên phải cho Render quyền
+   đọc lúc nối GitHub.
+2. **Language: Docker** (chọn tay, kể cả khi trong danh sách có Python).
+3. **Instance Type: Free**.
+4. Không cần đặt biến môi trường nào cả — `Dockerfile` đã ghi sẵn `MOCK=0`,
+   `ASR_MODEL`, `ASR_EAGER_LOAD=1`, và model nướng luôn trong ảnh.
 
-`ASR_EAGER_LOAD=1` bắt nạp model ngay lúc khởi động. Chậm khởi động vài phút
-nhưng người bấm đầu tiên không phải chờ. Máy chủ hay ngủ thì để `0` cho nó
-tỉnh nhanh, rồi gọi `POST /warmup` trước giờ chấm.
+Muốn đổi giọng đọc thì thêm biến `TTS_VOICE=vi-VN-NamMinhNeural`.
 
 Không cần đặt `ALLOWED_ORIGINS`: giao diện và API cùng một tên miền.
+
+**Lần build đầu lâu** — phải cài ffmpeg, cài thư viện, tải 240 MB model. Cứ để
+đó, đừng bấm huỷ giữa chừng.
 
 ---
 
@@ -107,17 +131,28 @@ curl https://<dia-chi>/health
 Phải thấy `asr_ready: true`, `mock: false`, `tts_ready: true`. Nếu `asr_ready`
 còn `false` thì model chưa nạp xong, đợi thêm rồi gọi `POST /warmup`.
 
-Sau đó mở `https://<dia-chi>` bằng điện thoại, bấm micro, hỏi thử một câu.
-**Phải bấm trên https thì micro mới hiện xin quyền.**
+Sau đó mở địa chỉ Render cấp bằng điện thoại, bấm micro, hỏi thử một câu.
+Render cấp sẵn https nên micro chạy được.
+
+**Lần vào đầu tiên sau khi máy chủ ngủ sẽ mất khoảng 1 phút** — Render hiện
+trang chờ của họ trước khi tới được giao diện kiosk. Trước giờ cho các bạn
+test thì mở link trước vài phút cho nó tỉnh, hoặc chạy:
+
+```bash
+python scripts/keepalive.py https://<dia-chi-render>
+```
 
 ---
 
 ## Gửi cho các bạn
 
-Gửi đúng một dòng:
+Gửi đúng mấy dòng này:
 
-> Mở link này bằng Chrome trên điện thoại rồi bấm nút micro, hỏi thử
-> "tôi muốn xin giấy xác nhận cư trú": https://<dia-chi>
+> Mở link bằng Chrome trên điện thoại, bấm nút micro rồi hỏi
+> "tôi muốn xin giấy xác nhận cư trú".
+> Lần đầu vào có thể chờ 1 phút cho máy chủ tỉnh, và mỗi câu hỏi máy nghĩ
+> khoảng 10-15 giây vì đang chạy trên máy chủ miễn phí.
+> Link: https://<dia-chi-render>
 
 Nhắc thêm: hiện kho mới có **1 thủ tục** (xác nhận cư trú), hỏi thủ tục khác
 thì máy chuyển sang màn hình mời gặp cán bộ — đúng thiết kế, không phải hỏng.

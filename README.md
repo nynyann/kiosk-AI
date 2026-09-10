@@ -236,11 +236,18 @@ model, độ trễ một lượt) để chọn gói máy chủ cho đúng.
 
 Tóm tắt:
 
-1. Đẩy model lên HuggingFace, đặt `ASR_MODEL=<tài-khoản>/PhoWhisper-small-ct2`.
-   Model 250 MB bị `.gitignore` chặn nên không đi theo repo.
-2. Đẩy repo lên GitHub, tạo dịch vụ Docker trỏ vào đây.
-3. Đặt biến môi trường: `MOCK=0`, `ASR_MODEL`, `ASR_EAGER_LOAD=1`.
-4. Đợi build xong, mở `/health` kiểm tra, rồi mở `/` xem giao diện.
+1. Model đã lên HuggingFace rồi: `owmeowmeownyny/PhoWhisper-small-ct2`, công
+   khai. `Dockerfile` tự tải về lúc build, không phải làm gì thêm.
+2. Trên Render: New → Web Service → nối repo này → **Language: Docker** →
+   Instance Type: Free. Không cần đặt biến môi trường nào.
+3. Đợi build xong, mở `/health` kiểm tra, rồi mở `/` xem giao diện.
+
+**HuggingFace Spaces bản Docker không dùng được** — cần gói trả phí, chỉ
+Static Spaces mới miễn phí. Kho model thì vẫn miễn phí, hai thứ khác nhau.
+
+Trên máy chủ miễn phí (ít hơn 1 nhân CPU) mỗi câu hỏi mất **10–15 giây** thay
+vì 2–3 giây như máy nhà — đo thật, 1 luồng CPU chậm gấp đôi 8 luồng. Link đó
+để gửi các bạn xem trước, **hôm chấm nên chạy trên máy nhà**.
 
 **Micro chỉ chạy trên https**, hoặc trên đúng chữ `localhost`. Gửi nhau địa chỉ
 `192.168.x.x` cùng Wi-Fi là nút micro hỏng — đo rồi, `navigator.mediaDevices`
