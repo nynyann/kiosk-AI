@@ -1,0 +1,7 @@
+# -*- coding: utf-8 -*-
+# Chỉ cần khi chạy test. CỐ Ý tách khỏi requirements.txt để Dockerfile không
+# cài pytest vào ảnh chạy thật — máy chủ không chạy test, cài vào chỉ nặng thêm.
+#
+#   pip install -r requirements-dev.txt
+#   python -m pytest tests/ -q
+pytest==9.1.1

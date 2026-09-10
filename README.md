@@ -118,9 +118,14 @@ không phải sửa code.
 ## Kiểm tra trước khi bàn giao
 
 ```bash
-python tests/test_normalize.py        # lưới an toàn cho phần chuẩn hoá
+pip install -r requirements-dev.txt   # một lần, chỉ có pytest
+python -m pytest tests/ -q            # 15 test: giao kèo API + chuẩn hoá
 python -m app.normalize               # in bảng 10 câu trước/sau, ảnh cho mục 4.3
 ```
+
+Test tự bật chế độ giả nên không cần mô hình, không cần ffmpeg, chạy dưới 2
+giây. Từng file cũng chạy thẳng được nếu không muốn cài pytest:
+`python tests/test_normalize.py`.
 
 ---
 

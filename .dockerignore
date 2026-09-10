@@ -1,0 +1,49 @@
+# Những gì KHÔNG gửi vào build context của Docker.
+#
+# Dockerfile dùng `COPY . .`, mà trước khi copy thì Docker nén cả thư mục này
+# gửi sang daemon. Không có file này thì bộ dữ liệu Common Voice 484 MB và ba
+# thư mục môi trường ảo cũng bị gửi theo, build chậm lê thê mà chẳng dùng đến.
+#
+# Giữ danh sách này khớp với .gitignore. Có vài mục ở đây mà .gitignore không
+# có (.git/, tests/, eval/) vì đó là thứ cần cho việc phát triển nhưng máy chủ
+# lúc chạy không cần.
+
+# Môi trường ảo — ảnh Docker tự cài lại từ requirements.txt
+.venv/
+.venv-1/
+.venv-tools/
+venv/
+
+__pycache__/
+*.pyc
+
+# Bí mật của từng máy. TUYỆT ĐỐI không đóng vào ảnh Docker: ảnh có thể bị đẩy
+# lên registry công khai, và ai `docker run` cũng đọc được.
+.env
+
+# Mô hình (~500MB). Xem chú thích trong Dockerfile: nạp từ HuggingFace lúc chạy
+# hoặc gắn ổ đĩa ngoài, không đóng vào ảnh.
+models/
+
+# Bộ dữ liệu công khai tải về. Common Voice cấm re-host — không commit và cũng
+# không đóng vào ảnh Docker.
+*.tar.gz
+data/eval/public/
+
+# Ghi âm và kết quả đo — sinh ra lúc chạy, không phải đầu vào của ảnh
+data/eval/audio/
+*.wav
+*.webm
+results/
+data/logs/
+
+# Lịch sử git: máy chủ lúc chạy không cần, mà thư mục này thường khá nặng
+.git/
+.gitignore
+
+# Việc phát triển và đo đạc, không chạy trong ảnh
+tests/
+eval/
+scripts/
+.vscode/
+.qodo/
