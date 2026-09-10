@@ -1,10 +1,12 @@
 # Giao kèo API — Kiosk hướng dẫn thủ tục hành chính
 
-Phiên bản 1.1 — chốt ngày 10/09/2026. **Chốt rồi không đổi tên trường nữa.**
+Phiên bản 1.2 — chốt ngày 10/09/2026. **Chốt rồi không đổi tên trường nữa.**
 
-Đổi so với 1.0: thêm đường dẫn `POST /tts` và hai trường `tts_ready`,
-`tts_voice` trong `/health`. **Chỉ thêm, không đổi và không bỏ trường nào**,
-nên giao diện viết theo 1.0 vẫn chạy nguyên như cũ.
+Đổi so với 1.0, **chỉ thêm, không đổi và không bỏ trường nào**, nên giao diện
+viết theo 1.0 vẫn chạy nguyên:
+- 1.1: thêm `POST /tts`, thêm `tts_ready` và `tts_voice` trong `/health`.
+- 1.2: thêm `asr_error` trong `/health`, và `/warmup` nay thử lại được sau khi
+  nạp hỏng, trả thêm `error` khi vẫn chưa nạp được.
 Nếu buộc phải đổi, tăng số phiên bản và báo trong nhóm chat trước khi đẩy code.
 
 Địa chỉ máy chủ:
@@ -40,7 +42,8 @@ Phản hồi:
   "mock": false,
   "uptime_seconds": 1874.2,
   "tts_ready": true,
-  "tts_voice": "vi-VN-HoaiMyNeural"
+  "tts_voice": "vi-VN-HoaiMyNeural",
+  "asr_error": null
 }
 ```
 
@@ -48,7 +51,10 @@ Phản hồi:
 môi trường, hoặc không có mạng). Giao diện lúc đó tự rơi về giọng của trình
 duyệt — xem mục 5.
 
-`asr_ready = false` nghĩa là mô hình chưa nạp xong. Lần gọi đầu sau khi máy chủ tỉnh dậy có thể mất 20–60 giây để nạp mô hình.
+`asr_ready = false` nghĩa là mô hình chưa nạp xong. Khi đó `asr_error` cho
+biết vì sao: `null` là chưa thử nạp lần nào (bình thường, đợi thêm), còn có
+chữ là **đã thử và hỏng** — đợi mãi cũng không tự khỏi, phải gọi `POST /warmup`
+để thử lại. Đây là chỗ nhìn đầu tiên khi máy chủ chạy mà không nghe được. Lần gọi đầu sau khi máy chủ tỉnh dậy có thể mất 20–60 giây để nạp mô hình.
 
 ---
 

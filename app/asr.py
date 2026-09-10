@@ -49,11 +49,27 @@ class AsrError(Exception):
 
 
 # ---------------------------------------------------------------------------
-def load_model():
-    """Nạp mô hình. Gọi nhiều lần cũng chỉ nạp một lần."""
+def last_error() -> Optional[str]:
+    """Vì sao nạp hỏng. Để /health nói được lý do thay vì chỉ báo chưa sẵn sàng."""
+    return _model_error
+
+
+def load_model(retry: bool = False):
+    """Nạp mô hình. Gọi nhiều lần cũng chỉ nạp một lần.
+
+    `retry=True` thì thử lại kể cả khi lần trước đã hỏng. Cần cái này vì trước
+    đây một lần hỏng là hỏng vĩnh viễn tới lúc khởi động lại máy chủ: /warmup
+    gặp `_model_error` đã đặt là trả về ngay trong 0,0 giây mà không thử gì,
+    nên không có cách nào cứu ngoài restart. Mà lần hỏng đầu thường chỉ là sự
+    cố nhất thời — mạng chập lúc tải model, hoặc máy chủ miễn phí thiếu bộ nhớ
+    đúng lúc khởi động.
+    """
     global _model, _model_error
-    if _model is not None or _model_error is not None:
+    if _model is not None:
         return _model
+    if _model_error is not None and not retry:
+        return None
+    _model_error = None
     try:
         from faster_whisper import WhisperModel
         t0 = time.time()

@@ -77,6 +77,8 @@ class HealthResult(BaseModel):
     # quyết định gọi /tts hay rơi về giọng của trình duyệt.
     tts_ready: bool = False
     tts_voice: Optional[str] = None
+    # Chỉ có giá trị khi asr_ready = false: câu lỗi lúc nạp mô hình.
+    asr_error: Optional[str] = None
 
 
 class ErrorResult(BaseModel):

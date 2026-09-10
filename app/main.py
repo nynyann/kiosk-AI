@@ -24,7 +24,7 @@ from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
 from . import config, kb, tts
-from .asr import AsrError, is_ready, load_model, transcribe_bytes
+from .asr import AsrError, is_ready, last_error, load_model, transcribe_bytes
 from .schemas import (AnswerRequest, AnswerResult, AsrResult, HealthResult,
                       TtsRequest, TurnResult)
 
@@ -151,6 +151,10 @@ def health():
     return HealthResult(
         asr_ready=config.MOCK or is_ready(),
         asr_model="mock" if config.MOCK else config.ASR_MODEL_LABEL,
+        # Nói luôn vì sao chưa sẵn sàng. Không có trường này thì đứng trước
+        # `asr_ready: false` chỉ biết đoán, mà log máy chủ thì không phải ai
+        # trong nhóm cũng mở được.
+        asr_error=None if (config.MOCK or is_ready()) else last_error(),
         kb_procedures=kb.count(),
         mock=config.MOCK,
         uptime_seconds=round(time.time() - _started, 1),
@@ -166,8 +170,12 @@ def warmup():
     if config.MOCK:
         return {"ok": True, "warm": True, "mock": True}
     t0 = time.time()
-    load_model()
-    return {"ok": True, "warm": is_ready(), "seconds": round(time.time() - t0, 1)}
+    # retry=True: gọi tay /warmup là cố ý muốn thử lại, kể cả lần trước đã hỏng.
+    load_model(retry=True)
+    out = {"ok": True, "warm": is_ready(), "seconds": round(time.time() - t0, 1)}
+    if not is_ready():
+        out["error"] = last_error() or "không rõ lý do"
+    return out
 
 
 @app.post("/kb/reload")
