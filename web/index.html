@@ -767,10 +767,32 @@ function pickMimeType(){
 
 async function startRecording(){
   stopSpeaking();
+
+  // Trình duyệt chỉ mở micro cho trang chạy HTTPS hoặc đúng chữ "localhost".
+  // Mở qua địa chỉ mạng nội bộ kiểu http://192.168.1.3:8000 thì
+  // navigator.mediaDevices là undefined — KHÔNG phải bị từ chối quyền. Tách
+  // riêng ra vì hai lỗi này sửa bằng hai cách hoàn toàn khác nhau, mà báo gộp
+  // thì người test đi tìm nút cấp quyền không hề tồn tại.
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    const qua = window.isSecureContext
+      ? "Trình duyệt này không hỗ trợ thu âm."
+      : "Trang đang mở bằng http nên trình duyệt khoá micro. Mở lại bằng https, hoặc mở ngay trên máy chạy máy chủ với địa chỉ localhost.";
+    showError("Máy chưa dùng được micro. " + qua);
+    console.warn("getUserMedia không dùng được. isSecureContext =", window.isSecureContext,
+                 "| origin =", location.origin);
+    return;
+  }
+
   try{
     mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
   } catch(e){
-    showError("Con chưa xin được quyền dùng micro. Bác nhờ cán bộ bật quyền micro cho trình duyệt giúp con.");
+    // Tới được đây nghĩa là trình duyệt CÓ cho hỏi, nhưng bị từ chối hoặc máy
+    // không có micro nào. Lúc này mới đúng là chuyện cấp quyền.
+    const thieuMic = e && (e.name === "NotFoundError" || e.name === "DevicesNotFoundError");
+    showError(thieuMic
+      ? "Máy này chưa có micro nào để con nghe ạ."
+      : "Con chưa xin được quyền dùng micro. Bác nhờ cán bộ bật quyền micro cho trình duyệt giúp con.");
+    console.warn("getUserMedia bị từ chối:", e && e.name);
     return;
   }
 

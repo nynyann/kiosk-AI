@@ -11,6 +11,7 @@ máy chủ FastAPI phục vụ luôn trang kiosk ở `/`, còn API nằm ở `/h
 | Máy chủ     | `app/`              | FastAPI + PhoWhisper                      |
 | Nội dung    | `data/kb/`          | Mỗi thủ tục một file JSON                 |
 | Giao kèo API| `API_CONTRACT.md`   | Chốt rồi, đổi phải tăng phiên bản         |
+| Triển khai  | `DEPLOY.md`         | Cách đưa lên mạng cho người khác test     |
 
 ## Phạm vi hỗ trợ
 
@@ -230,10 +231,23 @@ Vài giây thay vì vài chục phút. Nó in WER cũ cạnh WER mới của t�
 
 ## Triển khai
 
-1. Đẩy repo lên GitHub.
-2. Tạo dịch vụ Docker mới trên một nền tảng container miễn phí, trỏ vào repo này.
-3. Đặt biến môi trường: `ASR_MODEL`, `MOCK=0`. Muốn đổi giọng đọc thì thêm `TTS_VOICE`.
+**Xem `DEPLOY.md`** — hướng dẫn từng bước, kèm số đo thật (RAM, thời gian nạp
+model, độ trễ một lượt) để chọn gói máy chủ cho đúng.
+
+Tóm tắt:
+
+1. Đẩy model lên HuggingFace, đặt `ASR_MODEL=<tài-khoản>/PhoWhisper-small-ct2`.
+   Model 250 MB bị `.gitignore` chặn nên không đi theo repo.
+2. Đẩy repo lên GitHub, tạo dịch vụ Docker trỏ vào đây.
+3. Đặt biến môi trường: `MOCK=0`, `ASR_MODEL`, `ASR_EAGER_LOAD=1`.
 4. Đợi build xong, mở `/health` kiểm tra, rồi mở `/` xem giao diện.
+
+**Micro chỉ chạy trên https**, hoặc trên đúng chữ `localhost`. Gửi nhau địa chỉ
+`192.168.x.x` cùng Wi-Fi là nút micro hỏng — đo rồi, `navigator.mediaDevices`
+bằng `undefined`. Chi tiết trong `DEPLOY.md`.
+
+Máy chủ cần **320–380 MB RAM** lúc chạy thật (đo sau 5 lượt nhận dạng). Gói
+miễn phí 512 MB là vừa khít, có gói 1 GB thì chọn.
 
 Chỉ một dịch vụ duy nhất, vì giao diện và API cùng một tên miền. Cũng vì cùng
 tên miền nên trình duyệt không hỏi CORS: để `ALLOWED_ORIGINS` mặc định cũng
