@@ -1,6 +1,10 @@
 # Giao kèo API — Kiosk hướng dẫn thủ tục hành chính
 
-Phiên bản 1.0 — chốt ngày 06/09/2026. **Chốt rồi không đổi tên trường nữa.**
+Phiên bản 1.1 — chốt ngày 10/09/2026. **Chốt rồi không đổi tên trường nữa.**
+
+Đổi so với 1.0: thêm đường dẫn `POST /tts` và hai trường `tts_ready`,
+`tts_voice` trong `/health`. **Chỉ thêm, không đổi và không bỏ trường nào**,
+nên giao diện viết theo 1.0 vẫn chạy nguyên như cũ.
 Nếu buộc phải đổi, tăng số phiên bản và báo trong nhóm chat trước khi đẩy code.
 
 Địa chỉ máy chủ:
@@ -34,9 +38,15 @@ Phản hồi:
   "asr_model": "PhoWhisper-small",
   "kb_procedures": 6,
   "mock": false,
-  "uptime_seconds": 1874.2
+  "uptime_seconds": 1874.2,
+  "tts_ready": true,
+  "tts_voice": "vi-VN-HoaiMyNeural"
 }
 ```
+
+`tts_ready = false` nghĩa là máy chủ không đọc thành tiếng được (tắt bằng biến
+môi trường, hoặc không có mạng). Giao diện lúc đó tự rơi về giọng của trình
+duyệt — xem mục 5.
 
 `asr_ready = false` nghĩa là mô hình chưa nạp xong. Lần gọi đầu sau khi máy chủ tỉnh dậy có thể mất 20–60 giây để nạp mô hình.
 
@@ -177,6 +187,48 @@ Gộp `/asr` và `/answer` thành một lượt. Đây là đường dẫn giao 
 ```
 
 Nếu ASR nghe không ra tiếng (`no_speech = true`) thì `answer` trả về `handoff = true` với câu mời nói lại, **không** phải câu chuyển cán bộ.
+
+---
+
+## 5. `POST /tts`
+
+Đọc một đoạn chữ thành tiếng Việt.
+
+**Vì sao cần**: Web Speech API của trình duyệt chỉ đọc được thứ tiếng mà HỆ
+ĐIỀU HÀNH đã cài giọng. Máy Windows thường chỉ có giọng tiếng Anh, nên dù đã
+đặt `lang = "vi-VN"` nó vẫn lấy giọng Mỹ đọc chữ tiếng Việt, bác nghe không ra
+chữ nào. Kiosk phải chạy được trên máy bất kỳ nên máy chủ tự sinh tiếng.
+
+**Gửi lên**: JSON
+
+```json
+{ "text": "Để xin giấy xác nhận cư trú, bác cần làm ba bước sau." }
+```
+
+Truyền chuỗi `speech` mà `/answer` hoặc `/turn` đã trả về. Trường `voice`
+không bắt buộc, để trống thì dùng giọng mặc định (`vi-VN-HoaiMyNeural`, nữ);
+truyền `vi-VN-NamMinhNeural` nếu muốn giọng nam.
+
+**Nhận về**: file **mp3** (`Content-Type: audio/mpeg`), không phải JSON.
+
+```js
+const r = await fetch(BASE + "/tts", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ text: answer.speech })
+});
+new Audio(URL.createObjectURL(await r.blob())).play();
+```
+
+Lỗi thì vẫn trả JSON đúng định dạng chung. Mã lỗi: `tts_disabled`,
+`tts_timeout`, `tts_failed`, `text_too_long`, `bad_request`.
+
+**Khi gọi hỏng, giao diện phải rơi về Web Speech API chứ đừng câm.** Thà giọng
+chưa chuẩn còn hơn người dân đứng nhìn màn hình không nghe gì.
+
+Máy chủ sinh sẵn tiếng cho mọi câu trong kho ngay lúc khởi động và giữ trong bộ
+nhớ đệm, nên lượt hỏi thật gần như trả về tức thì. Lần gọi nguội cho một câu
+chưa có sẵn có thể mất tới chục giây.
 
 ---
 

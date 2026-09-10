@@ -12,6 +12,10 @@ ctranslate2==4.5.0
 # nên phải khai báo tường minh, nếu không ImportError lúc nạp mô hình.
 requests==2.34.2
 
+# Đọc thành tiếng. Gọi sang giọng neural tiếng Việt của Microsoft Edge, miễn
+# phí và không cần khoá API, nhưng CẦN MẠNG lúc chạy. Xem app/tts.py.
+edge-tts==7.2.8
+
 # Chuyển mô hình PhoWhisper sang CTranslate2 (chỉ cần khi convert, chạy một lần)
 # transformers==4.48.0
 # torch==2.5.1

@@ -622,6 +622,18 @@ function sessionId(){
 /* ---------------------------------------------------------------------
    Đọc thành tiếng (Web Speech API)
    --------------------------------------------------------------------- */
+// Đọc thành tiếng đi qua máy chủ: POST /tts trả về mp3 giọng tiếng Việt thật.
+//
+// Vì sao không dùng thẳng Web Speech API của trình duyệt như bản đầu: nó chỉ
+// đọc được thứ tiếng mà HỆ ĐIỀU HÀNH đã cài giọng. Máy Windows thường chỉ có
+// giọng tiếng Anh, nên dù đã đặt u.lang = "vi-VN" nó vẫn lấy giọng Mỹ đọc chữ
+// tiếng Việt — bác nghe không ra chữ nào. Kiosk phải chạy được trên máy bất kỳ
+// nên không thể trông vào việc máy đó đã cài gói giọng hay chưa.
+//
+// Web Speech vẫn giữ làm đường lùi, phòng khi máy chủ mất mạng: thà giọng Tây
+// còn hơn câm hẳn.
+let serverTtsReady = false;   // /health bảo có, đặt ở checkHealth()
+
 let viVoice = null;
 function loadVoices(){
   const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
@@ -631,10 +643,51 @@ if (window.speechSynthesis){
   loadVoices();
   speechSynthesis.onvoiceschanged = loadVoices;
 }
+
 let lastSpeech = "";
-function speak(text){
-  if (!text || !window.speechSynthesis) return;
+let currentAudio = null;
+// Mỗi lần gọi speak() tăng số này lên. Tiếng sinh ở máy chủ mất 1-3 giây, mà
+// trong lúc chờ bác có thể đã bấm "Hỏi câu khác" rồi hỏi câu mới. Không có
+// cái mốc này thì file tiếng của câu CŨ về sau sẽ phát đè lên màn hình MỚI.
+let speechTicket = 0;
+
+async function speak(text){
+  if (!text) return;
   lastSpeech = text;
+  const ticket = ++speechTicket;
+  stopSpeaking();
+
+  if (serverTtsReady){
+    try{
+      const res = await fetch(BASE + "/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text })
+      });
+      if (!res.ok) throw new Error("tts " + res.status);
+      const blob = await res.blob();
+      if (ticket !== speechTicket) return;   // đã có câu mới, bỏ file này
+      const audio = new Audio(URL.createObjectURL(blob));
+      currentAudio = audio;
+      audio.onended = audio.onerror = () => URL.revokeObjectURL(audio.src);
+      await audio.play();
+      return;
+    } catch(e){
+      // Mất mạng, máy chủ hỏng, hoặc trình duyệt chặn tự phát tiếng.
+      console.warn("máy chủ không đọc được, dùng giọng trình duyệt:", e);
+      if (ticket !== speechTicket) return;
+    }
+  }
+
+  speakWithBrowser(text);
+}
+
+// Đường lùi. Không có giọng tiếng Việt trong máy thì đây chính là chỗ phát ra
+// giọng Tây đọc chữ Việt — ghi lại vào bảng gỡ lỗi để nhóm biết mà xử lý, chứ
+// đứng nghe thì tưởng máy chủ hỏng.
+function speakWithBrowser(text){
+  if (!window.speechSynthesis) return;
+  if (!viVoice) console.warn("Máy này không có giọng tiếng Việt nào cài sẵn.");
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = "vi-VN";
@@ -642,8 +695,13 @@ function speak(text){
   u.rate = 0.95;
   speechSynthesis.speak(u);
 }
+
 function stopSpeaking(){
   if (window.speechSynthesis) speechSynthesis.cancel();
+  if (currentAudio){
+    currentAudio.pause();
+    currentAudio = null;
+  }
 }
 
 /* ---------------------------------------------------------------------
@@ -656,6 +714,7 @@ async function pollHealth(){
   try{
     const res = await fetch(BASE + "/health");
     const data = await res.json();
+    serverTtsReady = !!data.tts_ready;
     if (data.mock){
       setStatus("warn", "Máy chủ giả (demo)");
     } else {

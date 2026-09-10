@@ -73,9 +73,21 @@ class HealthResult(BaseModel):
     kb_procedures: int = 0
     mock: bool = False
     uptime_seconds: float = 0.0
+    # Máy chủ có tự đọc thành tiếng được không. Giao diện xem trường này để
+    # quyết định gọi /tts hay rơi về giọng của trình duyệt.
+    tts_ready: bool = False
+    tts_voice: Optional[str] = None
 
 
 class ErrorResult(BaseModel):
     ok: bool = False
     error: str
     code: str = "internal_error"
+
+
+class TtsRequest(BaseModel):
+    """Đầu vào của /tts. `text` là chuỗi `speech` mà /answer hoặc /turn trả về."""
+    text: str
+    # Để trống thì dùng giọng mặc định trong config. Chỉ truyền khi muốn thử
+    # giọng khác, ví dụ đổi sang vi-VN-NamMinhNeural cho giọng nam.
+    voice: Optional[str] = None

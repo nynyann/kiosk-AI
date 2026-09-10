@@ -39,6 +39,31 @@ NO_SPEECH_CEILING = float(os.getenv("NO_SPEECH_CEILING", "0.6"))
 # Ngưỡng tra cứu: Kim tính lại bằng hàm chi phí kỳ vọng ở bước 12, tạm để đây.
 KB_MATCH_THRESHOLD = float(os.getenv("KB_MATCH_THRESHOLD", "0.55"))
 
+# --- Đọc thành tiếng --------------------------------------------------------
+# Máy chủ tự sinh mp3 thay vì để trình duyệt đọc. Lý do đầy đủ ở đầu app/tts.py:
+# Web Speech API chỉ đọc được thứ tiếng mà hệ điều hành đã cài giọng, mà máy
+# Windows thường chỉ có giọng tiếng Anh nên nó lấy giọng Mỹ đọc chữ tiếng Việt.
+TTS_ENABLED = os.getenv("TTS_ENABLED", "1") == "1"
+# vi-VN-HoaiMyNeural (nữ) hoặc vi-VN-NamMinhNeural (nam).
+TTS_VOICE = os.getenv("TTS_VOICE", "vi-VN-HoaiMyNeural")
+# Chậm hơn mặc định một chút cho người già nghe kịp. Định dạng của edge-tts là
+# phần trăm so với tốc độ gốc, bắt buộc có dấu + hoặc -.
+TTS_RATE = os.getenv("TTS_RATE", "-8%")
+# Hạn giờ lúc đang phục vụ: người dân đứng trước màn hình chờ, quá mức này thì
+# thà bỏ cuộc để giao diện rơi về giọng trình duyệt còn hơn treo im lặng.
+TTS_TIMEOUT_SECONDS = float(os.getenv("TTS_TIMEOUT_SECONDS", "8"))
+# Hạn giờ lúc hâm nóng lúc khởi động thì rộng rãi hẳn, vì KHÔNG có ai đang chờ.
+# Đo thật: cùng một câu 584 ký tự, lần gọi nguội mất 13,9 giây còn lần sau chỉ
+# 1,6 giây. Để 8 giây như lúc phục vụ thì hâm nóng hỏng đúng câu trả lời dài
+# nhất — mà đó lại chính là câu người dân nghe nhiều nhất.
+TTS_PREWARM_TIMEOUT_SECONDS = float(os.getenv("TTS_PREWARM_TIMEOUT_SECONDS", "45"))
+TTS_MAX_CHARS = int(os.getenv("TTS_MAX_CHARS", "2000"))
+# Nội dung lấy từ data/kb/ nên chỉ quanh quẩn vài chục câu. 128 mục là thừa sức
+# giữ hết, mà tốn chừng vài MB bộ nhớ.
+TTS_CACHE_SIZE = int(os.getenv("TTS_CACHE_SIZE", "128"))
+# Sinh sẵn tiếng cho mọi câu trong kho ngay lúc khởi động, chạy nền.
+TTS_PREWARM = os.getenv("TTS_PREWARM", "1") == "1"
+
 # --- CORS -------------------------------------------------------------------
 # TRƯỚC KHI NỘP: thay "*" bằng đúng tên miền trang giao diện của Kns.
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")

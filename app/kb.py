@@ -129,15 +129,9 @@ def build_answer(query: str, session_id: str | None = None) -> AnswerResult:
         Step(order=i + 1, title=st.get("title", ""), detail=st.get("detail", ""))
         for i, st in enumerate(proc.get("steps", []))
     ]
-    n = len(steps)
-    lead = f"Để {proc.get('name', 'làm thủ tục này').lower()}, bác cần làm {n} bước sau."
-
+    lead = _lead_for(proc, len(steps))
     src = proc.get("source") or {}
-    spoken = lead + " " + " ".join(
-        f"Bước {st.order}. {st.title}. {st.detail}" for st in steps
-    )
-    if proc.get("where_to_submit"):
-        spoken += f" Bác nộp tại {proc['where_to_submit']}"
+    spoken = _spoken_for(proc, steps, lead)
 
     return AnswerResult(
         handoff=False,
@@ -159,3 +153,33 @@ def retry_answer() -> AnswerResult:
     """Trả về khi ASR không nghe ra tiếng. Khác câu chuyển cán bộ."""
     return AnswerResult(handoff=True, match_score=0.0,
                         answer=RETRY_TEXT, speech=for_speech(RETRY_TEXT))
+
+
+def _lead_for(proc: dict, n_steps: int) -> str:
+    return f"Để {proc.get('name', 'làm thủ tục này').lower()}, bác cần làm {n_steps} bước sau."
+
+
+def _spoken_for(proc: dict, steps, lead: str) -> str:
+    spoken = lead + " " + " ".join(
+        f"Bước {st.order}. {st.title}. {st.detail}" for st in steps
+    )
+    if proc.get("where_to_submit"):
+        spoken += f" Bác nộp tại {proc['where_to_submit']}"
+    return spoken
+
+
+def all_speech_texts() -> List[str]:
+    """Mọi chuỗi `speech` mà máy chủ có thể trả về.
+
+    Dùng để sinh sẵn file tiếng lúc khởi động. Kho chỉ có vài chục thủ tục nên
+    danh sách này ngắn, mà đổi lại người dân đầu tiên trong ngày không phải
+    ngồi nhìn màn hình im lặng 2-3 giây chờ máy sinh tiếng.
+    """
+    texts = [for_speech(HANDOFF_TEXT), for_speech(RETRY_TEXT)]
+    for proc in _PROCEDURES:
+        steps = [
+            Step(order=i + 1, title=st.get("title", ""), detail=st.get("detail", ""))
+            for i, st in enumerate(proc.get("steps", []))
+        ]
+        texts.append(for_speech(_spoken_for(proc, steps, _lead_for(proc, len(steps)))))
+    return texts

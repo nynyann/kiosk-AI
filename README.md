@@ -7,6 +7,7 @@ máy chủ FastAPI phục vụ luôn trang kiosk ở `/`, còn API nằm ở `/h
 | Phần        | Ở đâu               | Ghi chú                                   |
 | ----------- | ------------------- | ----------------------------------------- |
 | Giao diện   | `web/index.html`    | Một file HTML, không cần build, không npm |
+| Đọc tiếng   | `app/tts.py`        | Máy chủ tự sinh mp3 giọng tiếng Việt      |
 | Máy chủ     | `app/`              | FastAPI + PhoWhisper                      |
 | Nội dung    | `data/kb/`          | Mỗi thủ tục một file JSON                 |
 | Giao kèo API| `API_CONTRACT.md`   | Chốt rồi, đổi phải tăng phiên bản         |
@@ -115,11 +116,41 @@ không phải sửa code.
 
 ---
 
+## Đọc thành tiếng
+
+Máy chủ tự sinh file mp3 giọng tiếng Việt (`POST /tts`), giao diện chỉ việc phát.
+
+**Vì sao không để trình duyệt tự đọc.** Web Speech API chỉ đọc được thứ tiếng
+mà hệ điều hành đã cài giọng. Máy Windows ở ta thường chỉ có giọng tiếng Anh,
+nên dù code đã đặt `lang = "vi-VN"` nó vẫn lấy giọng Mỹ đọc chữ tiếng Việt —
+bác nghe không ra chữ nào. Kiosk chạy trên máy nào cũng phải ra tiếng Việt,
+không thể bắt mỗi máy đi cài gói giọng trước.
+
+Đổi giọng bằng biến môi trường, không phải sửa code:
+
+```bash
+TTS_VOICE=vi-VN-NamMinhNeural   # giọng nam, mặc định là HoaiMy giọng nữ
+TTS_RATE=-15%                   # đọc chậm hơn nữa
+TTS_ENABLED=0                   # tắt hẳn, quay về giọng trình duyệt
+```
+
+**Cần mạng lúc chạy.** Gọi hỏng thì giao diện tự rơi về Web Speech API — thà
+giọng chưa chuẩn còn hơn để bác đứng nhìn màn hình không nghe gì.
+
+Lúc khởi động, máy chủ sinh sẵn tiếng cho mọi câu trong kho rồi giữ trong bộ
+nhớ đệm, chạy nền nên không làm chậm khởi động. Có đo: không sinh sẵn thì từ
+lúc chữ hiện ra tới lúc có tiếng mất **2,5 giây** im lặng; sinh sẵn rồi còn
+**0,02–0,3 giây**. Cùng một câu, lần gọi nguội mất tới 13,9 giây còn lần sau
+chỉ 1,6 giây — nên hạn giờ lúc hâm nóng (45 giây) để rộng hơn hẳn hạn giờ lúc
+đang phục vụ (8 giây), lúc phục vụ thì có người đang đứng chờ.
+
+---
+
 ## Kiểm tra trước khi bàn giao
 
 ```bash
 pip install -r requirements-dev.txt   # một lần, chỉ có pytest
-python -m pytest tests/ -q            # 15 test: giao kèo API + chuẩn hoá
+python -m pytest tests/ -q            # 20 test: giao kèo API + đọc tiếng + chuẩn hoá
 python -m app.normalize               # in bảng 10 câu trước/sau, ảnh cho mục 4.3
 ```
 
@@ -201,7 +232,7 @@ Vài giây thay vì vài chục phút. Nó in WER cũ cạnh WER mới của t�
 
 1. Đẩy repo lên GitHub.
 2. Tạo dịch vụ Docker mới trên một nền tảng container miễn phí, trỏ vào repo này.
-3. Đặt biến môi trường: `ASR_MODEL`, `MOCK=0`.
+3. Đặt biến môi trường: `ASR_MODEL`, `MOCK=0`. Muốn đổi giọng đọc thì thêm `TTS_VOICE`.
 4. Đợi build xong, mở `/health` kiểm tra, rồi mở `/` xem giao diện.
 
 Chỉ một dịch vụ duy nhất, vì giao diện và API cùng một tên miền. Cũng vì cùng

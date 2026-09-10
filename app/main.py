@@ -11,6 +11,7 @@ Mở http://localhost:8000/docs để bấm thử từng đường dẫn.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import time
 from contextlib import asynccontextmanager
@@ -19,13 +20,13 @@ from typing import Optional
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from . import config, kb
+from . import config, kb, tts
 from .asr import AsrError, is_ready, load_model, transcribe_bytes
 from .schemas import (AnswerRequest, AnswerResult, AsrResult, HealthResult,
-                      TurnResult)
+                      TtsRequest, TurnResult)
 
 if config.MOCK:
     from .mock import mock_answer, mock_asr
@@ -33,12 +34,49 @@ if config.MOCK:
 _started = time.time()
 
 
+async def _prewarm_tts() -> None:
+    """Sinh sẵn file tiếng cho mọi câu trả lời có trong kho.
+
+    Không sinh sẵn thì người đầu tiên hỏi mỗi thủ tục phải nhìn màn hình im
+    lặng khoảng 2,5 giây trong lúc máy gọi ra ngoài lấy tiếng — đo được ở
+    trình duyệt. Sau khi có sẵn, lấy từ bộ đệm chỉ mất vài mili-giây.
+
+    Chạy nền, KHÔNG chặn lúc khởi động: mất mạng thì máy chủ vẫn phải lên,
+    cùng lắm là câu đầu chậm như cũ.
+    """
+    texts = list(kb.all_speech_texts())
+    # Chế độ giả trả câu riêng trong app/mock.py, không trùng câu dựng từ kho.
+    # Hâm nóng cả hai để buổi demo chạy MOCK=1 cũng không bị lặng lúc đầu.
+    if config.MOCK:
+        texts += [mock_answer().speech for _ in range(6)]
+    texts = list(dict.fromkeys(t for t in texts if t))
+
+    ok = 0
+    for text in texts:
+        # Thử lại một lần: lần gọi nguội đầu tiên trong ngày hay chậm bất
+        # thường, mà hỏng ở đây thì lượt hỏi thật phải chờ sinh lại từ đầu.
+        for lan in (1, 2):
+            try:
+                await tts.synthesize(text, timeout=config.TTS_PREWARM_TIMEOUT_SECONDS)
+                ok += 1
+                break
+            except tts.TtsError as exc:
+                if lan == 2:
+                    print(f"[tts] chưa sinh sẵn được một câu ({exc.code}): {text[:40]}…")
+    print(f"[tts] đã sinh sẵn {ok}/{len(texts)} câu, giọng {config.TTS_VOICE}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     kb.load_kb()
     if not config.MOCK and config.ASR_EAGER_LOAD:
         load_model()
+    warm_task = None
+    if config.TTS_ENABLED and config.TTS_PREWARM:
+        warm_task = asyncio.create_task(_prewarm_tts())
     yield
+    if warm_task and not warm_task.done():
+        warm_task.cancel()
 
 
 app = FastAPI(
@@ -116,6 +154,8 @@ def health():
         kb_procedures=kb.count(),
         mock=config.MOCK,
         uptime_seconds=round(time.time() - _started, 1),
+        tts_ready=config.TTS_ENABLED,
+        tts_voice=config.TTS_VOICE if config.TTS_ENABLED else None,
     )
 
 
@@ -214,6 +254,29 @@ async def turn_endpoint(
 
     return TurnResult(asr=a, answer=ans,
                       total_latency_seconds=round(time.time() - t0, 2))
+
+
+# ---------------------------------------------------------------------------
+@app.post("/tts")
+async def tts_endpoint(req: TtsRequest):
+    """Đọc một đoạn chữ thành tiếng Việt, trả về mp3.
+
+    Giao diện gọi cái này với chuỗi `speech` mà /answer và /turn đã trả về.
+    Không gộp sẵn mp3 vào phản hồi /turn vì hai lý do: nhồi mp3 base64 vào JSON
+    làm phản hồi phình gấp mấy lần, và màn hình chữ hiện được ngay trong lúc
+    tiếng còn đang sinh — người dân đọc trước, nghe sau, không phải chờ cả hai.
+    """
+    if not config.TTS_ENABLED:
+        return _err("Máy chủ đang tắt phần đọc thành tiếng.", "tts_disabled", 503)
+    try:
+        audio = await tts.synthesize(req.text, req.voice)
+    except tts.TtsError as exc:
+        return _err(exc.message, exc.code,
+                    400 if exc.code in ("bad_request", "text_too_long") else 503)
+
+    # Cho trình duyệt giữ lại: cùng một câu trả lời thì cùng một file tiếng.
+    return Response(content=audio, media_type="audio/mpeg",
+                    headers={"Cache-Control": "public, max-age=86400"})
 
 
 # --- Giao diện kiosk --------------------------------------------------------
