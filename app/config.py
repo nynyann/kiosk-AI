@@ -58,10 +58,13 @@ TTS_RATE = os.getenv("TTS_RATE", "-8%")
 # thà bỏ cuộc để giao diện rơi về giọng trình duyệt còn hơn treo im lặng.
 TTS_TIMEOUT_SECONDS = float(os.getenv("TTS_TIMEOUT_SECONDS", "8"))
 # Hạn giờ lúc hâm nóng lúc khởi động thì rộng rãi hẳn, vì KHÔNG có ai đang chờ.
-# Đo thật: cùng một câu 584 ký tự, lần gọi nguội mất 13,9 giây còn lần sau chỉ
-# 1,6 giây. Để 8 giây như lúc phục vụ thì hâm nóng hỏng đúng câu trả lời dài
-# nhất — mà đó lại chính là câu người dân nghe nhiều nhất.
-TTS_PREWARM_TIMEOUT_SECONDS = float(os.getenv("TTS_PREWARM_TIMEOUT_SECONDS", "45"))
+# Đo thật: cùng một câu, lần gọi nguội mất 13,9 giây (584 ký tự) và tới 55,8
+# giây (967 ký tự, sau khi lắp 6 thủ tục của Mian), lần sau chỉ 1-2 giây. Để 45
+# giây thì hâm nóng hỏng đúng câu dài nhất. Không phải do độ dài — cắt còn 500
+# ký tự vẫn có lúc hỏng sau 3 giây — mà dịch vụ giọng đọc chập chờn lúc nguội.
+TTS_PREWARM_TIMEOUT_SECONDS = float(os.getenv("TTS_PREWARM_TIMEOUT_SECONDS", "90"))
+# Số lần thử cho mỗi câu lúc hâm nóng. Hỏng nhất thời khá hay gặp.
+TTS_PREWARM_ATTEMPTS = int(os.getenv("TTS_PREWARM_ATTEMPTS", "3"))
 TTS_MAX_CHARS = int(os.getenv("TTS_MAX_CHARS", "2000"))
 # Nội dung lấy từ data/kb/ nên chỉ quanh quẩn vài chục câu. 128 mục là thừa sức
 # giữ hết, mà tốn chừng vài MB bộ nhớ.

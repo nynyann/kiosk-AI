@@ -232,6 +232,15 @@ CANONICAL_TERMS: List[str] = [
 
 FUZZY_THRESHOLD = 0.86  # dưới mức này thì không dám sửa
 
+# Ngoài điểm giống của cả cụm, TỪNG TỪ (sau khi bỏ dấu) cũng phải giống từ
+# tương ứng trong cụm chuẩn ít nhất ngần này. Không có mức sàn này thì cụm
+# "thực căn cước" trong câu "chứng thực căn cước" bị coi là giống "thẻ căn
+# cước" tới 86% — vì "căn cước" chiếm phần lớn cụm — và bị sửa thành "chứng
+# thẻ căn cước", làm máy tra ra thủ tục làm căn cước thay vì chứng thực.
+# Lỗi nghe thật của người cao tuổi chủ yếu là lệch dấu ("thẽ", "cuốc"), bỏ dấu
+# xong thì từng từ trùng gần hết, nên mức sàn này không cản việc sửa đúng.
+FUZZY_TOKEN_FLOOR = 0.75
+
 
 def _strip_tones(s: str) -> str:
     """Bỏ dấu để so khớp. Người cao tuổi nói lệch dấu rất nhiều, mô hình
@@ -265,7 +274,15 @@ def fix_admin_terms(text: str) -> Tuple[str, List[Tuple[str, str]]]:
                 i += 1
                 continue
             ratio = SequenceMatcher(None, _strip_tones(window), term_flat).ratio()
-            if ratio >= FUZZY_THRESHOLD:
+            # Từ chỉ 1-2 chữ cái ("i"/"y", "ở"/"ỡ") thì so từng từ vô nghĩa —
+            # khác một chữ là điểm bằng 0 dù đó đúng là lỗi nghe. Bỏ qua chúng,
+            # để điểm cả cụm quyết định như trước.
+            tokens_ok = all(
+                SequenceMatcher(None, _strip_tones(a), _strip_tones(b)).ratio() >= FUZZY_TOKEN_FLOOR
+                for a, b in zip(tokens[i:i + n], term.split())
+                if len(_strip_tones(a)) > 2 and len(_strip_tones(b)) > 2
+            )
+            if ratio >= FUZZY_THRESHOLD and tokens_ok:
                 changes.append((window, term))
                 tokens[i:i + n] = term.split()
                 i += n

@@ -98,6 +98,23 @@ def test_term_recall_bat_dung_cum_hong():
     assert r2["cư trú"] is True      # WER cao hơn nhưng tra cứu vẫn trúng
 
 
+def test_khong_sua_nham_cum_dung_thanh_cum_chuan_khac():
+    """Tìm được khi lắp 6 thủ tục của Mian vào kho.
+
+    "chứng thực căn cước" từng bị sửa thành "chứng thẻ căn cước": cụm "thực căn
+    cước" giống "thẻ căn cước" tới 86% vì "căn cước" chiếm phần lớn, nên máy
+    tra ra thủ tục LÀM căn cước thay vì CHỨNG THỰC. Giờ từng từ sau khi bỏ dấu
+    cũng phải giống từ tương ứng ("thuc" với "the" thì không).
+    """
+    assert normalize("chứng thực căn cước") == "chứng thực căn cước"
+    assert normalize("tôi muốn chứng thực căn cước công dân") == "tôi muốn chứng thực căn cước công dân"
+    # Nhưng lỗi lệch dấu thật vẫn phải được sửa như cũ.
+    assert normalize("tôi muốn làm thẽ căn cước") == "tôi muốn làm thẻ căn cước"
+    assert normalize("căn cuốc công dân") == "căn cước công dân"
+    # Và từ 1 chữ như "i"/"y" không bị mức sàn từng từ chặn.
+    assert normalize("sao i bản chính") == "sao y bản chính"
+
+
 if __name__ == "__main__":
     # Console Windows mặc định cp1252, in tiếng Việt là vỡ ngay dòng tổng kết.
     try:

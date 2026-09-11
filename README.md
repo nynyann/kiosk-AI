@@ -285,7 +285,7 @@ màn hình bản thật** phòng khi sập đúng lúc giám khảo mở.
 | ------------------------------------------- | ------- | --------------------------- |
 | Thay tra cứu từ khoá bằng so khớp ngữ nghĩa | Kim     | `app/kb.py`, hàm `score()`  |
 | Tính ngưỡng bằng hàm chi phí kỳ vọng        | Kim     | `config.KB_MATCH_THRESHOLD` |
-| Viết 5 file JSON thủ tục còn lại            | Mian    | `data/kb/`                  |
+| ~~Viết 5 file JSON thủ tục còn lại~~ đã xong 6 | Mian    | `data/kb/`, điền `fee` từ Cổng DVCQG |
 | Thu 30 câu kiểm thử                         | cả nhóm | `data/eval/`                |
 | Bổ sung `HARD_FIXES` từ kết quả đo thật     | Lia     | `app/normalize.py`          |
 

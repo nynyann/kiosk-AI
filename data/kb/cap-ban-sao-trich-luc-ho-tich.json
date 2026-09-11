@@ -1,0 +1,66 @@
+{
+  "id": "cap-ban-sao-trich-luc-ho-tich",
+  "name": "Cấp bản sao trích lục hộ tịch",
+  "aliases": [
+    "cấp bản sao trích lục hộ tịch",
+    "trích lục hộ tịch",
+    "xin lại bản sao giấy khai sinh",
+    "xin bản sao giấy khai sinh",
+    "tôi mất giấy khai sinh",
+    "mất giấy khai sinh thì phải làm thế nào",
+    "xin lại giấy khai sinh",
+    "trích lục khai sinh",
+    "trích lục kết hôn",
+    "trích lục khai tử",
+    "bản sao giấy kết hôn",
+    "bản sao giấy chứng tử"
+  ],
+  "keywords": [
+    "trích lục",
+    "giấy khai sinh",
+    "hộ tịch",
+    "bản sao khai sinh",
+    "giấy kết hôn",
+    "giấy chứng tử"
+  ],
+  "steps": [
+    {
+      "title": "Xác định giấy cần xin",
+      "detail": "Bác nói rõ cần bản sao giấy khai sinh, giấy kết hôn, giấy chứng tử hay giấy hộ tịch nào khác. Lưu ý đây là xin lại bản sao của giấy đã đăng ký từ trước, chứ không phải đăng ký mới."
+    },
+    {
+      "title": "Chuẩn bị thông tin",
+      "detail": "Bác chuẩn bị họ tên, ngày sinh của người có tên trên giấy, và nhớ giấy đó đã đăng ký ở đâu, khoảng năm nào. Cán bộ dựa vào đó để tra trên hệ thống."
+    },
+    {
+      "title": "Nộp yêu cầu",
+      "detail": "Bác đến Trung tâm Phục vụ hành chính công để yêu cầu, ở đâu cũng được, không cần đúng nơi đã đăng ký. Có con cháu giúp thì làm trực tuyến trên Cổng dịch vụ công cũng được."
+    },
+    {
+      "title": "Nhận kết quả",
+      "detail": "Thông tin đầy đủ thì thường được cấp ngay trong ngày. Nếu bác đến sau 3 giờ chiều thì có thể nhận vào ngày làm việc hôm sau."
+    }
+  ],
+  "documents": [
+    "Căn cước công dân của bác",
+    "Thông tin về người có tên trên giấy: họ tên, ngày sinh",
+    "Thông tin về giấy cần xin: loại giấy, nơi đã đăng ký, khoảng năm đăng ký",
+    "Giấy tờ liên quan khác (chỉ khi cán bộ cần đối chiếu)"
+  ],
+  "where_to_submit": "Trung tâm Phục vụ hành chính công, không phụ thuộc nơi bác đang ở, hoặc trực tuyến trên Cổng Dịch vụ công Quốc gia.",
+  "fee": "Bác hỏi cán bộ để biết có mất phí không.",
+  "processing_time": "Thường trong ngày. Nếu tiếp nhận sau 15 giờ thì trả kết quả vào ngày làm việc tiếp theo.",
+  "validity": null,
+  "common_questions": [
+    "Tôi mất giấy khai sinh thì phải làm thế nào",
+    "Giấy khai sinh đăng ký ở quê, tôi đang ở thành phố thì xin ở đâu",
+    "Xin trích lục có phải về đúng xã ngày xưa không",
+    "Chưa từng đăng ký khai sinh thì có xin được không"
+  ],
+  "source": {
+    "title": "Khoản 9 Điều 4 và Điều 63 Luật Hộ tịch số 60/2014/QH13; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
+    "url": "https://dichvucong.gov.vn/"
+  },
+  "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.4",
+  "verified_date": "2026-09-11"
+}

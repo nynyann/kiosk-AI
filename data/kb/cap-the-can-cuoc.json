@@ -1,0 +1,63 @@
+{
+  "id": "cap-the-can-cuoc",
+  "name": "Cấp thẻ căn cước cho người từ đủ 14 tuổi trở lên",
+  "aliases": [
+    "cấp thẻ căn cước",
+    "làm căn cước",
+    "làm thẻ căn cước",
+    "làm căn cước công dân",
+    "làm cccd",
+    "xin cấp căn cước",
+    "đăng ký làm căn cước",
+    "chưa có căn cước",
+    "làm chứng minh thư"
+  ],
+  "keywords": [
+    "căn cước",
+    "cccd",
+    "chứng minh thư",
+    "chứng minh nhân dân",
+    "thẻ căn cước",
+    "định danh"
+  ],
+  "steps": [
+    {
+      "title": "Xác định nhu cầu",
+      "detail": "Bác xem mình làm căn cước lần đầu, hay đã có thẻ mà muốn đổi hoặc bị mất. Đổi thẻ và cấp lại thẻ là thủ tục khác, bác nói rõ với cán bộ để được hướng dẫn đúng."
+    },
+    {
+      "title": "Đăng ký lịch",
+      "detail": "Bác có thể đến thẳng cơ quan công an làm căn cước. Có con cháu giúp thì đăng ký trước thời gian và địa điểm trên Cổng dịch vụ công hoặc ứng dụng định danh quốc gia VNeID, đến sẽ không phải chờ lâu."
+    },
+    {
+      "title": "Đến làm thẻ",
+      "detail": "Bác đến cơ quan công an theo lịch, cung cấp họ tên, số định danh cá nhân và nơi ở. Cán bộ chụp ảnh, lấy vân tay và cho bác kiểm tra lại thông tin trước khi xác nhận."
+    },
+    {
+      "title": "Nhận thẻ",
+      "detail": "Trong 7 ngày làm việc bác nhận được thẻ. Nhận trực tiếp hay gửi về nhà tuỳ theo cách bác đã đăng ký."
+    }
+  ],
+  "documents": [
+    "Họ, chữ đệm và tên khai sinh",
+    "Số định danh cá nhân (12 số, có trên giấy khai sinh mới hoặc thông báo của công an)",
+    "Thông tin nơi bác đang ở",
+    "Lịch hẹn nếu đã đăng ký trực tuyến"
+  ],
+  "where_to_submit": "Cơ quan quản lý căn cước của công an nơi bác ở. Đăng ký lịch trước trên Cổng Dịch vụ công Quốc gia, Cổng Dịch vụ công Bộ Công an hoặc ứng dụng VNeID.",
+  "fee": "Bác hỏi cán bộ để biết có mất phí không.",
+  "processing_time": "7 ngày làm việc.",
+  "validity": "Thẻ có thời hạn theo độ tuổi, bác hỏi cán bộ để biết hạn cụ thể của mình.",
+  "common_questions": [
+    "Tôi mất căn cước thì làm lại thế nào",
+    "Thẻ căn cước hết hạn thì đổi ở đâu",
+    "Người già có phải làm căn cước không",
+    "Số định danh cá nhân là số nào"
+  ],
+  "source": {
+    "title": "Điều 19 và các quy định liên quan của Luật Căn cước số 26/2023/QH15; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
+    "url": "https://dichvucong.gov.vn/"
+  },
+  "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.6",
+  "verified_date": "2026-09-11"
+}

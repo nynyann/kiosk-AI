@@ -1,0 +1,60 @@
+{
+  "id": "cap-the-bao-hiem-y-te",
+  "name": "Cấp thẻ bảo hiểm y tế",
+  "aliases": [
+    "cấp thẻ bảo hiểm y tế",
+    "làm thẻ bảo hiểm y tế",
+    "xin thẻ bảo hiểm y tế",
+    "làm bảo hiểm y tế",
+    "thẻ bảo hiểm",
+    "đổi thông tin trên thẻ bảo hiểm",
+    "thẻ bảo hiểm y tế điện tử",
+    "mất thẻ bảo hiểm y tế"
+  ],
+  "keywords": [
+    "bảo hiểm y tế",
+    "thẻ bảo hiểm",
+    "thẻ bhyt",
+    "bhyt",
+    "khám bệnh bảo hiểm",
+    "bảo hiểm xã hội"
+  ],
+  "steps": [
+    {
+      "title": "Xác định nhu cầu",
+      "detail": "Bác xem mình cần cấp thẻ mới hay chỉ sửa thông tin trên thẻ đang có. Bác cũng chọn nhận thẻ điện tử hay thẻ giấy."
+    },
+    {
+      "title": "Chuẩn bị hồ sơ",
+      "detail": "Bác điền Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 2. Nếu có thay đổi thông tin cá nhân hay quyền lợi thì mang thêm giấy tờ chứng minh việc thay đổi đó."
+    },
+    {
+      "title": "Nộp hồ sơ",
+      "detail": "Bác nộp trực tiếp tại bộ phận một cửa của cơ quan Bảo hiểm xã hội, hoặc gửi qua bưu điện. Nếu có con cháu giúp thì nộp trực tuyến trên Cổng dịch vụ công hoặc ứng dụng của Bảo hiểm xã hội cũng được."
+    },
+    {
+      "title": "Nhận kết quả",
+      "detail": "Trong 5 ngày làm việc kể từ khi nhận đủ hồ sơ, cơ quan Bảo hiểm xã hội cấp thẻ cho bác. Bác nhận thẻ điện tử hoặc thẻ giấy theo lựa chọn lúc kê khai."
+    }
+  ],
+  "documents": [
+    "Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 2 (ban hành kèm Nghị định 188/2025/NĐ-CP)",
+    "Giấy tờ chứng minh việc thay đổi thông tin hoặc quyền lợi (chỉ khi bác có thay đổi)"
+  ],
+  "where_to_submit": "Bộ phận một cửa của cơ quan Bảo hiểm xã hội, hoặc qua bưu điện, hoặc trực tuyến trên Cổng Dịch vụ công Quốc gia và ứng dụng của Bảo hiểm xã hội.",
+  "fee": "Bác hỏi cán bộ để biết có mất phí không.",
+  "processing_time": "5 ngày làm việc kể từ ngày nhận đủ hồ sơ.",
+  "validity": "Thẻ có thời hạn sử dụng, bác hỏi cán bộ để biết hạn cụ thể của mình.",
+  "common_questions": [
+    "Tôi mất thẻ bảo hiểm y tế thì làm lại thế nào",
+    "Thẻ điện tử với thẻ giấy khác nhau chỗ nào",
+    "Tôi đổi chỗ ở thì có phải làm lại thẻ không",
+    "Người già có được cấp thẻ bảo hiểm miễn phí không"
+  ],
+  "source": {
+    "title": "Luật Bảo hiểm y tế và các văn bản hướng dẫn hiện hành; Nghị định 188/2025/NĐ-CP; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
+    "url": "https://dichvucong.gov.vn/"
+  },
+  "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.3",
+  "verified_date": "2026-09-11"
+}

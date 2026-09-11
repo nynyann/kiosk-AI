@@ -1,0 +1,60 @@
+{
+  "id": "tro-cap-huu-tri-xa-hoi",
+  "name": "Trợ cấp hưu trí xã hội",
+  "aliases": [
+    "trợ cấp hưu trí xã hội",
+    "trợ cấp hưu trí",
+    "tôi hơn 75 tuổi có được nhận trợ cấp không",
+    "tôi không có lương hưu thì được hỗ trợ gì",
+    "không có lương hưu có được nhà nước hỗ trợ không",
+    "trợ cấp cho người trên 75 tuổi",
+    "tiền trợ cấp tuổi già không có lương hưu",
+    "hưởng trợ cấp hưu trí xã hội"
+  ],
+  "keywords": [
+    "hưu trí xã hội",
+    "hưu trí",
+    "không có lương hưu",
+    "75 tuổi",
+    "trên 75",
+    "hộ nghèo"
+  ],
+  "steps": [
+    {
+      "title": "Kiểm tra điều kiện",
+      "detail": "Bác từ đủ 75 tuổi trở lên và không đang nhận lương hưu hay trợ cấp bảo hiểm xã hội hằng tháng. Nếu bác từ 70 đến dưới 75 tuổi thì phải thuộc hộ nghèo hoặc hộ cận nghèo."
+    },
+    {
+      "title": "Chuẩn bị hồ sơ",
+      "detail": "Bác điền Văn bản đề nghị hưởng trợ cấp hưu trí xã hội theo Mẫu số 01. Chỉ cần một bộ, không phải mang thêm giấy tờ gì khác trừ khi cán bộ yêu cầu."
+    },
+    {
+      "title": "Nộp hồ sơ",
+      "detail": "Bác nộp tại Trung tâm Phục vụ hành chính công của xã, phường nơi bác đang ở. Có thể gửi qua bưu điện hoặc nộp trực tuyến nếu địa phương có."
+    },
+    {
+      "title": "Nhận kết quả",
+      "detail": "Trong 10 ngày làm việc, xã sẽ xem xét và trả lời. Đủ điều kiện thì bác được quyết định hưởng trợ cấp, chưa đủ thì được nêu rõ lý do."
+    }
+  ],
+  "documents": [
+    "Văn bản đề nghị hưởng trợ cấp hưu trí xã hội theo Mẫu số 01 (ban hành kèm Nghị định 176/2025/NĐ-CP)",
+    "Căn cước công dân để cán bộ đối chiếu (chỉ khi cán bộ yêu cầu)"
+  ],
+  "where_to_submit": "Trung tâm Phục vụ hành chính công cấp xã nơi bác cư trú, hoặc gửi qua bưu điện, hoặc nộp trực tuyến nếu địa phương có.",
+  "fee": "Bác hỏi cán bộ để biết có mất phí không.",
+  "processing_time": "10 ngày làm việc kể từ ngày nhận được hồ sơ hợp lệ.",
+  "validity": null,
+  "common_questions": [
+    "Tôi 76 tuổi không có lương hưu thì có được nhà nước hỗ trợ không",
+    "Tôi 72 tuổi thuộc hộ nghèo có được không",
+    "Tôi đang nhận lương hưu thấp thì có được thêm không",
+    "Mẫu số 01 lấy ở đâu"
+  ],
+  "source": {
+    "title": "Điều 21 Luật Bảo hiểm xã hội số 41/2024/QH15; Điều 2 và Điều 4 Nghị định 176/2025/NĐ-CP; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
+    "url": "https://dichvucong.gov.vn/"
+  },
+  "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.1",
+  "verified_date": "2026-09-11"
+}

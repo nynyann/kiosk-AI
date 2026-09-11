@@ -1,0 +1,61 @@
+{
+  "id": "tro-cap-xa-hoi-hang-thang",
+  "name": "Trợ cấp xã hội hằng tháng",
+  "aliases": [
+    "trợ cấp xã hội hằng tháng",
+    "trợ cấp người già",
+    "tiền trợ cấp hằng tháng",
+    "tiền hỗ trợ của nhà nước",
+    "trợ cấp bảo trợ xã hội",
+    "xin trợ cấp hằng tháng",
+    "điều chỉnh trợ cấp hằng tháng",
+    "thôi hưởng trợ cấp"
+  ],
+  "keywords": [
+    "trợ cấp xã hội",
+    "hằng tháng",
+    "bảo trợ xã hội",
+    "trợ cấp người già",
+    "tiền hỗ trợ",
+    "thôi hưởng"
+  ],
+  "steps": [
+    {
+      "title": "Xác định trường hợp",
+      "detail": "Bác xem mình đang muốn xin trợ cấp mới, hay điều chỉnh, hay thôi hưởng trợ cấp đang nhận. Mỗi trường hợp dùng một mẫu tờ khai khác nhau, nên bác nói rõ với cán bộ để được chọn đúng mẫu."
+    },
+    {
+      "title": "Chuẩn bị hồ sơ",
+      "detail": "Bác điền tờ khai theo mẫu đúng với trường hợp của mình. Thông tin cư trú cán bộ tự tra trên hệ thống, bác không phải mang sổ hộ khẩu."
+    },
+    {
+      "title": "Nộp hồ sơ",
+      "detail": "Bác nộp tại Uỷ ban nhân dân xã, phường nơi bác đang ở. Có thể nộp trực tiếp, qua bưu điện hoặc trực tuyến."
+    },
+    {
+      "title": "Nhận kết quả",
+      "detail": "Trong 10 ngày làm việc kể từ khi nhận đủ hồ sơ, xã sẽ xem xét và trả lời. Chưa đủ điều kiện thì bác được trả lời bằng văn bản có nêu rõ lý do."
+    }
+  ],
+  "documents": [
+    "Tờ khai theo mẫu đúng với trường hợp của bác (xin mới, điều chỉnh, hoặc thôi hưởng)",
+    "Văn bản đề nghị điều chỉnh hoặc thôi hưởng (chỉ khi bác đang nhận trợ cấp và muốn thay đổi)",
+    "Giấy tờ liên quan khác (chỉ khi cán bộ cần xác minh thêm)"
+  ],
+  "where_to_submit": "Uỷ ban nhân dân cấp xã nơi bác cư trú. Nộp trực tiếp, qua bưu điện, hoặc trực tuyến.",
+  "fee": "Bác hỏi cán bộ để biết có mất phí không.",
+  "processing_time": "10 ngày làm việc kể từ ngày nhận đủ hồ sơ theo quy định.",
+  "validity": null,
+  "common_questions": [
+    "Tôi già rồi có được tiền trợ cấp hằng tháng của nhà nước không",
+    "Đang nhận trợ cấp muốn đổi số tài khoản thì làm sao",
+    "Tôi muốn thôi không nhận trợ cấp nữa thì làm thế nào",
+    "Trợ cấp này khác trợ cấp hưu trí xã hội chỗ nào"
+  ],
+  "source": {
+    "title": "Nghị định 20/2021/NĐ-CP và các văn bản sửa đổi, bổ sung hiện hành; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
+    "url": "https://dichvucong.gov.vn/"
+  },
+  "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.2",
+  "verified_date": "2026-09-11"
+}

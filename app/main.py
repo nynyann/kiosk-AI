@@ -53,15 +53,16 @@ async def _prewarm_tts() -> None:
 
     ok = 0
     for text in texts:
-        # Thử lại một lần: lần gọi nguội đầu tiên trong ngày hay chậm bất
-        # thường, mà hỏng ở đây thì lượt hỏi thật phải chờ sinh lại từ đầu.
-        for lan in (1, 2):
+        # Thử lại vài lần: dịch vụ giọng đọc lúc nguội hay hỏng nhất thời
+        # (NoAudioReceived sau vài giây) hoặc chậm bất thường, mà hỏng ở đây
+        # thì lượt hỏi thật phải chờ sinh lại từ đầu.
+        for lan in range(1, config.TTS_PREWARM_ATTEMPTS + 1):
             try:
                 await tts.synthesize(text, timeout=config.TTS_PREWARM_TIMEOUT_SECONDS)
                 ok += 1
                 break
             except tts.TtsError as exc:
-                if lan == 2:
+                if lan == config.TTS_PREWARM_ATTEMPTS:
                     print(f"[tts] chưa sinh sẵn được một câu ({exc.code}): {text[:40]}…")
     print(f"[tts] đã sinh sẵn {ok}/{len(texts)} câu, giọng {config.TTS_VOICE}")
 

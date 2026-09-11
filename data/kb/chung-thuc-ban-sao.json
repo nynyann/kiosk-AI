@@ -1,0 +1,62 @@
+{
+  "id": "chung-thuc-ban-sao",
+  "name": "Chứng thực bản sao từ bản chính",
+  "aliases": [
+    "chứng thực bản sao từ bản chính",
+    "chứng thực bản sao",
+    "chứng thực giấy tờ",
+    "công chứng bản sao",
+    "công chứng giấy tờ",
+    "sao y bản chính",
+    "sao y công chứng",
+    "photo công chứng",
+    "chứng thực căn cước",
+    "chứng thực sổ đỏ"
+  ],
+  "keywords": [
+    "chứng thực",
+    "sao y",
+    "công chứng",
+    "bản sao",
+    "bản chính",
+    "photo"
+  ],
+  "steps": [
+    {
+      "title": "Xác định giấy cần chứng thực",
+      "detail": "Bác xem cần chứng thực giấy gì và bao nhiêu bản. Quan trọng nhất là bác phải có bản chính của giấy đó, không có bản chính thì không chứng thực được."
+    },
+    {
+      "title": "Chuẩn bị giấy tờ",
+      "detail": "Bác mang bản chính và bản photo cần chứng thực. Nếu chưa photo thì mang bản chính đến, cán bộ có thể chụp giúp nếu có máy."
+    },
+    {
+      "title": "Nộp và đối chiếu",
+      "detail": "Bác đến Uỷ ban nhân dân xã, phường hoặc Trung tâm Phục vụ hành chính công, xuất trình bản chính. Cán bộ đối chiếu bản chính với bản photo rồi đóng dấu chứng thực."
+    },
+    {
+      "title": "Nhận kết quả",
+      "detail": "Thường xong ngay trong ngày. Nếu bác đến sau 3 giờ chiều, hoặc giấy nhiều trang, nhiều bản, thì có thể nhận vào ngày làm việc hôm sau."
+    }
+  ],
+  "documents": [
+    "Bản chính của giấy tờ cần chứng thực (bắt buộc, còn nguyên vẹn, không tẩy xoá)",
+    "Bản photo cần chứng thực (nếu chưa có, cán bộ có thể chụp từ bản chính)"
+  ],
+  "where_to_submit": "Uỷ ban nhân dân cấp xã hoặc Trung tâm Phục vụ hành chính công nơi gần bác. Văn phòng công chứng cũng làm được.",
+  "fee": "Bác hỏi cán bộ để biết mức phí, thường tính theo số trang.",
+  "validity": null,
+  "processing_time": "Trong ngày tiếp nhận. Nếu tiếp nhận sau 15 giờ thì sang ngày làm việc tiếp theo. Giấy nhiều trang, nhiều bản có thể lâu hơn.",
+  "common_questions": [
+    "Tôi chỉ có bản photo, mất bản chính rồi thì có chứng thực được không",
+    "Giấy bị rách một góc có chứng thực được không",
+    "Chứng thực ở xã khác nơi tôi ở có được không",
+    "Công chứng với chứng thực có giống nhau không"
+  ],
+  "source": {
+    "title": "Khoản 2 Điều 2, Điều 5 Nghị định 23/2015/NĐ-CP và các văn bản sửa đổi, bổ sung; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
+    "url": "https://dichvucong.gov.vn/"
+  },
+  "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.5",
+  "verified_date": "2026-09-11"
+}
