@@ -50,6 +50,20 @@ def count() -> int:
     return len(_PROCEDURES)
 
 
+def get(procedure_id: str) -> dict | None:
+    """Một thủ tục theo mã (tên file). None nếu không có."""
+    for p in _PROCEDURES:
+        if p.get("id") == procedure_id:
+            return p
+    return None
+
+
+def summaries() -> List[dict]:
+    """Danh sách ngắn để vẽ nút chọn thủ tục ở màn hình chính."""
+    return [{"id": p["id"], "name": p.get("name", p["id"]), "short": p.get("short")}
+            for p in _PROCEDURES]
+
+
 # ---------------------------------------------------------------------------
 def score(query: str, proc: dict) -> float:
     """Điểm khớp 0–1 giữa câu hỏi và một thủ tục.
@@ -105,8 +119,8 @@ def search(query: str) -> Tuple[dict | None, float]:
 
 
 # ---------------------------------------------------------------------------
-HANDOFF_TEXT = "Câu này con chưa được học ạ. Con mời bác gặp cán bộ ở quầy số 1."
-RETRY_TEXT = "Con chưa nghe rõ ạ. Bác nói lại giúp con một lần nữa."
+HANDOFF_TEXT = "Câu này cháu chưa được học ạ. Cháu mời bác gặp cán bộ ở quầy số 1, hoặc bác bấm chọn một thủ tục trên màn hình."
+RETRY_TEXT = "Cháu chưa nghe rõ ạ. Bác nói lại giúp cháu một lần nữa."
 
 
 def build_answer(query: str, session_id: str | None = None) -> AnswerResult:
@@ -146,6 +160,7 @@ def build_answer(query: str, session_id: str | None = None) -> AnswerResult:
         processing_time=proc.get("processing_time"),
         source=Source(**src) if src.get("title") else None,
         speech=for_speech(spoken),
+        confirm=for_speech(confirm_text(proc)),
     )
 
 
@@ -168,15 +183,24 @@ def _spoken_for(proc: dict, steps, lead: str) -> str:
     return spoken
 
 
+def confirm_text(proc: dict) -> str:
+    """Câu máy nói khi đã nhận ra thủ tục, trước khi vào bước 1."""
+    return f"Cháu hiểu bác cần làm thủ tục {proc.get('name', '')}. Đúng không ạ?"
+
+
 def all_speech_texts() -> List[str]:
     """Mọi chuỗi `speech` mà máy chủ có thể trả về.
 
-    Dùng để sinh sẵn file tiếng lúc khởi động. Kho chỉ có vài chục thủ tục nên
-    danh sách này ngắn, mà đổi lại người dân đầu tiên trong ngày không phải
-    ngồi nhìn màn hình im lặng 2-3 giây chờ máy sinh tiếng.
+    Dùng để sinh sẵn file tiếng lúc khởi động. Gồm câu xác nhận thủ tục, câu
+    trả lời một lượt của /answer (giữ cho giao diện cũ), và toàn bộ câu của
+    luồng từng bước (câu hỏi, kết luận, bước 2, bước 3, FAQ). Chừng 120 câu
+    cho 6 thủ tục, chạy nền nên không làm chậm khởi động.
     """
+    from . import flow  # tránh import vòng
     texts = [for_speech(HANDOFF_TEXT), for_speech(RETRY_TEXT)]
     for proc in _PROCEDURES:
+        texts.append(for_speech(confirm_text(proc)))
+        texts += flow.all_speech_texts(proc)
         steps = [
             Step(order=i + 1, title=st.get("title", ""), detail=st.get("detail", ""))
             for i, st in enumerate(proc.get("steps", []))

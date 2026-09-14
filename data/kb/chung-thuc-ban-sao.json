@@ -1,6 +1,7 @@
 {
   "id": "chung-thuc-ban-sao",
   "name": "Chứng thực bản sao từ bản chính",
+  "short": "Sao y, công chứng bản photo giấy tờ",
   "aliases": [
     "chứng thực bản sao từ bản chính",
     "chứng thực bản sao",
@@ -53,6 +54,123 @@
     "Chứng thực ở xã khác nơi tôi ở có được không",
     "Công chứng với chứng thực có giống nhau không"
   ],
+  "flow": {
+    "check": {
+      "intro": "Cháu hỏi bác vài câu để biết bác cần mang bản chính nào và có chứng thực được không ạ.",
+      "questions": [
+        {
+          "id": "what",
+          "text": "Bác muốn chứng thực bản sao của giấy tờ nào ạ?",
+          "options": [
+            { "value": "id", "label": "Căn cước công dân", "match": ["căn cước", "cccd", "chứng minh"] },
+            { "value": "birth", "label": "Giấy khai sinh", "match": ["khai sinh"] },
+            { "value": "land", "label": "Sổ đỏ, giấy tờ nhà đất", "match": ["sổ đỏ", "nhà đất", "sổ hồng", "đất"] },
+            { "value": "other", "label": "Bằng cấp, giấy tờ khác", "match": ["bằng", "khác", "hợp đồng", "sổ"] }
+          ]
+        },
+        {
+          "id": "original",
+          "text": "Bác có bản chính của giấy tờ đó không ạ?",
+          "options": [
+            { "value": "yes", "label": "Có bản chính" },
+            { "value": "no", "label": "Không có, chỉ có bản photo", "match": ["không có", "mất", "chỉ có photo", "chỉ có bản sao"] }
+          ]
+        },
+        {
+          "id": "intact",
+          "text": "Bản chính còn nguyên vẹn, đọc rõ, không bị tẩy xoá hay sửa chữa chứ ạ?",
+          "ask_if": { "original": ["yes"] },
+          "options": [
+            { "value": "yes", "label": "Còn nguyên vẹn", "match": ["nguyên", "rõ", "còn tốt", "bình thường"] },
+            { "value": "no", "label": "Bị rách nát, tẩy xoá, không đọc được", "match": ["rách", "nát", "tẩy", "xoá", "mờ", "hỏng", "không đọc được"] },
+            { "value": "unsure", "label": "Tôi không chắc", "match": ["không chắc", "không rõ", "không biết", "hơi"] }
+          ]
+        },
+        {
+          "id": "count",
+          "text": "Bác cần chứng thực bao nhiêu bản ạ?",
+          "ask_if": { "original": ["yes"] },
+          "options": [
+            { "value": "few", "label": "1 đến 2 bản", "range": [1, 2] },
+            { "value": "some", "label": "3 đến 5 bản", "range": [3, 5] },
+            { "value": "many", "label": "Nhiều hơn 5 bản", "range": [6, 1000], "match": ["nhiều"], "note": "Bác cần nhiều bản: thời hạn có thể kéo dài hơn một ngày theo quy định, bác nên đi sớm trong buổi sáng." }
+          ]
+        }
+      ],
+      "outcomes": [
+        {
+          "when": { "original": ["no"], "what": ["birth"] },
+          "verdict": "redirect",
+          "reason": "Chứng thực bản sao từ bản chính bắt buộc phải có bản chính để cán bộ đối chiếu. Bác không có bản chính giấy khai sinh thì chưa chứng thực được. Bác có thể xin cấp bản sao trích lục hộ tịch trước, bản sao do cơ quan hộ tịch cấp có giá trị sử dụng như bản chính.",
+          "suggest": "cap-ban-sao-trich-luc-ho-tich"
+        },
+        {
+          "when": { "original": ["no"] },
+          "verdict": "ineligible",
+          "reason": "Chứng thực bản sao từ bản chính bắt buộc phải có bản chính để cán bộ đối chiếu. Bác chưa có bản chính thì chưa làm được thủ tục này. Bác xem xét xin cấp lại hoặc xin bản sao từ sổ gốc của giấy tờ đó trước, rồi mới đi chứng thực."
+        },
+        {
+          "when": { "intact": ["no"] },
+          "verdict": "ineligible",
+          "reason": "Bản chính bị tẩy xoá, sửa chữa, thêm bớt nội dung, hoặc hư hỏng, cũ nát đến mức không xác định được nội dung thì không được dùng làm cơ sở chứng thực. Bác cần xin cấp lại giấy tờ đó trước."
+        },
+        {
+          "when": { "intact": ["unsure"] },
+          "verdict": "consult",
+          "reason": "Cháu chưa xác định được bản chính của bác có đủ điều kiện làm cơ sở chứng thực không. Bác cứ mang bản chính đến Uỷ ban nhân dân xã, cán bộ sẽ kiểm tra trực tiếp và cho bác biết."
+        }
+      ],
+      "eligible": {
+        "note": "Bác có bản chính hợp lệ, nên có thể đi chứng thực bản sao."
+      }
+    },
+    "prepare": {
+      "say": "Bác nhớ mang bản chính giấy tờ cần chứng thực. Nếu bác đã có bản photo thì mang cả bản photo; nếu chưa photo, bác có thể hỏi cơ quan tiếp nhận xem có thể chụp từ bản chính hay không.",
+      "tips": [
+        "Bản chính không được dùng để chứng thực nếu: bị tẩy xoá, sửa chữa; hư hỏng đến mức không đọc được; có dấu mật hoặc ghi rõ không được sao chụp; có nội dung trái pháp luật.",
+        "Photo đủ số bản cần dùng, vì mỗi bản chứng thực tính phí riêng."
+      ]
+    },
+    "submit": {
+      "say": "Bác đến Uỷ ban nhân dân xã hoặc Trung tâm Phục vụ hành chính công gần bác, xuất trình bản chính và nộp bản photo. Cán bộ đối chiếu rồi đóng dấu chứng thực.",
+      "places": [
+        "Uỷ ban nhân dân cấp xã hoặc Trung tâm Phục vụ hành chính công theo tổ chức của địa phương (nên đến đây)",
+        "Tổ chức hành nghề công chứng",
+        "Cơ quan đại diện có thẩm quyền, nếu thuộc phạm vi của cơ quan đó"
+      ],
+      "methods": [
+        "Nộp trực tiếp: xuất trình bản chính, nộp bản photo cần chứng thực"
+      ],
+      "bring": [
+        "Bản chính của giấy tờ cần chứng thực",
+        "Bản photo cần chứng thực, đủ số bản bác cần"
+      ],
+      "agency": "Cán bộ có thẩm quyền chứng thực kiểm tra bản chính, đối chiếu với bản sao. Bản sao đúng với bản chính và không thuộc trường hợp bị từ chối thì được chứng thực.",
+      "result": "Bác nhận bản sao đã được chứng thực."
+    },
+    "faq": [
+      {
+        "q": ["chỉ có bản photo mất bản chính có được không", "mất bản chính", "không có bản chính"],
+        "a": "Không được. Chứng thực bản sao từ bản chính bắt buộc phải có bản chính để đối chiếu. Bác cần xin cấp lại hoặc xin bản sao từ sổ gốc trước."
+      },
+      {
+        "q": ["giấy bị rách một góc có được không", "bị rách", "hơi cũ"],
+        "a": "Nếu vẫn đọc rõ, xác định được nội dung thì cán bộ vẫn có thể chứng thực. Bị rách nát, tẩy xoá đến mức không xác định được nội dung thì không được. Bác cứ mang đến để cán bộ kiểm tra."
+      },
+      {
+        "q": ["ở xã khác nơi tôi ở có được không", "xã khác", "không đúng xã"],
+        "a": "Được. Bác chứng thực ở bất kỳ Uỷ ban nhân dân xã hoặc Trung tâm Phục vụ hành chính công nào, không bắt buộc đúng nơi cư trú."
+      },
+      {
+        "q": ["công chứng với chứng thực có giống nhau không", "công chứng", "khác nhau"],
+        "a": "Người dân hay gọi chung là công chứng, nhưng việc xác nhận bản photo đúng với bản chính gọi là chứng thực bản sao. Uỷ ban nhân dân xã làm được, văn phòng công chứng cũng làm được."
+      },
+      {
+        "q": ["phí bao nhiêu", "mất bao nhiêu tiền", "lệ phí"],
+        "a": "Phí chứng thực tính theo số trang, số bản. Cháu không nêu con số để tránh sai, bác hỏi cán bộ hoặc xem bảng phí niêm yết tại nơi nộp."
+      }
+    ]
+  },
   "source": {
     "title": "Khoản 2 Điều 2, Điều 5 Nghị định 23/2015/NĐ-CP và các văn bản sửa đổi, bổ sung; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
     "url": "https://dichvucong.gov.vn/"

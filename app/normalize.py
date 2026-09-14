@@ -179,6 +179,10 @@ def digits_to_words(text: str) -> str:
         m, r = divmod(n, 1_000_000)
         return f"{num_to_vi(m)} triệu" + (f" {num_to_vi(r)}" if r else "")
 
+    # Tách số dính chữ trước khi đổi: "QH15" -> "QH 15", không thì thành
+    # "QHmười lăm" và giọng đọc nuốt mất số.
+    text = re.sub(r"(?<=[^\W\d_])(?=\d)", " ", text)
+    text = re.sub(r"(?<=\d)(?=[^\W\d_])", " ", text)
     return re.sub(r"\d+", lambda m: num_to_vi(int(m.group())), text)
 
 

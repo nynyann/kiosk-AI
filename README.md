@@ -2,16 +2,46 @@
 
 Cả giao diện lẫn máy chủ nằm chung một repo. Chạy một lệnh là có trọn bộ:
 máy chủ FastAPI phục vụ luôn trang kiosk ở `/`, còn API nằm ở `/health`,
-`/asr`, `/answer`, `/turn`. Tương ứng bước 1–8 trong sheet «Demo kiosk».
+`/asr`, `/answer`, `/turn`, `/procedures`, `/flow/*`.
 
 | Phần        | Ở đâu               | Ghi chú                                   |
 | ----------- | ------------------- | ----------------------------------------- |
 | Giao diện   | `web/index.html`    | Một file HTML, không cần build, không npm |
+| Luồng 3 bước| `app/flow.py`       | Máy chạy sơ đồ Bước 1 → 2 → 3, không chứa nội dung |
 | Đọc tiếng   | `app/tts.py`        | Máy chủ tự sinh mp3 giọng tiếng Việt      |
 | Máy chủ     | `app/`              | FastAPI + PhoWhisper                      |
-| Nội dung    | `data/kb/`          | Mỗi thủ tục một file JSON                 |
+| Nội dung    | `data/kb/`          | Mỗi thủ tục một file JSON, kèm mục `flow` |
 | Giao kèo API| `API_CONTRACT.md`   | Chốt rồi, đổi phải tăng phiên bản         |
 | Triển khai  | `DEPLOY.md`         | Cách đưa lên mạng cho người khác test     |
+
+## Kiosk chạy như thế nào
+
+Theo sơ đồ luồng và tài liệu «trực quan» của nhóm. Bác đứng trước kiosk:
+
+1. **Nói điều mình cần** bằng lời thường («tôi 76 tuổi, không có lương hưu
+   thì được hỗ trợ gì») — hoặc bấm chọn một trong 6 thủ tục trên màn hình.
+   Máy nhận ra thủ tục, hỏi lại «Cháu hiểu bác cần làm thủ tục X, đúng không
+   ạ?».
+2. **Bước 1. Kiểm tra điều kiện** — kiosk hỏi từng câu (tuổi, công dân, lương
+   hưu, trợ cấp BHXH, hộ nghèo…), bác bấm chọn hoặc trả lời bằng lời.
+   - Đáp ứng → sang bước 2. Máy nói «bác có khả năng thuộc diện», không bao
+     giờ nói «chắc chắn được hưởng».
+   - Không đáp ứng → giải thích điều kiện nào chưa đạt, kết luận, **không bắt
+     bác chuẩn bị hồ sơ thừa**. Nếu thực ra là thủ tục khác (đổi/cấp lại căn
+     cước, đăng ký lại khai sinh) thì nói rõ và gợi ý thủ tục phù hợp nếu
+     kho có.
+   - Không đủ thông tin để kết luận → mời bác gặp cán bộ, không đoán.
+3. **Bước 2. Chuẩn bị hồ sơ** — danh sách giấy tờ **theo đúng trường hợp bác
+   đã trả lời** (điều chỉnh trợ cấp thì hồ sơ khác xin mới), kèm lưu ý riêng.
+   Bác bấm «Hỏi thêm» và nói; máy chỉ trả lời từ kho tri thức của thủ tục đó,
+   không có thì mời hỏi cán bộ.
+4. **Bước 3. Nộp hồ sơ** — nộp ở đâu, cách nộp, giấy tờ mang theo, cơ quan xử
+   lý, thời hạn dự kiến, kết quả nhận được, nguồn văn bản.
+5. **Kết thúc** — tự về màn hình chính, xoá sạch trạng thái cho bác tiếp theo.
+
+Mọi câu hỏi, kết luận, hồ sơ nằm trong `data/kb/<thủ tục>.json` mục `flow`;
+`app/flow.py` chỉ là máy chạy. Sửa nội dung thì sửa JSON rồi gọi
+`POST /kb/reload`, không đụng code.
 
 ## Phạm vi hỗ trợ
 
@@ -36,8 +66,8 @@ tiếng.
 ---
 
 Ai cần đọc gì:
-- **Kns** — `web/index.html` và `API_CONTRACT.md`. Muốn xem giao diện chạy thật thì bật máy chủ giả ở phần dưới, khỏi cài mô hình.
-- **Mian** — chỉ cần `data/kb/_SCHEMA.md`.
+- **Kns** — `web/index.html` và `API_CONTRACT.md` (mục 7 là luồng 3 bước). Muốn xem giao diện chạy thật thì bật máy chủ giả ở phần dưới, khỏi cài mô hình.
+- **Mian** — `data/kb/_SCHEMA.md`, nhất là phần `flow`: câu hỏi bước 1 và kết luận viết ở đó.
 - **Kim** — `app/kb.py`, chỗ cần thay có ghi rõ trong file.
 
 ---
@@ -107,13 +137,14 @@ chủ khác lúc gỡ lỗi thì thêm `?base=` vào địa chỉ, ví dụ
 MOCK=1 uvicorn app.main:app --reload
 ```
 
-Không nạp mô hình, không cần ffmpeg, khởi động dưới 2 giây. Cả ba đường dẫn
-trả dữ liệu mẫu đúng định dạng thật, có độ trễ giả 0.4 giây. Mở
-http://localhost:8000 là thấy giao diện chạy đầy đủ trên dữ liệu mẫu đó.
+Không nạp mô hình, không cần ffmpeg, khởi động dưới 2 giây. Chỉ giả phần
+**nghe**: văn bản nhận dạng xoay vòng bốn mẫu (hai câu khớp thủ tục, một câu
+không khớp, một lượt không nghe rõ), độ trễ giả 0.4 giây. Kho tri thức và
+luồng 3 bước chạy **thật** trên `data/kb/`, nên bấm chọn thủ tục rồi đi hết
+bước 1 → 2 → 3 trên máy chủ giả là thấy đúng nội dung sẽ lên máy chủ thật.
 
-Câu trả lời mẫu xoay vòng, nên gọi vài lần là thấy được cả nhánh trả lời bình
-thường, nhánh chuyển cán bộ và nhánh không nghe rõ — thử đủ ba màn hình mà
-không phải sửa code.
+Trên máy tính, thư mục `.claude/launch.json` có sẵn cấu hình `kiosk-mock`
+để bật máy chủ giả từ Claude Code.
 
 ---
 
@@ -151,7 +182,7 @@ chỉ 1,6 giây — nên hạn giờ lúc hâm nóng (45 giây) để rộng hơ
 
 ```bash
 pip install -r requirements-dev.txt   # một lần, chỉ có pytest
-python -m pytest tests/ -q            # 20 test: giao kèo API + đọc tiếng + chuẩn hoá
+python -m pytest tests/ -q            # 43 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
 python -m app.normalize               # in bảng 10 câu trước/sau, ảnh cho mục 4.3
 ```
 
@@ -286,6 +317,8 @@ màn hình bản thật** phòng khi sập đúng lúc giám khảo mở.
 | Thay tra cứu từ khoá bằng so khớp ngữ nghĩa | Kim     | `app/kb.py`, hàm `score()`  |
 | Tính ngưỡng bằng hàm chi phí kỳ vọng        | Kim     | `config.KB_MATCH_THRESHOLD` |
 | ~~Viết 5 file JSON thủ tục còn lại~~ đã xong 6 | Mian    | `data/kb/`, điền `fee` từ Cổng DVCQG |
+| Đọc lại câu hỏi bước 1 và kết luận trong `flow` của 6 file, đối chiếu văn bản | Mian | `data/kb/*.json` mục `flow.check` |
+| Thêm câu hỏi thường gặp vào `flow.faq` sau mỗi buổi thử với người thật | Mian | `data/kb/*.json` mục `flow.faq` |
 | Thu 30 câu kiểm thử                         | cả nhóm | `data/eval/`                |
 | Bổ sung `HARD_FIXES` từ kết quả đo thật     | Lia     | `app/normalize.py`          |
 

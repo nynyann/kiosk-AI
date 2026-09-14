@@ -1,6 +1,7 @@
 {
   "id": "tro-cap-huu-tri-xa-hoi",
   "name": "Trợ cấp hưu trí xã hội",
+  "short": "Trợ cấp cho người cao tuổi không có lương hưu",
   "aliases": [
     "trợ cấp hưu trí xã hội",
     "trợ cấp hưu trí",
@@ -51,6 +52,267 @@
     "Tôi đang nhận lương hưu thấp thì có được thêm không",
     "Mẫu số 01 lấy ở đâu"
   ],
+  "flow": {
+    "check": {
+      "intro": "Trước tiên cháu hỏi bác vài câu để xem bác có thuộc diện được hưởng trợ cấp hưu trí xã hội không ạ.",
+      "questions": [
+        {
+          "id": "age",
+          "text": "Bác năm nay bao nhiêu tuổi ạ?",
+          "options": [
+            {
+              "value": "lt70",
+              "label": "Dưới 70 tuổi",
+              "range": [
+                0,
+                69
+              ],
+              "match": [
+                "dưới 70",
+                "chưa 70",
+                "chưa đến 70"
+              ]
+            },
+            {
+              "value": "70_74",
+              "label": "Từ 70 đến dưới 75 tuổi",
+              "range": [
+                70,
+                74
+              ],
+              "match": [
+                "70 đến 75",
+                "ngoài 70",
+                "hơn 70"
+              ]
+            },
+            {
+              "value": "ge75",
+              "label": "Từ 75 tuổi trở lên",
+              "range": [
+                75,
+                200
+              ],
+              "match": [
+                "trên 75",
+                "hơn 75",
+                "ngoài 75",
+                "75 trở lên",
+                "80",
+                "90"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "citizen",
+          "text": "Bác có phải là công dân Việt Nam không ạ?",
+          "options": [
+            {
+              "value": "yes",
+              "label": "Có, tôi là công dân Việt Nam"
+            },
+            {
+              "value": "no",
+              "label": "Không phải"
+            }
+          ]
+        },
+        {
+          "id": "pension",
+          "text": "Hiện bác có đang nhận lương hưu hằng tháng không ạ?",
+          "options": [
+            {
+              "value": "no",
+              "label": "Không nhận lương hưu"
+            },
+            {
+              "value": "yes",
+              "label": "Có, đang nhận lương hưu"
+            }
+          ]
+        },
+        {
+          "id": "bhxh",
+          "text": "Bác có đang nhận trợ cấp bảo hiểm xã hội hằng tháng không ạ?",
+          "options": [
+            {
+              "value": "no",
+              "label": "Không nhận"
+            },
+            {
+              "value": "yes",
+              "label": "Có, đang nhận"
+            }
+          ]
+        },
+        {
+          "id": "poor",
+          "text": "Bác từ 70 đến dưới 75 tuổi, vậy gia đình bác có thuộc hộ nghèo hoặc hộ cận nghèo không ạ?",
+          "ask_if": {
+            "age": [
+              "70_74"
+            ]
+          },
+          "options": [
+            {
+              "value": "yes",
+              "label": "Có, thuộc hộ nghèo hoặc cận nghèo"
+            },
+            {
+              "value": "no",
+              "label": "Không thuộc"
+            },
+            {
+              "value": "unsure",
+              "label": "Tôi không rõ",
+              "match": [
+                "không rõ",
+                "không biết",
+                "chưa rõ"
+              ]
+            }
+          ]
+        }
+      ],
+      "outcomes": [
+        {
+          "when": {
+            "age": [
+              "lt70"
+            ]
+          },
+          "verdict": "ineligible",
+          "reason": "Trợ cấp hưu trí xã hội dành cho người từ đủ 75 tuổi trở lên, hoặc từ đủ 70 tuổi nếu thuộc hộ nghèo, hộ cận nghèo. Bác chưa đến tuổi này nên chưa thuộc diện, bác chưa cần chuẩn bị hồ sơ."
+        },
+        {
+          "when": {
+            "citizen": [
+              "no"
+            ]
+          },
+          "verdict": "ineligible",
+          "reason": "Trợ cấp hưu trí xã hội chỉ áp dụng cho công dân Việt Nam theo Điều 21 Luật Bảo hiểm xã hội. Bác chưa thuộc diện làm thủ tục này."
+        },
+        {
+          "when": {
+            "pension": [
+              "yes"
+            ]
+          },
+          "verdict": "ineligible",
+          "reason": "Người đang nhận lương hưu hằng tháng thì không thuộc diện trợ cấp hưu trí xã hội. Nếu mức lương hưu bác đang nhận thấp hơn mức trợ cấp hưu trí xã hội theo quy định, bác hỏi cán bộ để được đối chiếu điều kiện cụ thể."
+        },
+        {
+          "when": {
+            "bhxh": [
+              "yes"
+            ]
+          },
+          "verdict": "ineligible",
+          "reason": "Người đang nhận trợ cấp bảo hiểm xã hội hằng tháng thì không thuộc diện trợ cấp hưu trí xã hội. Nếu mức bác đang nhận thấp hơn mức trợ cấp hưu trí xã hội theo quy định, bác hỏi cán bộ để được đối chiếu điều kiện cụ thể."
+        },
+        {
+          "when": {
+            "poor": [
+              "no"
+            ]
+          },
+          "verdict": "ineligible",
+          "reason": "Bác từ 70 đến dưới 75 tuổi thì phải thuộc hộ nghèo hoặc hộ cận nghèo mới thuộc diện được hưởng. Gia đình bác không thuộc hộ nghèo, cận nghèo nên hiện chưa đủ điều kiện. Khi bác đủ 75 tuổi thì có thể làm thủ tục này."
+        },
+        {
+          "when": {
+            "poor": [
+              "unsure"
+            ]
+          },
+          "verdict": "consult",
+          "reason": "Bác từ 70 đến dưới 75 tuổi thì cần thuộc hộ nghèo hoặc hộ cận nghèo. Cháu chưa đủ thông tin để xác định, bác hỏi cán bộ Uỷ ban nhân dân xã để biết gia đình mình có thuộc hộ nghèo, cận nghèo không rồi quay lại làm hồ sơ."
+        }
+      ],
+      "eligible": {
+        "note": "Theo thông tin bác cung cấp, bác có khả năng thuộc diện được hưởng trợ cấp hưu trí xã hội. Bác có thể chuẩn bị hồ sơ để cơ quan có thẩm quyền xem xét."
+      }
+    },
+    "prepare": {
+      "say": "Bác chỉ cần chuẩn bị một bộ hồ sơ gồm Văn bản đề nghị hưởng trợ cấp hưu trí xã hội theo Mẫu số 01. Bác không phải tự chuẩn bị giấy tờ mà cơ quan nhà nước có thể tra trên hệ thống.",
+      "tips": [
+        "Số lượng hồ sơ: 01 bộ.",
+        "Mẫu số 01 ban hành kèm Nghị định 176/2025/NĐ-CP. Bác có thể xin mẫu tại nơi nộp hoặc nhờ cán bộ hướng dẫn điền.",
+        "Trường hợp cụ thể cần xác minh thêm thì bác làm theo yêu cầu của cơ quan tiếp nhận."
+      ]
+    },
+    "submit": {
+      "say": "Bác có thể nộp hồ sơ trực tiếp tại Trung tâm Phục vụ hành chính công cấp xã nơi bác cư trú, hoặc gửi qua bưu điện, hoặc nộp trực tuyến nếu địa phương có.",
+      "places": [
+        "Trung tâm Phục vụ hành chính công cấp xã nơi bác cư trú (Chủ tịch Uỷ ban nhân dân cấp xã là người giải quyết)"
+      ],
+      "methods": [
+        "Nộp trực tiếp tại Trung tâm Phục vụ hành chính công cấp xã",
+        "Gửi qua bưu điện",
+        "Nộp trực tuyến nếu địa phương cung cấp"
+      ],
+      "bring": [
+        "Văn bản đề nghị hưởng trợ cấp hưu trí xã hội theo Mẫu số 01",
+        "Giấy tờ liên quan để đối chiếu, chỉ khi cơ quan tiếp nhận yêu cầu"
+      ],
+      "agency": "Uỷ ban nhân dân cấp xã tiếp nhận và xem xét hồ sơ. Cơ quan có thẩm quyền xác thực thông tin của bác với Cơ sở dữ liệu quốc gia về dân cư.",
+      "result": "Đủ điều kiện thì bác được quyết định hưởng trợ cấp hưu trí xã hội và được chi trả theo quy định. Chưa đủ điều kiện thì bác được trả lời và nêu rõ lý do."
+    },
+    "faq": [
+      {
+        "q": [
+          "hơn 75 tuổi có được nhận trợ cấp không",
+          "có được nhận trợ cấp không",
+          "có được hưởng không",
+          "tôi có thuộc diện không"
+        ],
+        "a": "Theo thông tin bác đã cung cấp ở bước 1, bác có khả năng thuộc diện được hưởng. Cháu không kết luận chắc chắn được, cơ quan có thẩm quyền sẽ xem xét cụ thể khi nhận hồ sơ của bác."
+      },
+      {
+        "q": [
+          "mẫu số 01 lấy ở đâu",
+          "lấy mẫu ở đâu",
+          "mẫu đơn ở đâu",
+          "xin mẫu ở đâu"
+        ],
+        "a": "Mẫu số 01 ban hành kèm Nghị định 176/2025/NĐ-CP. Bác xin mẫu tại Trung tâm Phục vụ hành chính công cấp xã, cán bộ sẽ hướng dẫn bác điền."
+      },
+      {
+        "q": [
+          "đang nhận lương hưu thấp có được thêm không",
+          "lương hưu thấp",
+          "lương hưu ít"
+        ],
+        "a": "Người đang nhận lương hưu thì thường không thuộc diện. Nếu mức bác đang nhận thấp hơn mức trợ cấp hưu trí xã hội theo quy định, bác hỏi cán bộ để được đối chiếu điều kiện cụ thể."
+      },
+      {
+        "q": [
+          "72 tuổi hộ nghèo có được không",
+          "70 tuổi hộ nghèo",
+          "chưa đủ 75 tuổi"
+        ],
+        "a": "Từ đủ 70 đến dưới 75 tuổi thì bác phải thuộc hộ nghèo hoặc hộ cận nghèo và không nhận lương hưu, trợ cấp bảo hiểm xã hội hằng tháng thì mới thuộc diện."
+      },
+      {
+        "q": [
+          "có phải mang sổ hộ khẩu không",
+          "mang hộ khẩu",
+          "giấy tờ cư trú"
+        ],
+        "a": "Không cần. Thông tin cư trú của bác cơ quan tiếp nhận tự tra trên Cơ sở dữ liệu quốc gia về dân cư. Bác chỉ mang giấy tờ khác khi cán bộ yêu cầu đối chiếu."
+      },
+      {
+        "q": [
+          "được bao nhiêu tiền",
+          "mức trợ cấp bao nhiêu",
+          "mỗi tháng bao nhiêu"
+        ],
+        "a": "Mức trợ cấp do Chính phủ quy định và có thể được điều chỉnh. Cháu không nêu con số để tránh sai, bác hỏi cán bộ tiếp nhận để biết mức hiện hành."
+      }
+    ]
+  },
   "source": {
     "title": "Điều 21 Luật Bảo hiểm xã hội số 41/2024/QH15; Điều 2 và Điều 4 Nghị định 176/2025/NĐ-CP; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
     "url": "https://dichvucong.gov.vn/"

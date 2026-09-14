@@ -1,6 +1,7 @@
 {
   "id": "cap-the-can-cuoc",
   "name": "Cấp thẻ căn cước cho người từ đủ 14 tuổi trở lên",
+  "short": "Làm thẻ căn cước lần đầu",
   "aliases": [
     "cấp thẻ căn cước",
     "làm căn cước",
@@ -54,6 +55,104 @@
     "Người già có phải làm căn cước không",
     "Số định danh cá nhân là số nào"
   ],
+  "flow": {
+    "check": {
+      "intro": "Cháu hỏi bác vài câu để xác định bác cần cấp thẻ lần đầu hay thuộc trường hợp khác ạ.",
+      "questions": [
+        {
+          "id": "have",
+          "text": "Bác hiện đã có thẻ căn cước chưa ạ?",
+          "options": [
+            { "value": "no", "label": "Chưa có thẻ", "match": ["chưa", "chưa có", "chưa làm", "lần đầu"] },
+            { "value": "yes", "label": "Đã có thẻ rồi", "match": ["có rồi", "đã có", "làm rồi", "có"] }
+          ]
+        },
+        {
+          "id": "why",
+          "text": "Bác đã có thẻ, vậy bác muốn đổi thẻ hay bị mất thẻ ạ?",
+          "ask_if": { "have": ["yes"] },
+          "options": [
+            { "value": "change", "label": "Muốn đổi thẻ (hết hạn, hỏng, đổi thông tin)", "match": ["đổi", "hết hạn", "hỏng", "cũ"] },
+            { "value": "lost", "label": "Bị mất thẻ", "match": ["mất", "rơi", "thất lạc"] }
+          ]
+        },
+        {
+          "id": "info",
+          "text": "Thông tin họ tên, ngày tháng năm sinh, nơi cư trú của bác có thay đổi so với trước không ạ?",
+          "ask_if": { "have": ["no"] },
+          "options": [
+            { "value": "no", "label": "Không thay đổi" },
+            { "value": "yes", "label": "Có thay đổi", "note": "Thông tin của bác có thay đổi: cán bộ sẽ hướng dẫn bác thu thập, cập nhật thông tin trong Cơ sở dữ liệu quốc gia về dân cư trước khi làm thẻ." },
+            { "value": "unsure", "label": "Tôi không chắc", "match": ["không chắc", "không rõ", "không biết"], "note": "Bác chưa chắc thông tin có đúng không: khi đến làm thẻ, cán bộ sẽ kiểm tra trong Cơ sở dữ liệu dân cư và cho bác đối chiếu." }
+          ]
+        }
+      ],
+      "outcomes": [
+        {
+          "when": { "why": ["change"] },
+          "verdict": "redirect",
+          "reason": "Đổi thẻ đang có là thủ tục cấp đổi thẻ căn cước, khác với cấp thẻ lần đầu. Kho hướng dẫn hiện chưa có thủ tục cấp đổi, bác đến cơ quan quản lý căn cước của công an để được hướng dẫn đúng quy trình, tránh chuẩn bị nhầm."
+        },
+        {
+          "when": { "why": ["lost"] },
+          "verdict": "redirect",
+          "reason": "Làm lại thẻ bị mất là thủ tục cấp lại thẻ căn cước, khác với cấp thẻ lần đầu. Kho hướng dẫn hiện chưa có thủ tục cấp lại, bác đến cơ quan quản lý căn cước của công an để được hướng dẫn đúng quy trình, tránh chuẩn bị nhầm."
+        }
+      ],
+      "eligible": {
+        "note": "Bác thuộc trường hợp cấp thẻ căn cước lần đầu. Cháu hướng dẫn bác các bước tiếp theo."
+      }
+    },
+    "prepare": {
+      "say": "Bác chuẩn bị ba thông tin: họ, chữ đệm và tên khai sinh; số định danh cá nhân; và nơi cư trú. Bác có thể đăng ký trước thời gian và địa điểm làm căn cước trên Cổng Dịch vụ công Quốc gia, Cổng Dịch vụ công Bộ Công an hoặc ứng dụng định danh quốc gia. Nếu bác chưa quen, cháu có thể hướng dẫn từng bước.",
+      "tips": [
+        "Đăng ký trực tuyến: đăng nhập, chọn thủ tục cấp thẻ căn cước, kiểm tra thông tin lấy từ Cơ sở dữ liệu dân cư, chọn thời gian và địa điểm, nhận xác nhận lịch.",
+        "Không đăng ký trước cũng được: bác đến thẳng cơ quan quản lý căn cước, nhưng có thể phải chờ lâu hơn."
+      ]
+    },
+    "submit": {
+      "say": "Bác đến cơ quan quản lý căn cước của công an theo lịch đã đăng ký hoặc đến trực tiếp. Cán bộ kiểm tra thông tin, lập hồ sơ, chụp ảnh, thu vân tay và cho bác kiểm tra lại thông tin trước khi xác nhận.",
+      "places": [
+        "Cơ quan quản lý căn cước của công an nơi bác cư trú"
+      ],
+      "methods": [
+        "Đến trực tiếp cơ quan quản lý căn cước",
+        "Đăng ký lịch trước qua Cổng Dịch vụ công Quốc gia",
+        "Đăng ký lịch trước qua Cổng Dịch vụ công Bộ Công an",
+        "Đăng ký lịch trước qua ứng dụng định danh quốc gia VNeID"
+      ],
+      "bring": [
+        "Họ, chữ đệm và tên khai sinh",
+        "Số định danh cá nhân",
+        "Thông tin nơi cư trú",
+        "Lịch hẹn, nếu bác đã đăng ký trực tuyến"
+      ],
+      "agency": "Cơ quan quản lý căn cước kiểm tra thông tin trong Cơ sở dữ liệu quốc gia về dân cư, lập hồ sơ, thu nhận thông tin nhận dạng và sinh trắc học, cho bác kiểm tra và xác nhận. Thông tin chưa có hoặc chưa đúng thì cán bộ hướng dẫn cập nhật trước.",
+      "result": "Bác nhận thẻ căn cước theo phương thức đã đăng ký và được cơ quan quản lý căn cước hướng dẫn."
+    },
+    "faq": [
+      {
+        "q": ["số định danh cá nhân là số nào", "số định danh", "mã định danh"],
+        "a": "Số định danh cá nhân là dãy 12 số của riêng bác, có trên giấy khai sinh mới, thông báo số định danh của công an, hoặc trên căn cước công dân gắn chip nếu đã từng có. Chưa biết số này thì cán bộ tra giúp bác."
+      },
+      {
+        "q": ["mất căn cước thì làm lại thế nào", "mất căn cước", "làm lại căn cước"],
+        "a": "Mất thẻ thì làm thủ tục cấp lại thẻ căn cước, khác với cấp lần đầu. Bác đến cơ quan quản lý căn cước của công an để được hướng dẫn đúng thủ tục."
+      },
+      {
+        "q": ["hết hạn thì đổi ở đâu", "thẻ hết hạn", "đổi thẻ"],
+        "a": "Thẻ hết hạn thì làm thủ tục cấp đổi tại cơ quan quản lý căn cước của công an, hoặc đăng ký trước trên Cổng Dịch vụ công. Đây là thủ tục khác với cấp lần đầu."
+      },
+      {
+        "q": ["người già có phải làm căn cước không", "bắt buộc không", "có phải làm không"],
+        "a": "Theo Luật Căn cước, công dân Việt Nam từ đủ 14 tuổi trở lên phải làm thủ tục cấp thẻ căn cước, không giới hạn tuổi trên. Bác chưa có thẻ thì nên đi làm."
+      },
+      {
+        "q": ["có phải chụp ảnh lấy vân tay không", "chụp ảnh", "vân tay"],
+        "a": "Có. Khi đến cơ quan công an, cán bộ thu nhận ảnh chân dung, vân tay và mống mắt theo quy định, rồi cho bác kiểm tra lại thông tin trước khi xác nhận."
+      }
+    ]
+  },
   "source": {
     "title": "Điều 19 và các quy định liên quan của Luật Căn cước số 26/2023/QH15; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
     "url": "https://dichvucong.gov.vn/"

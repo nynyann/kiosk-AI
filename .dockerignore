@@ -47,3 +47,6 @@ eval/
 scripts/
 .vscode/
 .qodo/
+
+# Cấu hình chạy máy chủ giả từ Claude Code, không cần trong ảnh
+.claude/

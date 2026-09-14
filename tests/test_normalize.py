@@ -70,6 +70,9 @@ def test_chu_so_thanh_chu_de_doc():
     assert digits_to_words("quầy số 1") == "quầy số một"
     assert digits_to_words("15 ngày") == "mười lăm ngày"
     assert "trên" in for_speech("mẫu 01/CT")
+    # Số dính chữ phải tách ra, không thì giọng đọc nuốt mất số: "QH15" từng
+    # thành "QHmười lăm". Lộ ra khi đọc nguồn văn bản ở bước 3 của luồng.
+    assert digits_to_words("Luật số 41/2024/QH15") == "Luật số bốn mươi mốt/hai nghìn hai mươi bốn/QH mười lăm"
 
 
 def test_khong_pha_cau_da_dung():

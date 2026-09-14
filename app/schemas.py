@@ -56,6 +56,9 @@ class AnswerResult(BaseModel):
     processing_time: Optional[str] = None
     source: Optional[Source] = None
     speech: str = ""
+    # Câu ngắn để máy hỏi lại «Cháu hiểu bác cần làm thủ tục X. Đúng không ạ?»
+    # trước khi vào luồng từng bước. Giao diện 2.0 đọc câu này thay vì `speech`.
+    confirm: str = ""
 
 
 class TurnResult(BaseModel):
@@ -93,3 +96,115 @@ class TtsRequest(BaseModel):
     # Để trống thì dùng giọng mặc định trong config. Chỉ truyền khi muốn thử
     # giọng khác, ví dụ đổi sang vi-VN-NamMinhNeural cho giọng nam.
     voice: Optional[str] = None
+
+
+# ---------------------------------------------------------------------------
+# Luồng theo từng bước (API 2.0). Xem app/flow.py và API_CONTRACT.md mục 7.
+# ---------------------------------------------------------------------------
+class ProcedureSummary(BaseModel):
+    id: str
+    name: str
+    # Một dòng ngắn để in dưới tên trên nút chọn thủ tục ở màn hình chính.
+    short: Optional[str] = None
+
+
+class ProceduresResult(BaseModel):
+    ok: bool = True
+    procedures: List[ProcedureSummary] = []
+
+
+class FlowOption(BaseModel):
+    value: str
+    label: str
+
+
+class FlowQuestion(BaseModel):
+    id: str
+    text: str
+    options: List[FlowOption] = []
+    # Câu thứ mấy / trong bao nhiêu câu SẼ hỏi theo các câu trả lời hiện có.
+    index: int = 1
+    total: int = 1
+
+
+class FlowState(BaseModel):
+    """Trạng thái một lượt của luồng. Giao diện chỉ cần nhìn `stage`:
+
+    check   — bước 1, đang hỏi: hiện `question`, bác bấm chọn hoặc nói
+    stop    — bước 1 kết luận không đáp ứng: hiện `title` + `reason`
+    prepare — bước 2: hiện `documents`, `notes`, `tips`
+    submit  — bước 3: hiện `places`, `methods`, `bring`, `agency`, `processing_time`, `result`
+    done    — kết thúc
+    """
+    ok: bool = True
+    procedure_id: str
+    procedure_name: str = ""
+    stage: str
+    step: int = 1
+    step_title: str = ""
+    answers: dict = {}
+    title: Optional[str] = None
+    prompt: str = ""
+    speech: str = ""
+    question: Optional[FlowQuestion] = None
+    # Lời dẫn của bước 1, chỉ có ở câu hỏi đầu tiên.
+    intro: Optional[str] = None
+    # Chỉ có khi stage = stop (ineligible | consult | redirect) hoặc prepare (eligible).
+    verdict: Optional[str] = None
+    reason: Optional[str] = None
+    suggest_procedure_id: Optional[str] = None
+    suggest_procedure_name: Optional[str] = None
+    note: Optional[str] = None
+    documents: List[str] = []
+    notes: List[str] = []
+    tips: List[str] = []
+    places: List[str] = []
+    methods: List[str] = []
+    bring: List[str] = []
+    agency: Optional[str] = None
+    processing_time: Optional[str] = None
+    result: Optional[str] = None
+    fee: Optional[str] = None
+    source: Optional[Source] = None
+    # Chỉ có khi trả lời bằng lời nói (/flow/answer-voice).
+    asr: Optional[AsrResult] = None
+    # false = nghe được nhưng không ánh xạ ra lựa chọn nào; trạng thái trả về
+    # là trạng thái cũ (câu hỏi cũ) để bác bấm chọn.
+    matched: Optional[bool] = None
+    message: Optional[str] = None
+
+
+class FlowStartRequest(BaseModel):
+    procedure_id: str
+    session_id: Optional[str] = None
+
+
+class FlowAnswerRequest(BaseModel):
+    procedure_id: str
+    answers: dict = {}
+    question_id: str
+    value: str
+    session_id: Optional[str] = None
+
+
+class FlowNextRequest(BaseModel):
+    """Chuyển bước bằng tay: từ `prepare` sang bước 3, từ `submit` sang kết thúc."""
+    procedure_id: str
+    answers: dict = {}
+    stage: str
+    session_id: Optional[str] = None
+
+
+class FlowAskResult(BaseModel):
+    """Trả lời câu hỏi thêm ở bước 2 / bước 3, chỉ từ kho của thủ tục đó."""
+    ok: bool = True
+    procedure_id: str
+    question: str = ""
+    answer: str = ""
+    speech: str = ""
+    matched: bool = False
+    match_score: float = 0.0
+    # Câu hỏi có vẻ thuộc thủ tục khác: gợi ý chuyển.
+    switch_to: Optional[str] = None
+    switch_name: Optional[str] = None
+    asr: Optional[AsrResult] = None

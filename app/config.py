@@ -66,9 +66,10 @@ TTS_PREWARM_TIMEOUT_SECONDS = float(os.getenv("TTS_PREWARM_TIMEOUT_SECONDS", "90
 # Số lần thử cho mỗi câu lúc hâm nóng. Hỏng nhất thời khá hay gặp.
 TTS_PREWARM_ATTEMPTS = int(os.getenv("TTS_PREWARM_ATTEMPTS", "3"))
 TTS_MAX_CHARS = int(os.getenv("TTS_MAX_CHARS", "2000"))
-# Nội dung lấy từ data/kb/ nên chỉ quanh quẩn vài chục câu. 128 mục là thừa sức
-# giữ hết, mà tốn chừng vài MB bộ nhớ.
-TTS_CACHE_SIZE = int(os.getenv("TTS_CACHE_SIZE", "128"))
+# Nội dung lấy từ data/kb/: mỗi thủ tục chừng 20 câu (câu hỏi bước 1, kết
+# luận, bước 2, bước 3, FAQ), 6 thủ tục cỡ 120 câu. 256 mục giữ hết, tốn chừng
+# vài MB bộ nhớ.
+TTS_CACHE_SIZE = int(os.getenv("TTS_CACHE_SIZE", "256"))
 # Sinh sẵn tiếng cho mọi câu trong kho ngay lúc khởi động, chạy nền.
 TTS_PREWARM = os.getenv("TTS_PREWARM", "1") == "1"
 
@@ -82,3 +83,7 @@ LOG_PATH = Path(os.getenv("LOG_PATH", str(DATA_DIR / "logs" / "turns.jsonl")))
 # Không ghi file âm thanh xuống đĩa. Mục 4.5 của bản đề xuất cam kết điều này,
 # code phải khớp với cam kết đó.
 STORE_AUDIO = False
+
+# Ngưỡng khớp câu hỏi thêm (bước 2, 3) với FAQ của thủ tục đang làm. Tính
+# bằng tỷ lệ từ của mẫu câu FAQ xuất hiện trong câu hỏi, 0–1.
+FAQ_MATCH_THRESHOLD = float(os.getenv("FAQ_MATCH_THRESHOLD", "0.6"))

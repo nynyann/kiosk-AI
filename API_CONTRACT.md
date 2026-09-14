@@ -1,12 +1,19 @@
 # Giao kèo API — Kiosk hướng dẫn thủ tục hành chính
 
-Phiên bản 1.2 — chốt ngày 10/09/2026. **Chốt rồi không đổi tên trường nữa.**
+Phiên bản 2.0 — chốt ngày 14/09/2026. **Chốt rồi không đổi tên trường nữa.**
 
 Đổi so với 1.0, **chỉ thêm, không đổi và không bỏ trường nào**, nên giao diện
 viết theo 1.0 vẫn chạy nguyên:
 - 1.1: thêm `POST /tts`, thêm `tts_ready` và `tts_voice` trong `/health`.
 - 1.2: thêm `asr_error` trong `/health`, và `/warmup` nay thử lại được sau khi
   nạp hỏng, trả thêm `error` khi vẫn chưa nạp được.
+- 2.0: **luồng từng bước** theo sơ đồ «Bước 1 kiểm tra điều kiện → Bước 2
+  chuẩn bị hồ sơ → Bước 3 nộp hồ sơ» — mục 6 và 7 bên dưới. Thêm
+  `GET /procedures`, `POST /flow/start`, `/flow/answer`, `/flow/answer-voice`,
+  `/flow/next`, `/flow/ask`; thêm `confirm` trong phản hồi của `/answer` và
+  `/turn`. Giao diện 2.0 dùng `/turn` chỉ để NHẬN RA thủ tục rồi vào luồng,
+  không hiện cả 4 bước một lượt như 1.x nữa. Lên số lớn vì cách dùng đổi hẳn,
+  còn trường cũ vẫn nguyên.
 Nếu buộc phải đổi, tăng số phiên bản và báo trong nhóm chat trước khi đẩy code.
 
 Địa chỉ máy chủ:
@@ -175,6 +182,12 @@ Gửi câu hỏi bằng chữ, nhận hướng dẫn.
 
 ---
 
+Từ 2.0 có thêm `confirm`: câu ngắn «Cháu hiểu bác cần làm thủ tục X. Đúng
+không ạ?» để giao diện đọc ở màn hình xác nhận trước khi gọi `/flow/start`.
+Chỉ có khi `handoff = false`.
+
+---
+
 ## 4. `POST /turn`
 
 Gộp `/asr` và `/answer` thành một lượt. Đây là đường dẫn giao diện dùng chính, hai đường trên chỉ để gỡ lỗi và đo đạc.
@@ -238,6 +251,143 @@ chưa có sẵn có thể mất tới chục giây.
 
 ---
 
+## 6. `GET /procedures`
+
+Danh sách thủ tục trong kho, để vẽ nút chọn ở màn hình chính. Bác không nói
+được, hoặc máy nghe không ra, thì bấm chọn vẫn vào được luồng.
+
+```json
+{
+  "ok": true,
+  "procedures": [
+    { "id": "tro-cap-huu-tri-xa-hoi", "name": "Trợ cấp hưu trí xã hội",
+      "short": "Trợ cấp cho người cao tuổi không có lương hưu" }
+  ]
+}
+```
+
+---
+
+## 7. Luồng từng bước `/flow/*`
+
+Đúng sơ đồ đã vẽ:
+
+```
+Bắt đầu → Bước 1. Kiểm tra điều kiện ─┬─ Đáp ứng → Bước 2. Chuẩn bị hồ sơ → Bước 3. Nộp hồ sơ → Kết thúc
+                                       └─ Không → giải thích điều kiện chưa đáp ứng, kết luận → Kết thúc
+```
+
+**Máy chủ không giữ phiên.** Mỗi lượt giao diện gửi lại `answers` (các câu đã
+trả lời ở bước 1) mà máy chủ vừa trả về; máy chủ tính lại từ đầu. Máy chủ
+miễn phí khởi động lại giữa chừng cũng không mất trạng thái của bác.
+
+Mọi đường dẫn `/flow/*` trả về cùng một kiểu **FlowState**:
+
+```json
+{
+  "ok": true,
+  "procedure_id": "tro-cap-huu-tri-xa-hoi",
+  "procedure_name": "Trợ cấp hưu trí xã hội",
+  "stage": "check",
+  "step": 1,
+  "step_title": "Kiểm tra điều kiện",
+  "answers": { "age": "70_74" },
+  "intro": "Trước tiên cháu hỏi bác vài câu…",
+  "prompt": "Bác có phải là công dân Việt Nam không ạ?",
+  "speech": "…câu để đọc thành tiếng…",
+  "question": {
+    "id": "citizen", "index": 2, "total": 5,
+    "text": "Bác có phải là công dân Việt Nam không ạ?",
+    "options": [ { "value": "yes", "label": "Có, tôi là công dân Việt Nam" },
+                 { "value": "no",  "label": "Không phải" } ]
+  },
+  "verdict": null, "reason": null,
+  "suggest_procedure_id": null, "suggest_procedure_name": null,
+  "note": null, "documents": [], "notes": [], "tips": [],
+  "places": [], "methods": [], "bring": [],
+  "agency": null, "processing_time": null, "result": null, "fee": null,
+  "source": { "title": "…", "url": "…" },
+  "asr": null, "matched": null, "message": null
+}
+```
+
+Giao diện chỉ cần nhìn `stage` để biết vẽ màn hình nào:
+
+| `stage`   | Bước | Hiện gì | Bác làm gì tiếp |
+|-----------|------|---------|-----------------|
+| `check`   | 1 | `intro` (chỉ câu đầu), `question.text`, nút cho từng `question.options` | bấm chọn → `/flow/answer`, hoặc nói → `/flow/answer-voice` |
+| `stop`    | 1 | `title` + `reason`. `verdict` là `ineligible` (chưa đủ điều kiện), `consult` (cần cán bộ xác định) hoặc `redirect` (đây là thủ tục khác, có thể kèm `suggest_procedure_id`) | Làm lại, xem thủ tục gợi ý, hoặc kết thúc |
+| `prepare` | 2 | `note` (kết quả bước 1), `prompt`, `documents` (danh sách giấy tờ **theo đúng trường hợp của bác**), `notes` (lưu ý theo lựa chọn), `tips` | hỏi thêm → `/flow/ask`; tiếp tục → `/flow/next` với `stage: "prepare"` |
+| `submit`  | 3 | `prompt`, `places`, `methods`, `bring`, `agency`, `processing_time`, `result`, `fee`, `source` | hỏi thêm → `/flow/ask`; kết thúc → `/flow/next` với `stage: "submit"` |
+| `done`    | — | `prompt` | về màn hình chính |
+
+`speech` luôn là câu để đọc thành tiếng cho trạng thái đó (đưa vào `/tts`).
+
+### 7.1 `POST /flow/start`
+
+```json
+{ "procedure_id": "tro-cap-huu-tri-xa-hoi", "session_id": "kiosk-01-..." }
+```
+
+Mã không có trong kho → `404`, `code = procedure_not_found`.
+
+### 7.2 `POST /flow/answer` — bác bấm chọn
+
+```json
+{ "procedure_id": "…", "answers": { "age": "70_74" }, "question_id": "citizen", "value": "yes" }
+```
+
+Gửi nguyên `answers` của FlowState trước, máy chủ tự gộp thêm câu mới.
+
+### 7.3 `POST /flow/answer-voice` — bác trả lời bằng lời
+
+`multipart/form-data`: `audio` (file), `procedure_id`, `question_id`,
+`answers` (chuỗi JSON), `session_id`.
+
+Máy chủ nghe → ánh xạ sang một lựa chọn (đọc số tuổi, cụm từ đặc trưng,
+có/không) → như `/flow/answer`. Phản hồi có thêm `asr` và `matched`:
+- `matched = true`: đã hiểu, trạng thái tiếp theo.
+- `matched = false`: nghe được nhưng không ra lựa chọn nào, hoặc không nghe
+  rõ. Trạng thái trả về **là câu hỏi cũ**, kèm `message` để hiện và `speech`
+  đọc câu đó, mời bác bấm chọn.
+
+### 7.4 `POST /flow/next` — chuyển bước bằng tay
+
+```json
+{ "procedure_id": "…", "answers": { … }, "stage": "prepare" }
+```
+
+`stage` là bước ĐANG đứng: `prepare` → trả bước 3; `submit` → trả `done`;
+`check` → tính lại bước 1 từ `answers` (dùng cho nút «Quay lại»: giao diện bỏ
+câu trả lời cuối rồi gửi lên).
+
+### 7.5 `POST /flow/ask` — hỏi thêm ở bước 2 / bước 3
+
+`multipart/form-data`: `procedure_id`, và **một trong hai** `audio` (file)
+hoặc `text` (chuỗi). Trả về:
+
+```json
+{
+  "ok": true,
+  "procedure_id": "tro-cap-huu-tri-xa-hoi",
+  "question": "mẫu số 01 lấy ở đâu",
+  "answer": "Mẫu số 01 ban hành kèm Nghị định 176/2025/NĐ-CP. Bác xin mẫu tại…",
+  "speech": "…",
+  "matched": true,
+  "match_score": 1.0,
+  "switch_to": null, "switch_name": null,
+  "asr": { … }
+}
+```
+
+**Chỉ trả lời từ kho tri thức của thủ tục đang làm** (mục `flow.faq` và các
+trường nơi nộp / thời hạn / phí / giấy tờ). Không có thì `matched = false` và
+`answer` mời bác hỏi cán bộ — máy không bịa. Nếu câu hỏi khớp rõ với một thủ
+tục **khác**, `switch_to` / `switch_name` có giá trị và `answer` hỏi bác có
+muốn chuyển không; giao diện hiện nút chuyển.
+
+---
+
 ## Chạy máy chủ giả
 
 Kns không phải chờ mô hình. Bật biến môi trường:
@@ -246,8 +396,11 @@ Kns không phải chờ mô hình. Bật biến môi trường:
 MOCK=1 uvicorn app.main:app --reload
 ```
 
-Cả ba đường dẫn trả dữ liệu mẫu cố định, đúng định dạng trên, độ trễ giả 0.4 giây.
-Khi máy chủ thật xong, Kns chỉ đổi hằng số `BASE` trong giao diện, không sửa gì khác.
+Chỉ giả phần **nghe**: `/asr`, `/turn`, `/flow/answer-voice`, `/flow/ask` với
+`audio` trả văn bản mẫu xoay vòng (hai câu khớp thủ tục, một câu không khớp,
+một lượt không nghe rõ), độ trễ giả 0.4 giây. Kho tri thức và luồng `/flow/*`
+chạy **thật** trên `data/kb/`, vì kho không cần mô hình — bấm hết cả 3 bước
+trên máy chủ giả là thấy đúng nội dung sẽ lên máy chủ thật.
 
 ---
 

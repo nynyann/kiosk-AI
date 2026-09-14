@@ -1,6 +1,7 @@
 {
   "id": "cap-ban-sao-trich-luc-ho-tich",
   "name": "Cấp bản sao trích lục hộ tịch",
+  "short": "Xin lại bản sao giấy khai sinh, kết hôn, khai tử",
   "aliases": [
     "cấp bản sao trích lục hộ tịch",
     "trích lục hộ tịch",
@@ -57,6 +58,94 @@
     "Xin trích lục có phải về đúng xã ngày xưa không",
     "Chưa từng đăng ký khai sinh thì có xin được không"
   ],
+  "flow": {
+    "check": {
+      "intro": "Cháu hỏi bác vài câu để xác định đúng loại giấy bác cần xin ạ.",
+      "questions": [
+        {
+          "id": "doc",
+          "text": "Bác cần xin lại giấy khai sinh hay một giấy tờ hộ tịch khác ạ?",
+          "options": [
+            { "value": "birth", "label": "Giấy khai sinh", "match": ["khai sinh"] },
+            { "value": "marriage", "label": "Giấy kết hôn", "match": ["kết hôn", "đăng ký kết hôn", "hôn thú"] },
+            { "value": "death", "label": "Giấy chứng tử", "match": ["chứng tử", "khai tử"] },
+            { "value": "other", "label": "Giấy hộ tịch khác", "match": ["khác", "hộ tịch"] }
+          ]
+        },
+        {
+          "id": "kind",
+          "text": "Giấy đó đã được đăng ký từ trước và bác chỉ cần bản sao, hay bác chưa từng đăng ký và cần đăng ký lại ạ?",
+          "options": [
+            { "value": "copy", "label": "Đã đăng ký rồi, chỉ cần bản sao", "match": ["bản sao", "đã đăng ký", "có rồi", "mất", "xin lại"] },
+            { "value": "reregister", "label": "Chưa từng đăng ký / cần đăng ký lại", "match": ["chưa từng", "chưa đăng ký", "đăng ký lại", "không có dữ liệu"] }
+          ]
+        },
+        {
+          "id": "remember",
+          "text": "Bác còn nhớ thông tin về việc đăng ký đó không ạ? Ví dụ họ tên người trên giấy, nơi đăng ký, khoảng năm đăng ký.",
+          "ask_if": { "kind": ["copy"] },
+          "options": [
+            { "value": "yes", "label": "Nhớ đầy đủ" },
+            { "value": "partly", "label": "Nhớ một phần", "match": ["một phần", "nhớ sơ", "không hết", "mang máng"], "note": "Bác chỉ nhớ một phần: bác ghi ra những gì nhớ được, cán bộ có thể tra cứu theo họ tên và ngày sinh của người trên giấy." },
+            { "value": "no", "label": "Không nhớ", "note": "Bác không nhớ thông tin đăng ký: bác cố hỏi người thân về nơi và khoảng năm đăng ký, hoặc nhờ cán bộ tra cứu theo họ tên, ngày sinh. Thiếu thông tin thì có thể mất thêm thời gian." }
+          ]
+        }
+      ],
+      "outcomes": [
+        {
+          "when": { "kind": ["reregister"] },
+          "verdict": "redirect",
+          "reason": "Trường hợp chưa từng đăng ký, hoặc mất giấy mà không còn dữ liệu và cần đăng ký lại, là một thủ tục khác (ví dụ đăng ký lại khai sinh), không phải cấp bản sao trích lục. Kho hướng dẫn hiện chưa có thủ tục đó, bác gặp cán bộ hộ tịch tại Uỷ ban nhân dân xã để được hướng dẫn đúng."
+        }
+      ],
+      "eligible": {
+        "note": "Bác chỉ cần bản sao của giấy đã đăng ký, nên bác có thể yêu cầu cấp bản sao trích lục hộ tịch."
+      }
+    },
+    "prepare": {
+      "say": "Bác chuẩn bị thông tin về người có giấy tờ cần xin lại và thông tin về sự kiện hộ tịch. Nếu bác thực hiện trực tuyến, hệ thống sẽ yêu cầu bác xác thực và điền thông tin theo hướng dẫn.",
+      "tips": [
+        "Không cần về đúng nơi đã đăng ký ngày xưa: cá nhân có quyền yêu cầu cơ quan quản lý Cơ sở dữ liệu hộ tịch cấp bản sao, không phụ thuộc nơi cư trú.",
+        "Giấy tờ liên quan chỉ cần mang khi cơ quan tiếp nhận yêu cầu đối chiếu trong trường hợp cụ thể."
+      ]
+    },
+    "submit": {
+      "say": "Bác có thể nộp yêu cầu trực tiếp tại Trung tâm Phục vụ hành chính công có thẩm quyền, hoặc trực tuyến trên Cổng Dịch vụ công Quốc gia.",
+      "places": [
+        "Trung tâm Phục vụ hành chính công có thẩm quyền, không phụ thuộc nơi bác đang ở"
+      ],
+      "methods": [
+        "Nộp trực tiếp tại Trung tâm Phục vụ hành chính công",
+        "Nộp trực tuyến trên Cổng Dịch vụ công Quốc gia: đăng nhập, chọn cơ quan quản lý Cơ sở dữ liệu hộ tịch, khai thông tin, gửi yêu cầu"
+      ],
+      "bring": [
+        "Căn cước công dân của bác",
+        "Thông tin về người có tên trên giấy: họ tên, ngày sinh",
+        "Thông tin về giấy cần xin: loại giấy, nơi đã đăng ký, khoảng năm đăng ký",
+        "Giấy tờ liên quan khác, chỉ khi cán bộ cần đối chiếu"
+      ],
+      "agency": "Cơ quan quản lý Cơ sở dữ liệu hộ tịch điện tử có thẩm quyền tra cứu và cấp bản sao.",
+      "result": "Bác nhận bản sao Trích lục hộ tịch hoặc bản sao Giấy khai sinh."
+    },
+    "faq": [
+      {
+        "q": ["đăng ký ở quê đang ở thành phố thì xin ở đâu", "đăng ký ở quê", "có phải về đúng xã ngày xưa không", "về quê xin"],
+        "a": "Không cần về quê. Bác có quyền yêu cầu cấp bản sao trích lục không phụ thuộc nơi cư trú, đến Trung tâm Phục vụ hành chính công gần bác hoặc làm trực tuyến."
+      },
+      {
+        "q": ["chưa từng đăng ký khai sinh thì có xin được không", "chưa từng đăng ký", "không có dữ liệu"],
+        "a": "Nếu chưa từng đăng ký hoặc không còn dữ liệu thì không cấp bản sao được, mà phải làm thủ tục đăng ký lại. Đó là thủ tục khác, bác gặp cán bộ hộ tịch để được hướng dẫn."
+      },
+      {
+        "q": ["mất giấy khai sinh thì phải làm thế nào", "mất giấy khai sinh"],
+        "a": "Nếu giấy khai sinh đã đăng ký từ trước thì bác xin cấp bản sao trích lục, cán bộ tra trên Cơ sở dữ liệu hộ tịch rồi cấp lại bản sao cho bác. Bác chuẩn bị họ tên, ngày sinh và nơi, năm đăng ký."
+      },
+      {
+        "q": ["xin cho người thân được không", "xin cho con", "xin cho bố mẹ", "người khác"],
+        "a": "Bác cung cấp thông tin của người có tên trên giấy (họ tên, ngày sinh) và thông tin về sự kiện hộ tịch. Cán bộ tiếp nhận sẽ hướng dẫn nếu cần thêm giấy tờ chứng minh quan hệ."
+      }
+    ]
+  },
   "source": {
     "title": "Khoản 9 Điều 4 và Điều 63 Luật Hộ tịch số 60/2014/QH13; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
     "url": "https://dichvucong.gov.vn/"

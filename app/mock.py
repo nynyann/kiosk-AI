@@ -5,8 +5,9 @@ không nạp mô hình gì cả. Mục đích duy nhất: Kns làm giao diện k
 
 Có độ trễ giả 0.4 giây để Kns thấy được vòng quay chờ của mình có chạy không.
 
-Câu trả lời mẫu xoay vòng theo mỗi lần gọi, để Kns thử được cả nhánh trả lời
-bình thường lẫn nhánh chuyển cán bộ mà không phải sửa code.
+Chỉ giả phần NGHE. Phần tra kho và luồng từng bước chạy trên kho thật trong
+data/kb/, vì kho không cần mô hình. `mock_answer()` giữ lại cho ai cần một
+AnswerResult mẫu cố định, main.py không dùng nữa.
 """
 
 import time
@@ -17,42 +18,49 @@ from .schemas import AnswerResult, AsrResult, Segment, Source, Step
 
 MOCK_DELAY = 0.4
 
+# Xoay vòng 4 mẫu: hai câu khớp thủ tục (xác nhận → vào luồng), một câu
+# không khớp gì (chuyển cán bộ / chọn tay), một lượt không nghe rõ (nói lại).
 _ASR_SAMPLES = cycle([
-    ("tôi muốn xin giấy xác nhận cư trú", "ờ tôi muốn xin giấy xác nhận cư chú", 0.87, False),
+    ("tôi hơn 75 tuổi có được nhận trợ cấp không", "ờ tôi hơn bảy mươi lăm tuổi có được nhận chợ cấp không", 0.87, False),
     ("làm căn cước công dân cần giấy tờ gì", "làm căn cước công dâng cần giấy tờ gì", 0.79, False),
+    ("hôm nay trời đẹp quá", "hôm nay trời đẹp quá", 0.81, False),
     ("", "", 0.11, True),  # nhánh không nghe rõ
 ])
 
 _SAMPLE_STEPS = [
-    Step(order=1, title="Chuẩn bị giấy tờ",
-         detail="Bác mang theo căn cước công dân còn hạn sử dụng."),
-    Step(order=2, title="Nộp hồ sơ",
-         detail="Bác đến công an xã, hoặc nhờ con cháu nộp trên Cổng dịch vụ công quốc gia."),
-    Step(order=3, title="Nhận kết quả",
-         detail="Bác nhận giấy xác nhận ngay trong ngày làm việc."),
+    Step(order=1, title="Kiểm tra điều kiện",
+         detail="Bác từ đủ 75 tuổi trở lên và không đang nhận lương hưu."),
+    Step(order=2, title="Chuẩn bị hồ sơ",
+         detail="Bác điền Văn bản đề nghị theo Mẫu số 01."),
+    Step(order=3, title="Nộp hồ sơ",
+         detail="Bác nộp tại Trung tâm Phục vụ hành chính công cấp xã."),
 ]
 
 _ANSWERS = cycle([
     AnswerResult(
         handoff=False,
-        procedure_id="xac-nhan-cu-tru",
-        procedure_name="Xác nhận thông tin về cư trú",
+        # Mã thủ tục phải có thật trong data/kb/, vì giao diện sẽ gọi
+        # /flow/start với mã này — luồng từng bước chạy trên kho thật kể cả
+        # ở chế độ giả, chỉ có phần nghe là giả.
+        procedure_id="tro-cap-huu-tri-xa-hoi",
+        procedure_name="Trợ cấp hưu trí xã hội",
         match_score=0.91,
-        answer="Để xác nhận thông tin về cư trú, bác cần làm 3 bước sau.",
+        answer="Để hưởng trợ cấp hưu trí xã hội, bác cần làm 3 bước sau.",
         steps=_SAMPLE_STEPS,
-        documents=["Căn cước công dân"],
-        where_to_submit="Công an xã nơi bác đang ở.",
-        fee="Không mất phí.",
-        processing_time="Trong ngày làm việc.",
-        source=Source(title="Luật Cư trú 2020, Điều 17",
-                      url="https://vanban.chinhphu.vn/"),
-        speech=for_speech("Để xác nhận thông tin về cư trú, bác cần làm 3 bước sau. "
-                          "Bước 1. Chuẩn bị giấy tờ. Bác mang theo căn cước công dân còn hạn."),
+        documents=["Văn bản đề nghị theo Mẫu số 01"],
+        where_to_submit="Trung tâm Phục vụ hành chính công cấp xã nơi bác cư trú.",
+        fee="Bác hỏi cán bộ để biết có mất phí không.",
+        processing_time="10 ngày làm việc.",
+        source=Source(title="Điều 21 Luật Bảo hiểm xã hội số 41/2024/QH15",
+                      url="https://dichvucong.gov.vn/"),
+        speech=for_speech("Để hưởng trợ cấp hưu trí xã hội, bác cần làm 3 bước sau. "
+                          "Bước 1. Kiểm tra điều kiện."),
+        confirm=for_speech("Cháu hiểu bác cần làm thủ tục Trợ cấp hưu trí xã hội. Đúng không ạ?"),
     ),
     AnswerResult(
         handoff=True, match_score=0.22,
-        answer="Câu này con chưa được học ạ. Con mời bác gặp cán bộ ở quầy số 1.",
-        speech=for_speech("Câu này con chưa được học ạ. Con mời bác gặp cán bộ ở quầy số 1."),
+        answer="Câu này cháu chưa được học ạ. Cháu mời bác gặp cán bộ ở quầy số 1, hoặc bác bấm chọn một thủ tục trên màn hình.",
+        speech=for_speech("Câu này cháu chưa được học ạ. Cháu mời bác gặp cán bộ ở quầy số 1, hoặc bác bấm chọn một thủ tục trên màn hình."),
     ),
 ])
 
