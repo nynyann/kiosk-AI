@@ -298,6 +298,7 @@ Mọi đường dẫn `/flow/*` trả về cùng một kiểu **FlowState**:
   "question": {
     "id": "citizen", "index": 2, "total": 5,
     "text": "Bác có phải là công dân Việt Nam không ạ?",
+    "hint": "Bác trả lời «có» hoặc «không», hoặc bấm chọn một ô bên dưới.",
     "options": [ { "value": "yes", "label": "Có, tôi là công dân Việt Nam" },
                  { "value": "no",  "label": "Không phải" } ]
   },
@@ -315,7 +316,7 @@ Giao diện chỉ cần nhìn `stage` để biết vẽ màn hình nào:
 
 | `stage`   | Bước | Hiện gì | Bác làm gì tiếp |
 |-----------|------|---------|-----------------|
-| `check`   | 1 | `intro` (chỉ câu đầu), `question.text`, nút cho từng `question.options` | bấm chọn → `/flow/answer`, hoặc nói → `/flow/answer-voice` |
+| `check`   | 1 | `intro` (chỉ câu đầu), `question.text`, `question.hint` (cách trả lời), nút cho từng `question.options` | bấm chọn → `/flow/answer`, hoặc nói → `/flow/answer-voice` |
 | `stop`    | 1 | `title` + `reason`. `verdict` là `ineligible` (chưa đủ điều kiện), `consult` (cần cán bộ xác định) hoặc `redirect` (đây là thủ tục khác, có thể kèm `suggest_procedure_id`) | Làm lại, xem thủ tục gợi ý, hoặc kết thúc |
 | `prepare` | 2 | `note` (kết quả bước 1), `prompt`, `documents` (danh sách giấy tờ **theo đúng trường hợp của bác**), `notes` (lưu ý theo lựa chọn), `tips` | hỏi thêm → `/flow/ask`; tiếp tục → `/flow/next` với `stage: "prepare"` |
 | `submit`  | 3 | `prompt`, `places`, `methods`, `bring`, `agency`, `processing_time`, `result`, `fee`, `source` | hỏi thêm → `/flow/ask`; kết thúc → `/flow/next` với `stage: "submit"` |

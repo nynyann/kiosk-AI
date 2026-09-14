@@ -221,6 +221,23 @@ def test_hoi_them_thuoc_thu_tuc_khac_thi_goi_y_chuyen():
     assert d["switch_to"] == "cap-the-can-cuoc" and d["switch_name"]
 
 
+def test_hoi_them_ve_thu_tuc_khac_kem_y_dinh_chung_van_goi_y_chuyen():
+    """"làm căn cước cần giấy tờ gì" hỏi giữa lúc làm trợ cấp: phải gợi ý
+    chuyển, không được đem giấy tờ của trợ cấp ra trả lời vì thấy chữ "giấy tờ"."""
+    d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "làm căn cước công dân cần giấy tờ gì"}).json()
+    assert d["switch_to"] == "cap-the-can-cuoc"
+    assert "Mẫu số 01" not in d["answer"]
+
+
+def test_cau_hoi_buoc_1_co_huong_dan_cach_tra_loi():
+    st = client.post("/flow/start", json={"procedure_id": HUU_TRI}).json()
+    assert "bấm chọn" in st["question"]["hint"]
+    assert "ví dụ" in st["question"]["hint"]          # câu hỏi tuổi: gợi ý nói số
+    assert "trả lời bằng lời" in st["speech"].lower()  # câu đầu dặn cách trả lời
+    st = _answer(HUU_TRI, {}, "age", "ge75")
+    assert "«có» hoặc «không»" in st["question"]["hint"]
+
+
 def test_hoi_them_thieu_ca_audio_lan_text():
     r = client.post("/flow/ask", data={"procedure_id": HUU_TRI})
     assert r.status_code == 400 and r.json()["ok"] is False

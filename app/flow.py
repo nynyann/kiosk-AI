@@ -96,9 +96,23 @@ def _cond_ok(cond: Optional[dict], answers: Dict[str, str]) -> bool:
     return True
 
 
+def _hint_for(q: dict) -> str:
+    """Hướng dẫn cách trả lời, theo kiểu câu hỏi. Tài liệu «trực quan» yêu cầu
+    kiosk phải nói rõ bác trả lời thế nào rồi mới hỏi tiếp."""
+    if q.get("hint"):
+        return q["hint"]
+    opts = q.get("options", [])
+    values = {o.get("value") for o in opts}
+    if any(o.get("range") for o in opts):
+        return "Bác nói số, ví dụ «tôi bảy mươi sáu tuổi», hoặc bấm chọn một ô bên dưới."
+    if values <= {"yes", "no"}:
+        return "Bác trả lời «có» hoặc «không», hoặc bấm chọn một ô bên dưới."
+    return "Bác nói câu trả lời, hoặc bấm chọn một ô bên dưới."
+
+
 def _question_model(q: dict, index: int, total: int) -> FlowQuestion:
     return FlowQuestion(
-        id=q["id"], text=q.get("text", ""), index=index, total=total,
+        id=q["id"], text=q.get("text", ""), hint=_hint_for(q), index=index, total=total,
         options=[FlowOption(value=o["value"], label=o.get("label", o["value"]))
                  for o in q.get("options", [])],
     )
@@ -196,6 +210,9 @@ def _question_state(proc: dict, answers, q: dict, index: int, total: int) -> Flo
     if not values <= {"yes", "no"} and len(opts) > 2:
         labels = [o.get("label", "") for o in opts]
         parts.append("Bác chọn: " + ", ".join(labels[:-1]) + ", hoặc " + labels[-1] + ".")
+    # Câu đầu tiên dặn luôn cách trả lời; các câu sau bác đã quen, không nhắc lại.
+    if intro:
+        parts.append("Bác trả lời bằng lời, hoặc bấm chọn trên màn hình ạ.")
     st.speech = _spoken(" ".join(p for p in parts if p))
     return st
 
@@ -376,6 +393,19 @@ def answer_question(proc: dict, text: str) -> FlowAskResult:
         res.speech = _spoken(res.answer)
         return res
 
+    # Câu hỏi có vẻ thuộc thủ tục khác? Chỉ gợi ý khi khớp rõ, và khớp thủ
+    # tục khác hơn hẳn thủ tục đang làm. Xét TRƯỚC ý định chung: "làm căn
+    # cước cần giấy tờ gì" hỏi giữa lúc làm trợ cấp thì phải gợi ý chuyển,
+    # không được đem giấy tờ của trợ cấp ra trả lời.
+    other, s_other = kb.search(q)
+    if other and other["id"] != proc["id"] and s_other >= config.KB_MATCH_THRESHOLD \
+            and s_other > kb.score(q, proc) + 0.2:
+        res.switch_to, res.switch_name = other["id"], other.get("name")
+        res.answer = (f"Câu này có vẻ thuộc thủ tục «{other.get('name')}», khác thủ tục bác đang làm. "
+                      f"Bác muốn chuyển sang thủ tục đó không ạ?")
+        res.speech = for_speech(res.answer)
+        return res
+
     info = _submit_info(proc)
     for intent, phrases in _GENERIC_INTENTS:
         if any(_contains_phrase(qf, p) for p in phrases):
@@ -392,17 +422,6 @@ def answer_question(proc: dict, text: str) -> FlowAskResult:
             res.matched, res.answer, res.match_score = True, ans, 0.5
             res.speech = _spoken(ans)
             return res
-
-    # Câu hỏi có vẻ thuộc thủ tục khác? Chỉ gợi ý khi khớp rõ, và khớp thủ
-    # tục khác hơn hẳn thủ tục đang làm.
-    other, s_other = kb.search(q)
-    if other and other["id"] != proc["id"] and s_other >= config.KB_MATCH_THRESHOLD \
-            and s_other > kb.score(q, proc) + 0.2:
-        res.switch_to, res.switch_name = other["id"], other.get("name")
-        res.answer = (f"Câu này có vẻ thuộc thủ tục «{other.get('name')}», khác thủ tục bác đang làm. "
-                      f"Bác muốn chuyển sang thủ tục đó không ạ?")
-        res.speech = for_speech(res.answer)
-        return res
 
     res.matched, res.answer = False, ASK_FALLBACK_TEXT
     res.speech = for_speech(res.answer)

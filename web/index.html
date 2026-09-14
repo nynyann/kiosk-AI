@@ -9,29 +9,31 @@
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#211f1c;
+    --ink:#1f1d1a;
     --ink-soft:#5b564c;
-    --paper:#fbf6ec;
-    --paper-raised:#f3ecdb;
-    --line:#e3d9c0;
+    --paper:#f7f1e3;
+    --paper-raised:#fffdf7;
+    --line:#e2d8c0;
     --indigo:#1f3a5f;
     --indigo-dark:#152a45;
+    --indigo-soft:#e6ecf5;
     --ochre:#c9922e;
-    --ochre-dark:#a8751c;
+    --ochre-dark:#9a6c17;
+    --ochre-soft:#fbf1dc;
     --brick:#a73f2e;
     --brick-dark:#87301f;
+    --brick-soft:#f8e4df;
     --green:#3e6b4f;
-    --green-soft:#e4efe6;
-    --radius-lg:28px;
-    --radius-md:18px;
-    --fs-display: clamp(1.8rem, 4.6vw, 3rem);
-    --fs-title: clamp(1.4rem, 3.4vw, 2.1rem);
-    --fs-body: clamp(1.08rem, 2.4vw, 1.42rem);
-    --fs-label: clamp(0.92rem, 1.8vw, 1.05rem);
-    --fs-button: clamp(1.15rem, 2.6vw, 1.5rem);
+    --green-soft:#e2eee5;
+    --r-lg:26px;
+    --r-md:16px;
+    --fs-title: clamp(1.35rem, 3.2vw, 1.9rem);
+    --fs-body: clamp(1.12rem, 2.4vw, 1.45rem);
+    --fs-label: clamp(0.95rem, 1.8vw, 1.08rem);
+    --fs-button: clamp(1.12rem, 2.5vw, 1.4rem);
   }
   @media (prefers-reduced-motion: reduce){
-    *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
   }
   *{ box-sizing:border-box; }
   [hidden]{ display:none !important; }
@@ -42,562 +44,205 @@
     background:var(--paper);
     color:var(--ink);
     overflow:hidden;
-    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color:transparent;
   }
+  button{ font-family:inherit; cursor:pointer; }
+  button:focus-visible{ outline:4px solid var(--ochre); outline-offset:3px; }
   #app{ height:100vh; display:flex; flex-direction:column; }
-  button{ font-family:inherit; }
 
-  /* ---------- status bar ---------- */
-  #statusbar{
-    display:flex; align-items:center; gap:10px;
-    padding: clamp(10px,2vh,18px) clamp(14px,3vw,28px);
-    font-size: var(--fs-label);
-    color: var(--ink-soft);
-    user-select:none;
+  /* ---------- thanh trên ---------- */
+  #topbar{
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    padding: clamp(10px,1.8vh,16px) clamp(14px,3vw,28px);
+    background:var(--paper-raised);
+    border-bottom:1px solid var(--line);
   }
-  #statusbar .dot{ width:11px; height:11px; border-radius:50%; background:#9a9483; flex-shrink:0; transition: background .3s ease; }
-  #statusbar .dot.ok{ background:var(--green); }
-  #statusbar .dot.bad{ background:var(--brick); }
-  #statusbar .dot.warn{ background:var(--ochre); }
-  #statusbar #statusText{ flex:1; }
-  #statusbar #brand{ font-weight:700; color:var(--indigo); letter-spacing:0.2px; }
+  #topbar .dot{ width:11px; height:11px; border-radius:50%; background:#9a9483; flex-shrink:0; transition:background .3s; }
+  #topbar .dot.ok{ background:var(--green); }
+  #topbar .dot.bad{ background:var(--brick); }
+  #topbar .dot.warn{ background:var(--ochre); }
+  #brand{ font-weight:800; color:var(--indigo); font-size:var(--fs-label); user-select:none; }
+  #statusText{ color:var(--ink-soft); font-size:var(--fs-label); }
   #homeBtn{
+    margin-left:auto;
     border:2px solid var(--line); background:#fff; color:var(--ink-soft);
-    font-weight:600; font-size:var(--fs-label);
-    padding:8px 16px; border-radius:999px; cursor:pointer;
+    font-weight:600; font-size:var(--fs-label); padding:8px 16px; border-radius:999px;
   }
-  #homeBtn[hidden]{ display:none; }
-
-  /* ---------- stepper (Bước 1 → 2 → 3) ---------- */
-  #stepper{
-    padding: 0 clamp(14px,3vw,28px) clamp(8px,1.5vh,14px);
-  }
-  #stepper[hidden]{ display:none; }
-  #stepper .proc-name{
-    font-size: var(--fs-label);
-    color: var(--ink-soft);
-    margin: 0 0 8px 0;
-    text-align:center;
-  }
-  #stepper .proc-name b{ color:var(--indigo); font-weight:700; }
-  .steps-bar{ display:flex; gap:8px; }
+  #stepper{ display:flex; gap:8px; width:100%; }
   .step-pill{
-    flex:1;
-    display:flex; align-items:center; gap:10px;
-    background:#fff;
-    border:2px solid var(--line);
-    border-radius:999px;
-    padding:8px 14px;
-    font-size: var(--fs-label);
-    color: var(--ink-soft);
-    min-width:0;
+    flex:1; display:flex; align-items:center; gap:10px; min-width:0;
+    background:#fff; border:2px solid var(--line); border-radius:999px;
+    padding:7px 12px; font-size:var(--fs-label); color:var(--ink-soft);
   }
-  .step-pill .n{
-    flex-shrink:0;
-    width:30px; height:30px; border-radius:50%;
-    background:var(--line); color:var(--ink-soft);
-    display:flex; align-items:center; justify-content:center;
-    font-weight:700;
-  }
+  .step-pill .n{ flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--line); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; font-weight:800; }
   .step-pill .t{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:600; }
-  .step-pill.active{ border-color:var(--indigo); color:var(--indigo); background:#fff; }
-  .step-pill.active .n{ background:var(--indigo); color:#fbf6ec; }
+  .step-pill.active{ border-color:var(--indigo); color:var(--indigo); }
+  .step-pill.active .n{ background:var(--indigo); color:#fff; }
   .step-pill.done{ border-color:var(--green); color:var(--green); }
   .step-pill.done .n{ background:var(--green); color:#fff; }
   .step-pill.failed{ border-color:var(--brick); color:var(--brick-dark); }
   .step-pill.failed .n{ background:var(--brick); color:#fff; }
-  @media (max-width:520px){ .step-pill .t{ display:none; } .step-pill{ justify-content:center; } }
+  @media (max-width:560px){ .step-pill .t{ display:none; } .step-pill{ justify-content:center; } }
 
-  /* ---------- stage & screens ---------- */
-  #stage{ flex:1; position:relative; min-height:0; }
-  .screen{
-    position:absolute; inset:0;
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding: clamp(20px,4vh,48px) clamp(20px,6vw,64px);
-    text-align:center;
-    opacity:0; visibility:hidden; transform: translateY(8px);
-    transition: opacity .28s ease, transform .28s ease;
-    overflow-y:auto;
-  }
-  .screen.active{ opacity:1; visibility:visible; transform: translateY(0); }
-  .screen.top{ justify-content:flex-start; padding-top: clamp(14px,2.5vh,26px); }
-  .prompt{
-    font-size:var(--fs-body); color:var(--ink-soft);
-    max-width: 34ch; line-height:1.5;
-    margin: 0 0 clamp(20px,4vh,40px) 0;
-  }
-  .prompt.tight{ margin-bottom: clamp(10px,2vh,18px); }
-  .prompt.dark{ color:var(--ink); }
-
-  /* ---------- mic button ---------- */
-  .mic-wrap{
+  /* ---------- khung hội thoại ---------- */
+  #chat{
+    flex:1; min-height:0; overflow-y:auto;
+    padding: clamp(14px,2.5vh,24px) clamp(14px,4vw,40px);
     position:relative;
-    width: min(46vw, 220px); height: min(46vw, 220px);
-    display:flex; align-items:center; justify-content:center;
-    margin-bottom: clamp(16px,3vh,28px);
   }
-  .mic-ring{
-    position:absolute; inset:0; border-radius:50%;
-    background: radial-gradient(circle at 35% 30%, #2c4a72, var(--indigo) 70%);
-    transform: scale(var(--level, 1));
-    transition: transform .08s linear;
+  #chatInner{ max-width:860px; margin:0 auto; display:flex; flex-direction:column; gap:14px; }
+  .msg{ display:flex; gap:12px; align-items:flex-end; animation: rise .25s ease both; }
+  @keyframes rise{ from{ opacity:0; transform:translateY(8px);} to{ opacity:1; transform:none; } }
+  .msg.kiosk{ justify-content:flex-start; }
+  .msg.user{ justify-content:flex-end; }
+  .avatar{
+    flex-shrink:0; width:44px; height:44px; border-radius:50%;
+    background:var(--indigo); color:#fff; display:flex; align-items:center; justify-content:center;
   }
-  #idle-screen .mic-ring, #retry-screen .mic-ring{ transform:none; }
-  .mic-btn{
-    position:relative; z-index:2; width:100%; height:100%;
-    border-radius:50%; border:none; background:transparent; color:#fbf6ec;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  .avatar svg{ width:24px; height:24px; }
+  .bubble{
+    max-width: min(88%, 680px);
+    padding: 14px 18px;
+    border-radius: var(--r-lg);
+    font-size: var(--fs-body); line-height:1.5;
+    text-align:left;
   }
-  .mic-btn:active{ filter:brightness(0.92); }
-  .mic-btn:focus-visible{ outline:4px solid var(--ochre); outline-offset:6px; }
-  .mic-btn svg{ width:42%; height:42%; }
-  .recording .mic-ring{
-    background: radial-gradient(circle at 35% 30%, #c85142, var(--brick) 70%);
-    animation: pulse 1.6s ease-in-out infinite;
+  .msg.kiosk .bubble{ background:var(--paper-raised); border:1px solid var(--line); border-bottom-left-radius:8px; }
+  .msg.user .bubble{ background:var(--indigo); color:#fff; border-bottom-right-radius:8px; font-weight:600; }
+  .bubble p{ margin:0 0 8px; }
+  .bubble p:last-child{ margin-bottom:0; }
+  .bubble .hint{
+    margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);
+    font-size: var(--fs-label); color: var(--ink-soft); line-height:1.45;
+    display:flex; gap:8px; align-items:flex-start;
   }
-  @keyframes pulse{
-    0%,100%{ box-shadow: 0 0 0 0 rgba(167,63,46,0.35); }
-    50%{ box-shadow: 0 0 0 22px rgba(167,63,46,0); }
+  .bubble .hint svg{ width:1.2em; height:1.2em; flex-shrink:0; margin-top:.15em; color:var(--ochre-dark); }
+  .bubble .stephead{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size: var(--fs-label); font-weight:800; letter-spacing:.3px;
+    color:var(--indigo); background:var(--indigo-soft);
+    padding:5px 12px; border-radius:999px; margin-bottom:10px;
   }
-  .timer{
-    font-variant-numeric: tabular-nums; font-size: var(--fs-title); font-weight:700;
-    color:var(--brick); margin-bottom: clamp(14px,3vh,26px);
-  }
-  .stop-btn{
-    border:none; background:var(--brick); color:#fff; font-weight:700;
-    font-size:var(--fs-button); padding: 16px 40px; border-radius: 999px; cursor:pointer;
-  }
-  .stop-btn:active{ background:var(--brick-dark); }
-  .stop-btn:focus-visible{ outline:4px solid var(--ochre); outline-offset:4px; }
+  .bubble .stephead.bad{ color:var(--brick-dark); background:var(--brick-soft); }
+  .bubble .stephead.warn{ color:var(--ochre-dark); background:var(--ochre-soft); }
+  .bubble .stephead.ok{ color:var(--green); background:var(--green-soft); }
+  .bubble .qtext{ font-size: var(--fs-title); font-weight:800; line-height:1.3; margin:0; }
+  .bubble b.proc{ color:var(--indigo); font-weight:800; }
+  .typing{ display:inline-flex; gap:6px; padding:6px 2px; }
+  .typing i{ width:10px; height:10px; border-radius:50%; background:var(--ink-soft); opacity:.4; animation: blink 1.2s infinite; }
+  .typing i:nth-child(2){ animation-delay:.2s; } .typing i:nth-child(3){ animation-delay:.4s; }
+  @keyframes blink{ 0%,80%,100%{ opacity:.25; } 40%{ opacity:1; } }
 
-  /* ---------- spinner ---------- */
-  .spinner{
-    width:64px; height:64px; border-radius:50%;
-    border:6px solid var(--line); border-top-color: var(--indigo);
-    animation: spin 0.9s linear infinite;
-    margin-bottom: clamp(18px,3.5vh,30px);
+  /* thẻ nội dung trong bong bóng (bước 2, 3) */
+  .card{ background:#fff; border:1px solid var(--line); border-radius:var(--r-md); padding:12px 14px; margin-top:10px; }
+  .card h3{ margin:0 0 8px; font-size:var(--fs-label); text-transform:uppercase; letter-spacing:.4px; color:var(--ink-soft); }
+  .checklist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .checklist li{ display:flex; gap:10px; align-items:flex-start; font-size:var(--fs-body); line-height:1.4; }
+  .checklist li .box{ flex-shrink:0; width:26px; height:26px; border-radius:7px; border:2px solid var(--indigo); color:var(--indigo); display:flex; align-items:center; justify-content:center; margin-top:2px; }
+  .checklist li .box svg{ width:16px; height:16px; }
+  .checklist.notes li{ font-size:var(--fs-label); }
+  .checklist.notes li .box{ border-color:var(--ochre-dark); color:var(--ochre-dark); background:var(--ochre-soft); }
+  .bullets{ margin:0; padding-left:1.25em; font-size:var(--fs-label); line-height:1.5; }
+  .bullets li{ margin-bottom:5px; }
+  .meta{ display:flex; gap:10px; font-size:var(--fs-label); line-height:1.45; margin-bottom:6px; }
+  .meta .k{ flex-shrink:0; width:8.5em; color:var(--ink-soft); }
+  .meta .v{ font-weight:600; }
+  .source{ display:inline-block; margin-top:6px; font-size:var(--fs-label); color:var(--ochre-dark); text-decoration:underline; }
+  .chips{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+  .chip{
+    border:2px solid var(--indigo); background:#fff; color:var(--indigo);
+    border-radius:14px; padding:12px 16px; font-weight:700; font-size:var(--fs-label); text-align:left; line-height:1.3;
   }
-  @keyframes spin{ to{ transform:rotate(360deg);} }
+  .chip:active{ background:var(--indigo); color:#fff; }
 
-  /* ---------- buttons ---------- */
-  .primary-btn{
-    border:none; background:var(--indigo); color:#fbf6ec; font-weight:700;
-    font-size:var(--fs-button); padding: 18px 40px; border-radius: 999px; cursor:pointer;
-    display:inline-flex; align-items:center; gap:12px;
+  /* ---------- khung trả lời (dưới cùng) ---------- */
+  #composer{
+    flex-shrink:0;
+    background:var(--paper-raised);
+    border-top:1px solid var(--line);
+    padding: clamp(12px,2vh,20px) clamp(14px,4vw,40px) calc(clamp(12px,2vh,20px) + env(safe-area-inset-bottom));
   }
-  .primary-btn:active{ background:var(--indigo-dark); }
-  .primary-btn:focus-visible{ outline:4px solid var(--ochre); outline-offset:4px; }
-  .primary-btn svg{ width:1.15em; height:1.15em; flex-shrink:0; }
-  .primary-btn.green{ background:var(--green); }
-  .secondary-btn{
-    border:2px solid var(--indigo); background:transparent; color:var(--indigo); font-weight:700;
-    font-size:var(--fs-button); padding: 16px 34px; border-radius: 999px; cursor:pointer;
-    display:inline-flex; align-items:center; gap:10px;
-  }
-  .secondary-btn:active{ background: rgba(31,58,95,0.08); }
-  .secondary-btn:focus-visible{ outline:4px solid var(--ochre); outline-offset:4px; }
-  .secondary-btn svg{ width:1.1em; height:1.1em; }
-  .ghost-btn{
-    border:none; background:transparent; color:var(--ink-soft); font-weight:600;
-    font-size:var(--fs-label); padding: 12px 20px; border-radius:999px; cursor:pointer;
-    text-decoration:underline;
-  }
-  .btn-row{ display:flex; flex-wrap:wrap; gap:14px; justify-content:center; margin-top: clamp(16px,3vh,28px); }
-  .btn-row.sticky{
-    position:sticky; bottom:0;
-    padding: 12px 0 4px;
-    background: linear-gradient(to top, var(--paper) 70%, transparent);
-    width:100%;
-  }
-
-  /* ---------- procedure menu (idle / handoff) ---------- */
-  .or-line{ font-size: var(--fs-label); color:var(--ink-soft); margin: 0 0 12px 0; }
-  .proc-grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-    gap:12px;
-    width:100%; max-width: 820px;
-  }
-  .proc-btn{
-    border:2px solid var(--line); background:#fff; color:var(--ink);
-    border-radius: var(--radius-md); padding: 14px 18px;
-    text-align:left; cursor:pointer;
-    display:flex; flex-direction:column; gap:4px;
-    min-height:76px;
-  }
-  .proc-btn:active{ background:var(--paper-raised); }
-  .proc-btn:focus-visible{ outline:4px solid var(--ochre); outline-offset:2px; }
-  .proc-btn .pn{ font-weight:700; font-size: var(--fs-body); color:var(--indigo); line-height:1.25; }
-  .proc-btn .ps{ font-size: var(--fs-label); color: var(--ink-soft); }
-
-  /* ---------- confirm ---------- */
-  .heard{ font-size: var(--fs-label); color: var(--ink-soft); margin-bottom: 6px; }
-  .heard b{ color:var(--ink); font-weight:600; }
-  .proc-title{
-    font-size: var(--fs-title); font-weight:800; color:var(--indigo);
-    max-width: 30ch; line-height:1.25; margin: 4px 0 clamp(16px,3vh,26px) 0;
-  }
-
-  /* ---------- question screen (bước 1) ---------- */
-  .q-intro{ font-size: var(--fs-label); color: var(--ink-soft); max-width: 44ch; margin: 0 0 10px; }
-  .q-count{ font-size: var(--fs-label); color: var(--ochre-dark); font-weight:700; margin: 0 0 6px; letter-spacing:.3px; }
-  .q-text{
-    font-size: var(--fs-title); font-weight:800; color:var(--ink);
-    max-width: 34ch; line-height:1.3; margin: 0 0 clamp(16px,3vh,26px);
-  }
-  .options{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-    gap:12px; width:100%; max-width: 760px;
-  }
+  #composerInner{ max-width:860px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .lead{ font-size:var(--fs-label); color:var(--ink-soft); text-align:center; margin:0; max-width:52ch; line-height:1.45; }
+  .options{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap:10px; width:100%; }
   .opt-btn{
     border:2px solid var(--indigo); background:#fff; color:var(--indigo);
-    border-radius: var(--radius-md);
-    padding: 18px 20px; min-height: 74px;
-    font-weight:700; font-size: var(--fs-body); line-height:1.3;
-    cursor:pointer; text-align:center;
+    border-radius:var(--r-md); padding:16px 18px; min-height:68px;
+    font-weight:700; font-size:var(--fs-body); line-height:1.3; text-align:center;
   }
-  .opt-btn:active{ background:var(--indigo); color:#fbf6ec; }
-  .opt-btn:focus-visible{ outline:4px solid var(--ochre); outline-offset:2px; }
-  .hint{
-    margin-top: 14px;
-    background: rgba(201,146,46,0.14); color: var(--ochre-dark);
-    font-weight:600; font-size: var(--fs-label);
-    padding: 10px 18px; border-radius: 999px;
-    max-width: 44ch;
+  .opt-btn:active{ background:var(--indigo); color:#fff; }
+  .row{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; width:100%; }
+  .mic-big{
+    width: min(34vw, 132px); height: min(34vw, 132px); border-radius:50%; border:none;
+    background: radial-gradient(circle at 35% 30%, #2c4a72, var(--indigo) 70%);
+    color:#fff; display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 10px 28px rgba(31,58,95,.28);
   }
-  .hint[hidden]{ display:none; }
+  .mic-big svg{ width:46%; height:46%; }
+  .mic-big:active{ filter:brightness(.92); }
+  .mic-big.rec{
+    background: radial-gradient(circle at 35% 30%, #c85142, var(--brick) 70%);
+    animation:pulse 1.5s ease-in-out infinite;
+    transform: scale(var(--level, 1));
+    box-shadow:none;
+  }
+  @keyframes pulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(167,63,46,.35);} 50%{ box-shadow:0 0 0 22px rgba(167,63,46,0);} }
+  .timer{ font-variant-numeric:tabular-nums; font-size:var(--fs-title); font-weight:800; color:var(--brick); }
+  .btn{
+    border:none; border-radius:999px; padding:16px 30px;
+    font-weight:700; font-size:var(--fs-button);
+    display:inline-flex; align-items:center; gap:10px;
+  }
+  .btn svg{ width:1.15em; height:1.15em; flex-shrink:0; }
+  .btn.primary{ background:var(--indigo); color:#fff; }
+  .btn.primary:active{ background:var(--indigo-dark); }
+  .btn.green{ background:var(--green); color:#fff; }
+  .btn.danger{ background:var(--brick); color:#fff; }
+  .btn.outline{ background:#fff; color:var(--indigo); border:2px solid var(--indigo); }
+  .btn.outline:active{ background:var(--indigo-soft); }
+  .btn.link{ background:transparent; color:var(--ink-soft); text-decoration:underline; font-size:var(--fs-label); padding:8px 14px; font-weight:600; }
 
-  /* ---------- cards (bước 2, 3) ---------- */
-  .card{
-    width:100%; max-width: 720px;
-    background:var(--paper-raised);
-    border-radius: var(--radius-lg);
-    padding: clamp(18px,3.2vw,30px);
-    text-align:left;
-    margin-bottom: 14px;
-  }
-  .card h2{
-    margin:0 0 10px; font-size: var(--fs-body); color: var(--indigo); font-weight:800;
-    display:flex; align-items:center; gap:10px;
-  }
-  .card h2 .ic{ width:1.25em; height:1.25em; flex-shrink:0; }
-  .card p{ margin:0 0 10px; font-size: var(--fs-label); line-height:1.5; color: var(--ink); }
-  .card p:last-child{ margin-bottom:0; }
-  .banner{
-    width:100%; max-width:720px; text-align:left;
-    background: var(--green-soft); border-left: 6px solid var(--green);
-    border-radius: var(--radius-md);
-    padding: 12px 18px; margin-bottom: 14px;
-    font-size: var(--fs-label); line-height:1.5; color: var(--ink);
-  }
-  .banner b{ color:var(--green); }
-  .checklist{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; }
-  .checklist li{
-    display:flex; gap:12px; align-items:flex-start;
-    background:#fff; border:1px solid var(--line); border-radius: var(--radius-md);
-    padding: 12px 14px; font-size: var(--fs-body); line-height:1.4; font-weight:500;
-  }
-  .checklist li .box{
-    flex-shrink:0; width:28px; height:28px; border-radius:8px;
-    border:2px solid var(--indigo); color:var(--indigo);
-    display:flex; align-items:center; justify-content:center; margin-top:2px;
-  }
-  .checklist li .box svg{ width:18px; height:18px; }
-  .bullets{ margin:0; padding-left: 1.3em; font-size: var(--fs-label); line-height:1.55; }
-  .bullets li{ margin-bottom:6px; }
-  .note-list li{ background:#fff8e8; border-color:#eadbb5; font-size: var(--fs-label); font-weight:500; }
-  .note-list li .box{ border-color:var(--ochre-dark); color:var(--ochre-dark); }
-  .meta-row{ display:flex; gap:10px; font-size: var(--fs-label); line-height:1.45; margin-bottom:8px; }
-  .meta-row .k{ flex-shrink:0; width: 8.5em; color: var(--ink-soft); }
-  .meta-row .v{ font-weight:600; }
-  .source-link{ display:inline-block; margin: 4px 0 8px; font-size: var(--fs-label); color: var(--ochre-dark); text-decoration: underline; }
-
-  /* hộp hỏi-đáp thêm, hiện trên đầu bước 2/3 sau khi bác hỏi */
-  .qa-box{
-    width:100%; max-width:720px; text-align:left;
-    background:#fff; border:2px solid var(--indigo);
-    border-radius: var(--radius-md);
-    padding: 14px 18px; margin-bottom: 14px;
-  }
-  .qa-box[hidden]{ display:none; }
-  .qa-box .q{ font-size: var(--fs-label); color: var(--ink-soft); margin-bottom:6px; }
-  .qa-box .a{ font-size: var(--fs-body); line-height:1.45; font-weight:500; }
-  .qa-box .switch{ margin-top:10px; }
-
-  /* ---------- badges ---------- */
-  .badge{
-    display:inline-flex; align-items:center; gap:8px;
-    background: rgba(167,63,46,0.1); color: var(--brick-dark);
-    font-weight:700; font-size: var(--fs-label);
-    padding: 8px 18px; border-radius:999px;
-    margin-bottom: clamp(14px,2.5vh,22px);
-  }
-  .badge.warn{ background: rgba(201,146,46,0.16); color: var(--ochre-dark); }
-  .badge.info{ background: rgba(31,58,95,0.1); color: var(--indigo); }
-  .badge.ok{ background: var(--green-soft); color: var(--green); }
-  .warn-icon{ width:1.3em; height:1.3em; flex-shrink:0; }
-  .done-icon{
-    width: 110px; height:110px; border-radius:50%; background: var(--green); color:#fff;
-    display:flex; align-items:center; justify-content:center; margin-bottom: 22px;
-  }
-  .done-icon svg{ width:56%; height:56%; }
-
-  /* ---------- debug panel ---------- */
+  /* ---------- bảng gỡ lỗi ---------- */
   #debug{
-    position:fixed; inset:auto 12px 12px 12px; max-width: 480px; margin:0 auto;
+    position:fixed; inset:auto 12px 12px 12px; max-width:480px; margin:0 auto;
     background:#fff; border:1px solid var(--line); border-radius:16px; padding:16px;
-    font-size:13px; color:var(--ink-soft); box-shadow:0 8px 30px rgba(0,0,0,0.18);
-    display:none; z-index:50;
+    font-size:13px; color:var(--ink-soft); box-shadow:0 8px 30px rgba(0,0,0,.18); display:none; z-index:50;
   }
   #debug.open{ display:block; }
-  #debug h3{ margin:0 0 8px 0; font-size:14px; color:var(--ink); }
+  #debug h3{ margin:0 0 8px; font-size:14px; color:var(--ink); }
   #debug label{ display:block; margin:8px 0 4px; }
   #debug input{ width:100%; padding:8px 10px; font-family:inherit; font-size:13px; border:1px solid var(--line); border-radius:8px; }
-  #debug .row{ display:flex; gap:8px; margin-top:10px; }
-  #debug button{ font-size:13px; padding:7px 12px; border-radius:8px; border:1px solid var(--indigo); background:var(--indigo); color:#fff; cursor:pointer; }
+  #debug .drow{ display:flex; gap:8px; margin-top:10px; }
+  #debug button{ font-size:13px; padding:7px 12px; border-radius:8px; border:1px solid var(--indigo); background:var(--indigo); color:#fff; }
   #debug button.ghost{ background:transparent; color:var(--indigo); }
-  #debug pre{ white-space:pre-wrap; max-height:140px; overflow:auto; background:var(--paper); padding:8px; border-radius:8px; margin-top:8px;}
+  #debug pre{ white-space:pre-wrap; max-height:140px; overflow:auto; background:var(--paper); padding:8px; border-radius:8px; margin-top:8px; }
 </style>
 </head>
 <body>
 <div id="app">
 
-  <div id="statusbar">
+  <header id="topbar">
     <span class="dot" id="statusDot"></span>
     <span id="brand" ontouchstart="handleBrandTap()" onclick="handleBrandTap()">Kiosk thủ tục</span>
     <span id="statusText">Đang kết nối…</span>
     <button id="homeBtn" hidden>✕ Về đầu</button>
-  </div>
-
-  <!-- Thanh tiến trình 3 bước, chỉ hiện khi đang trong một thủ tục -->
-  <div id="stepper" hidden>
-    <p class="proc-name">Thủ tục: <b id="stepperProc"></b></p>
-    <div class="steps-bar">
+    <div id="stepper" hidden>
       <div class="step-pill" data-step="1"><span class="n">1</span><span class="t">Kiểm tra điều kiện</span></div>
       <div class="step-pill" data-step="2"><span class="n">2</span><span class="t">Chuẩn bị hồ sơ</span></div>
       <div class="step-pill" data-step="3"><span class="n">3</span><span class="t">Nộp hồ sơ</span></div>
     </div>
-  </div>
+  </header>
 
-  <main id="stage">
+  <main id="chat"><div id="chatInner"></div></main>
 
-    <!-- CHECKING SERVER -->
-    <section class="screen active" id="checking-screen">
-      <div class="spinner" aria-hidden="true"></div>
-      <p class="prompt" id="checkingText">Máy đang khởi động, bác đợi cháu một chút.</p>
-    </section>
-
-    <!-- IDLE: bắt đầu -->
-    <section class="screen top" id="idle-screen">
-      <div class="mic-wrap">
-        <div class="mic-ring" aria-hidden="true"></div>
-        <button class="mic-btn" id="micBtn" aria-label="Bấm để nói">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0"/>
-            <line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>
-          </svg>
-        </button>
-      </div>
-      <p class="prompt tight">Bác bấm vào micro rồi nói điều bác cần, ví dụ: "tôi 76 tuổi, không có lương hưu thì được hỗ trợ gì".</p>
-      <p class="or-line">Hoặc bác bấm chọn thủ tục:</p>
-      <div class="proc-grid" id="procGrid"></div>
-    </section>
-
-    <!-- RECORDING -->
-    <section class="screen recording" id="recording-screen">
-      <div class="timer" id="timerText">00:00</div>
-      <div class="mic-wrap">
-        <div class="mic-ring" id="recRing" aria-hidden="true"></div>
-        <div class="mic-btn" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0"/>
-          </svg>
-        </div>
-      </div>
-      <p class="prompt tight" id="recPrompt">Cháu đang nghe, bác cứ nói tự nhiên.</p>
-      <button class="stop-btn" id="stopBtn">Nói xong rồi</button>
-    </section>
-
-    <!-- PROCESSING -->
-    <section class="screen" id="processing-screen">
-      <div class="spinner" aria-hidden="true"></div>
-      <p class="prompt" id="processingText">Cháu đang tìm câu trả lời cho bác.</p>
-    </section>
-
-    <!-- CONFIRM: đã nhận ra thủ tục -->
-    <section class="screen" id="confirm-screen">
-      <p class="heard" id="heardText"></p>
-      <p class="prompt tight">Cháu hiểu bác cần làm thủ tục:</p>
-      <h1 class="proc-title" id="confirmName"></h1>
-      <div class="btn-row">
-        <button class="primary-btn" id="confirmYesBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Đúng rồi, bắt đầu
-        </button>
-        <button class="secondary-btn" id="confirmNoBtn">Không phải, chọn lại</button>
-      </div>
-    </section>
-
-    <!-- RETRY (no speech heard) -->
-    <section class="screen" id="retry-screen">
-      <div class="mic-wrap">
-        <div class="mic-ring" aria-hidden="true"></div>
-        <button class="mic-btn" id="micBtnRetry" aria-label="Bấm để nói lại">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0"/>
-            <line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/>
-          </svg>
-        </button>
-      </div>
-      <p class="prompt" id="retryText">Máy chưa nghe rõ, bác nói lại giúp cháu.</p>
-      <button class="ghost-btn" id="retryBackBtn">Quay về màn hình chính</button>
-    </section>
-
-    <!-- HANDOFF: không khớp thủ tục nào -->
-    <section class="screen top" id="handoff-screen">
-      <span class="badge">
-        <svg class="warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-        </svg>
-        Cháu chưa hiểu bác cần gì
-      </span>
-      <p class="prompt tight" id="handoffText" style="max-width:40ch;"></p>
-      <p class="or-line">Bác bấm chọn một thủ tục dưới đây, hoặc hỏi lại:</p>
-      <div class="proc-grid" id="procGrid2"></div>
-      <div class="btn-row">
-        <button class="primary-btn" id="handoffAgainBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0"/></svg>
-          Hỏi lại
-        </button>
-      </div>
-    </section>
-
-    <!-- BƯỚC 1: câu hỏi kiểm tra điều kiện -->
-    <section class="screen top" id="question-screen">
-      <p class="q-intro" id="qIntro"></p>
-      <p class="q-count" id="qCount"></p>
-      <h1 class="q-text" id="qText"></h1>
-      <div class="options" id="qOptions"></div>
-      <p class="hint" id="qHint" hidden></p>
-      <div class="btn-row">
-        <button class="secondary-btn" id="qVoiceBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0"/></svg>
-          Trả lời bằng lời
-        </button>
-        <button class="secondary-btn" id="qReplayBtn">🔊 Nghe lại</button>
-        <button class="ghost-btn" id="qBackBtn">← Quay lại câu trước</button>
-      </div>
-    </section>
-
-    <!-- BƯỚC 1 kết luận: không đáp ứng / cần cán bộ / thủ tục khác -->
-    <section class="screen top" id="stop-screen">
-      <span class="badge" id="stopBadge">
-        <svg class="warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        <span id="stopTitle">Chưa đủ điều kiện</span>
-      </span>
-      <div class="card"><p id="stopReason" style="font-size:var(--fs-body);"></p></div>
-      <div class="btn-row">
-        <button class="primary-btn" id="suggestBtn" hidden></button>
-        <button class="secondary-btn" id="stopReplayBtn">🔊 Nghe lại</button>
-        <button class="secondary-btn" id="stopRestartBtn">↺ Làm lại từ đầu</button>
-        <button class="ghost-btn" id="stopEndBtn">Kết thúc</button>
-      </div>
-    </section>
-
-    <!-- BƯỚC 2: chuẩn bị hồ sơ -->
-    <section class="screen top" id="prepare-screen">
-      <div class="banner" id="prepNote"></div>
-      <div class="qa-box" id="prepQa" hidden></div>
-      <div class="card">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Giấy tờ cần chuẩn bị</h2>
-        <p id="prepSay"></p>
-        <ul class="checklist" id="prepDocs"></ul>
-      </div>
-      <div class="card" id="prepNotesCard" hidden>
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>Lưu ý theo trường hợp của bác</h2>
-        <ul class="checklist note-list" id="prepNotes"></ul>
-      </div>
-      <div class="card" id="prepTipsCard" hidden>
-        <h2>Thông tin thêm</h2>
-        <ul class="bullets" id="prepTips"></ul>
-      </div>
-      <div class="btn-row sticky">
-        <button class="secondary-btn" id="prepAskBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0"/></svg>
-          Hỏi thêm
-        </button>
-        <button class="secondary-btn" id="prepReplayBtn">🔊 Nghe lại</button>
-        <button class="primary-btn" id="prepNextBtn">Đã rõ, sang bước 3 →</button>
-      </div>
-    </section>
-
-    <!-- BƯỚC 3: nộp hồ sơ -->
-    <section class="screen top" id="submit-screen">
-      <div class="qa-box" id="subQa" hidden></div>
-      <div class="card">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>Nộp ở đâu</h2>
-        <p id="subSay"></p>
-        <ul class="bullets" id="subPlaces"></ul>
-        <p style="margin-top:10px;"><b>Cách nộp:</b></p>
-        <ul class="bullets" id="subMethods"></ul>
-      </div>
-      <div class="card">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Khi đi bác mang theo</h2>
-        <ul class="checklist" id="subBring"></ul>
-      </div>
-      <div class="card" id="subNotesCard" hidden>
-        <h2>Lưu ý theo trường hợp của bác</h2>
-        <ul class="checklist note-list" id="subNotes"></ul>
-      </div>
-      <div class="card">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Quá trình xử lý và thời hạn</h2>
-        <div id="subMeta"></div>
-        <a class="source-link" id="subSource" href="#" target="_blank" rel="noopener" hidden></a>
-      </div>
-      <div class="btn-row sticky">
-        <button class="secondary-btn" id="subAskBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0"/></svg>
-          Hỏi thêm
-        </button>
-        <button class="secondary-btn" id="subReplayBtn">🔊 Nghe lại</button>
-        <button class="primary-btn green" id="subDoneBtn">Đã rõ, kết thúc ✓</button>
-      </div>
-    </section>
-
-    <!-- KẾT THÚC -->
-    <section class="screen" id="done-screen">
-      <div class="done-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <p class="prompt dark" id="doneText"></p>
-      <button class="primary-btn" id="doneHomeBtn">Về màn hình chính</button>
-    </section>
-
-    <!-- ERROR -->
-    <section class="screen" id="error-screen">
-      <span class="badge">
-        <svg class="warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
-        Có lỗi xảy ra
-      </span>
-      <p class="prompt" id="errorText" style="max-width:36ch;"></p>
-      <div class="btn-row">
-        <button class="primary-btn" id="errorRetryBtn">Thử lại</button>
-        <button class="ghost-btn" id="errorHomeBtn">Về màn hình chính</button>
-      </div>
-    </section>
-
-  </main>
+  <footer id="composer"><div id="composerInner"></div></footer>
 </div>
 
-<!-- bảng gỡ lỗi ẩn: bấm 3 lần vào chữ "Kiosk thủ tục" -->
 <div id="debug">
   <h3>Bảng gỡ lỗi (chỉ dành cho Kns)</h3>
   <label for="baseInput">Địa chỉ máy chủ (BASE)</label>
   <input id="baseInput" type="text">
-  <div class="row">
+  <div class="drow">
     <button id="saveBaseBtn">Lưu &amp; tải lại</button>
     <button class="ghost" id="checkHealthBtn">Gọi /health</button>
     <button class="ghost" id="closeDebugBtn">Đóng</button>
@@ -607,11 +252,12 @@
 
 <script>
 /* =====================================================================
-   CẤU HÌNH — theo API_CONTRACT.md 2.0.
-   Trang này do chính máy chủ backend phục vụ ở "/", nên gọi API cùng origin:
-   BASE rỗng, fetch(BASE + "/turn") thành fetch("/turn"). Không vướng CORS,
-   đổi tên miền lúc triển khai không phải sửa dòng nào. Mở thẳng file từ ổ
-   đĩa (file://) thì rơi về máy chủ chạy trên máy cá nhân.
+   Giao diện kiosk dạng HỘI THOẠI, đi từng bước theo sơ đồ:
+     chào → bác cần gì → xác nhận thủ tục → Bước 1 hỏi từng điều kiện
+     → Bước 2 chuẩn bị hồ sơ → Bước 3 nộp hồ sơ → kết thúc.
+   Mọi câu máy hỏi là một bong bóng bên trái; bác trả lời (bấm hoặc nói)
+   là bong bóng bên phải. Khung dưới cùng chỉ hiện đúng thứ bác cần làm
+   lúc đó. Giao kèo: API_CONTRACT.md 2.0.
    ===================================================================== */
 const DEFAULT_BASE = location.protocol === "file:" ? "http://localhost:8000" : "";
 const qsBase = new URLSearchParams(location.search).get("base");
@@ -621,54 +267,33 @@ let BASE = localStorage.getItem("kiosk_base") || DEFAULT_BASE;
 const MAX_RECORD_SECONDS = 58;
 const HEALTH_POLL_MS = 4000;
 const HEALTH_MAX_WAIT_MS = 90000;
-
-// Không thao tác gì trong ngần này thì coi như bác đã xong: về màn hình
-// chính, đổi session, xoá trạng thái luồng — để bác tiếp theo không dính
-// câu trả lời của bác trước. Trong luồng phải đọc nhiều chữ nên để dài.
-const INACTIVITY_RESET_MS = 120000;
+const INACTIVITY_RESET_MS = 120000;   // không ai chạm gì → chào bác mới
 const DONE_AUTO_HOME_MS = 15000;
-const SCREENS_WITHOUT_INACTIVITY = new Set(["checking-screen", "recording-screen", "processing-screen"]);
+
+const GREETING_1 = "Xin chào bác! Cháu là máy hướng dẫn làm thủ tục hành chính.";
+const GREETING_2 = "Bác cần làm gì ạ?";
+const GREETING_HINT = "Bác bấm vào nút micro bên dưới rồi nói, ví dụ: «Tôi 76 tuổi, không có lương hưu thì được hỗ trợ gì?» Nói xong bác bấm «Nói xong rồi».";
+
+const ICON_MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a7 7 0 0 1-14 0"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>';
+const ICON_CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+const ICON_INFO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+const ICON_KIOSK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 
 /* ---------------------------------------------------------------------
-   Tiện ích chung
+   Tiện ích
    --------------------------------------------------------------------- */
 const $ = (id) => document.getElementById(id);
-const screens = {};
-document.querySelectorAll(".screen").forEach(el => screens[el.id] = el);
-
-let inactivityTimer = null;
-function armInactivityTimer(){
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(endConversation, INACTIVITY_RESET_MS);
-}
-function clearInactivityTimer(){ clearTimeout(inactivityTimer); }
-
-function showScreen(id){
-  Object.values(screens).forEach(s => s.classList.remove("active"));
-  screens[id].classList.add("active");
-  screens[id].scrollTop = 0;
-  if (SCREENS_WITHOUT_INACTIVITY.has(id)) clearInactivityTimer();
-  else armInactivityTimer();
-}
-
-// Bất kỳ chạm/bấm nào cũng tính là còn đang dùng.
-["click", "touchstart", "keydown"].forEach(ev =>
-  document.addEventListener(ev, () => { if (inactivityTimer) armInactivityTimer(); }, { passive: true }));
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
 
 function setStatus(kind, text){
   $("statusDot").className = "dot" + (kind ? " " + kind : "");
   $("statusText").textContent = text;
 }
-
 function sessionId(){
   if (!window._sid) window._sid = "kiosk-01-" + Math.floor(Date.now()/1000);
   return window._sid;
 }
-
-function escapeHtml(s){
-  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
-}
-
 async function api(path, opts){
   const res = await fetch(BASE + path, opts);
   let data;
@@ -679,25 +304,21 @@ async function api(path, opts){
   }
   return data;
 }
-function postJson(path, body){
-  return api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-}
+const postJson = (path, body) => api(path, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body) });
+
+let inactivityTimer = null;
+function armInactivity(){ clearTimeout(inactivityTimer); inactivityTimer = setTimeout(startConversation, INACTIVITY_RESET_MS); }
+["click", "touchstart", "keydown"].forEach(ev => document.addEventListener(ev, armInactivity, { passive:true }));
 
 /* ---------------------------------------------------------------------
-   Đọc thành tiếng: POST /tts trả mp3 giọng tiếng Việt; hỏng thì rơi về
-   giọng trình duyệt (thà giọng chưa chuẩn còn hơn im).
+   Đọc thành tiếng: POST /tts (mp3 giọng Việt), hỏng thì giọng trình duyệt
    --------------------------------------------------------------------- */
-let serverTtsReady = false;
-let viVoice = null;
+let serverTtsReady = false, viVoice = null, lastSpeech = "", currentAudio = null, speechTicket = 0;
 function loadVoices(){
   const voices = window.speechSynthesis ? speechSynthesis.getVoices() : [];
   viVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith("vi")) || null;
 }
 if (window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
-
-let lastSpeech = "";
-let currentAudio = null;
-let speechTicket = 0;   // câu cũ về muộn thì không được phát đè câu mới
 
 async function speak(text){
   if (!text) return;
@@ -706,9 +327,7 @@ async function speak(text){
   stopSpeaking();
   if (serverTtsReady){
     try{
-      const res = await fetch(BASE + "/tts", {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text })
-      });
+      const res = await fetch(BASE + "/tts", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ text }) });
       if (!res.ok) throw new Error("tts " + res.status);
       const blob = await res.blob();
       if (ticket !== speechTicket) return;
@@ -722,15 +341,10 @@ async function speak(text){
       if (ticket !== speechTicket) return;
     }
   }
-  speakWithBrowser(text);
-}
-function speakWithBrowser(text){
   if (!window.speechSynthesis) return;
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  u.lang = "vi-VN";
-  if (viVoice) u.voice = viVoice;
-  u.rate = 0.95;
+  u.lang = "vi-VN"; if (viVoice) u.voice = viVoice; u.rate = 0.95;
   speechSynthesis.speak(u);
 }
 function stopSpeaking(){
@@ -739,23 +353,86 @@ function stopSpeaking(){
 }
 
 /* ---------------------------------------------------------------------
-   Trạng thái luồng của bác đang đứng trước kiosk
+   Bong bóng hội thoại
    --------------------------------------------------------------------- */
-let procedures = [];        // từ GET /procedures
-let flowState = null;       // FlowState mới nhất từ máy chủ
-let answerOrder = [];       // thứ tự câu đã trả lời, cho nút "Quay lại"
-let pendingProc = null;     // thủ tục vừa nhận ra, đang chờ bác xác nhận
-let recordContext = "query"; // "query" | "answer" | "ask"
-let doneTimer = null;
-
-function endConversation(){
-  stopSpeaking();
-  clearTimeout(doneTimer);
-  flowState = null; answerOrder = []; pendingProc = null;
-  window._sid = null;
-  updateStepper();
-  showScreen("idle-screen");
+const chat = $("chatInner");
+// Cuộn xuống cái mới nhất. Bong bóng dài hơn cả khung (bước 2, 3) thì cuộn
+// cho ĐẦU bong bóng lộ ra để bác đọc từ trên xuống, không phải kéo ngược.
+function scrollDown(el){
+  requestAnimationFrame(() => {
+    const box = $("chat");
+    // Cuộn tức thì, không mượt: hai lần cuộn mượt nối nhau thì lần sau huỷ
+    // lần trước, có lúc màn hình đứng lại giữa chừng.
+    if (el && el.offsetHeight > box.clientHeight * 0.7) box.scrollTop = el.offsetTop - 8;
+    else box.scrollTop = box.scrollHeight;
+  });
 }
+
+function kioskSay(html, opts = {}){
+  const el = document.createElement("div");
+  el.className = "msg kiosk";
+  const hint = opts.hint ? `<div class="hint">${ICON_INFO}<span>${esc(opts.hint)}</span></div>` : "";
+  el.innerHTML = `<div class="avatar">${ICON_KIOSK}</div><div class="bubble">${html}${hint}</div>`;
+  chat.appendChild(el);
+  scrollDown(el);
+  if (opts.speech) speak(opts.speech);
+  return el;
+}
+function userSay(text){
+  const el = document.createElement("div");
+  el.className = "msg user";
+  el.innerHTML = `<div class="bubble">${esc(text)}</div>`;
+  chat.appendChild(el);
+  scrollDown();
+  return el;
+}
+let typingEl = null;
+function showTyping(){
+  hideTyping();
+  typingEl = document.createElement("div");
+  typingEl.className = "msg kiosk";
+  typingEl.innerHTML = `<div class="avatar">${ICON_KIOSK}</div><div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div>`;
+  chat.appendChild(typingEl);
+  scrollDown();
+}
+function hideTyping(){ if (typingEl){ typingEl.remove(); typingEl = null; } }
+function clearChat(){ hideTyping(); chat.innerHTML = ""; }
+
+/* ---------------------------------------------------------------------
+   Khung trả lời dưới cùng — chỉ hiện đúng việc bác cần làm lúc này
+   --------------------------------------------------------------------- */
+const composer = $("composerInner");
+function setComposer(html){ composer.innerHTML = html; scrollDown(); }
+const btn = (id, cls, label, icon = "") => `<button class="btn ${cls}" id="${id}">${icon}${label}</button>`;
+const NO_VOICE_BTN = btn("noVoiceBtn", "link", "Bác không nói được? Bấm đây để chọn bằng tay");
+
+function composerListen(lead, opts = {}){
+  setComposer(`
+    <p class="lead">${esc(lead)}</p>
+    <button class="mic-big" id="micBtn" aria-label="Bấm để nói">${ICON_MIC}</button>
+    <div class="row">${opts.extra || ""}</div>`);
+  $("micBtn").addEventListener("click", () => startRecording(opts.context || "query", opts.recLead));
+  if ($("noVoiceBtn")) $("noVoiceBtn").addEventListener("click", offerProcedureList);
+}
+function composerRecording(lead){
+  setComposer(`
+    <p class="lead">${esc(lead)}</p>
+    <div class="timer" id="timerText">00:00</div>
+    <button class="mic-big rec" id="recRing" aria-hidden="true">${ICON_MIC}</button>
+    <div class="row">${btn("stopBtn", "danger", "Nói xong rồi")}</div>`);
+  $("stopBtn").addEventListener("click", stopRecording);
+}
+function composerWaiting(lead){ setComposer(`<p class="lead">${esc(lead)}</p>`); }
+
+/* ---------------------------------------------------------------------
+   Trạng thái
+   --------------------------------------------------------------------- */
+let flowState = null;      // FlowState mới nhất
+let answerOrder = [];      // thứ tự câu đã trả lời (cho «Quay lại»)
+let pendingProc = null;    // thủ tục vừa nhận ra, chờ bác xác nhận
+let procedures = [];       // GET /procedures — chỉ đem ra khi máy không hiểu
+let recordContext = "query";
+let doneTimer = null;
 
 function updateStepper(){
   const st = flowState;
@@ -763,70 +440,75 @@ function updateStepper(){
   $("stepper").hidden = !show;
   $("homeBtn").hidden = !show;
   if (!show) return;
-  $("stepperProc").textContent = st.procedure_name || "";
   document.querySelectorAll(".step-pill").forEach(p => {
     const n = Number(p.dataset.step);
     p.classList.remove("active", "done", "failed");
-    if (st.stage === "stop"){
-      if (n === 1) p.classList.add("failed");
-    } else if (st.stage === "done"){
-      p.classList.add("done");
-    } else if (n < st.step) p.classList.add("done");
+    if (st.stage === "stop"){ if (n === 1) p.classList.add("failed"); }
+    else if (st.stage === "done") p.classList.add("done");
+    else if (n < st.step) p.classList.add("done");
     else if (n === st.step) p.classList.add("active");
   });
 }
 
+/* Bắt đầu cuộc trò chuyện mới: chào → hỏi bác cần gì */
+async function startConversation(){
+  stopSpeaking();
+  clearTimeout(doneTimer);
+  flowState = null; answerOrder = []; pendingProc = null; window._sid = null;
+  updateStepper();
+  clearChat();
+  composerWaiting("Bác đợi cháu một chút…");
+  kioskSay(`<p>${esc(GREETING_1)}</p>`);
+  await wait(650);
+  kioskSay(`<p class="qtext">${esc(GREETING_2)}</p>`, { hint: GREETING_HINT, speech: `${GREETING_1} ${GREETING_2} ${GREETING_HINT}` });
+  composerListen("Bấm micro rồi nói điều bác cần", { context: "query", extra: NO_VOICE_BTN });
+  armInactivity();
+}
+
+/* Chỉ khi bác không nói được hoặc máy không hiểu mới đưa danh sách ra */
+async function offerProcedureList(){
+  if (!procedures.length){
+    try{ procedures = (await api("/procedures")).procedures || []; } catch(e){ showError(e.message); return; }
+  }
+  const chips = procedures.map(p => `<button class="chip" data-id="${esc(p.id)}">${esc(p.name)}${p.short ? `<br><span style="font-weight:500;color:var(--ink-soft)">${esc(p.short)}</span>` : ""}</button>`).join("");
+  const el = kioskSay(`<p>Bác bấm chọn việc bác cần làm ạ:</p><div class="chips">${chips}</div>`,
+    { speech: "Bác bấm chọn việc bác cần làm trên màn hình ạ." });
+  el.querySelectorAll(".chip").forEach(c => c.addEventListener("click", () => {
+    const p = procedures.find(x => x.id === c.dataset.id);
+    userSay(p ? p.name : c.dataset.id);
+    startFlow(c.dataset.id);
+  }));
+  composerListen("Hoặc bấm micro rồi nói", { context: "query" });
+}
+
 /* ---------------------------------------------------------------------
-   Kiểm tra /health rồi tải danh sách thủ tục
+   Kiểm tra máy chủ
    --------------------------------------------------------------------- */
 let healthWaitStart = null;
 async function pollHealth(){
   if (healthWaitStart === null) healthWaitStart = Date.now();
+  let ready = false;
   try{
-    const res = await fetch(BASE + "/health");
-    const data = await res.json();
+    const data = await (await fetch(BASE + "/health")).json();
     serverTtsReady = !!data.tts_ready;
     setStatus(data.mock ? "warn" : "ok", data.mock ? "Máy chủ giả (demo)" : "Đã kết nối máy chủ");
-    if (!procedures.length) loadProcedures();
-    if (data.asr_ready){ showScreen("idle-screen"); return; }
-    $("checkingText").textContent = "Máy đang khởi động, bác đợi cháu một chút.";
+    ready = !!data.asr_ready;
   } catch(e){
     setStatus("bad", "Không kết nối được máy chủ");
-    $("checkingText").textContent =
-      "Không kết nối được máy chủ. Kiểm tra máy chủ đã chạy chưa (vd. MOCK=1 uvicorn app.main:app --reload) rồi thử lại.";
+    composerWaiting("Không kết nối được máy chủ. Kiểm tra máy chủ đã chạy chưa (vd. MOCK=1 uvicorn app.main:app --reload) rồi tải lại trang.");
   }
-  if (Date.now() - healthWaitStart > HEALTH_MAX_WAIT_MS){ showScreen("idle-screen"); return; }
+  if (ready || Date.now() - healthWaitStart > HEALTH_MAX_WAIT_MS){ startConversation(); return; }
+  composerWaiting("Máy đang khởi động, bác đợi cháu một chút…");
   setTimeout(pollHealth, HEALTH_POLL_MS);
 }
-
-async function loadProcedures(){
-  try{
-    const d = await api("/procedures");
-    procedures = d.procedures || [];
-    renderProcGrid($("procGrid"));
-    renderProcGrid($("procGrid2"));
-  } catch(e){ console.warn("không tải được danh sách thủ tục:", e); }
-}
-function renderProcGrid(el){
-  el.innerHTML = "";
-  procedures.forEach(p => {
-    const b = document.createElement("button");
-    b.className = "proc-btn";
-    b.innerHTML = `<span class="pn">${escapeHtml(p.name)}</span>${p.short ? `<span class="ps">${escapeHtml(p.short)}</span>` : ""}`;
-    b.addEventListener("click", () => startFlow(p.id));
-    el.appendChild(b);
-  });
-}
-showScreen("checking-screen");
+composerWaiting("Đang kết nối máy chủ…");
 pollHealth();
 
 /* ---------------------------------------------------------------------
-   Ghi âm — dùng chung cho 3 ngữ cảnh: hỏi ban đầu, trả lời câu bước 1,
-   hỏi thêm ở bước 2/3. Xong thì rẽ theo recordContext.
+   Ghi âm — dùng chung: hỏi ban đầu / trả lời câu bước 1 / hỏi thêm
    --------------------------------------------------------------------- */
 let mediaRecorder = null, mediaStream = null, audioChunks = [];
-let recordTimer = null, recordStartedAt = 0;
-let audioCtx = null, analyser = null, rafId = null;
+let recordTimer = null, recordStartedAt = 0, audioCtx = null, analyser = null, rafId = null;
 
 function pickMimeType(){
   for (const c of ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus", "audio/ogg"]){
@@ -834,11 +516,9 @@ function pickMimeType(){
   }
   return undefined;
 }
-
-async function startRecording(context, prompt){
+async function startRecording(context, lead){
   recordContext = context || "query";
   stopSpeaking();
-
   // Trình duyệt chỉ mở micro cho HTTPS hoặc đúng chữ "localhost". Mở qua
   // http://192.168.x.x thì navigator.mediaDevices là undefined — không phải
   // bị từ chối quyền, hai lỗi sửa hai cách khác nhau.
@@ -849,16 +529,13 @@ async function startRecording(context, prompt){
     showError("Máy chưa dùng được micro. " + qua);
     return;
   }
-  try{
-    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  } catch(e){
+  try{ mediaStream = await navigator.mediaDevices.getUserMedia({ audio:true }); }
+  catch(e){
     const thieuMic = e && (e.name === "NotFoundError" || e.name === "DevicesNotFoundError");
-    showError(thieuMic
-      ? "Máy này chưa có micro nào để cháu nghe ạ."
-      : "Cháu chưa xin được quyền dùng micro. Bác nhờ cán bộ bật quyền micro cho trình duyệt giúp cháu.");
+    showError(thieuMic ? "Máy này chưa có micro nào để cháu nghe ạ."
+                       : "Cháu chưa xin được quyền dùng micro. Bác nhờ cán bộ bật quyền micro cho trình duyệt giúp cháu.");
     return;
   }
-
   audioChunks = [];
   const mimeType = pickMimeType();
   try{ mediaRecorder = mimeType ? new MediaRecorder(mediaStream, { mimeType }) : new MediaRecorder(mediaStream); }
@@ -866,42 +543,35 @@ async function startRecording(context, prompt){
   mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) audioChunks.push(e.data); };
   mediaRecorder.onstop = onRecordingStopped;
   mediaRecorder.start();
-
   recordStartedAt = Date.now();
-  $("recPrompt").textContent = prompt || "Cháu đang nghe, bác cứ nói tự nhiên.";
-  $("timerText").textContent = "00:00";
-  showScreen("recording-screen");
+  composerRecording(lead || "Cháu đang nghe, bác cứ nói tự nhiên. Nói xong bác bấm nút đỏ.");
   recordTimer = setInterval(updateTimer, 200);
   setupLevelMeter(mediaStream);
 }
 function updateTimer(){
   const elapsed = (Date.now() - recordStartedAt) / 1000;
-  const mm = String(Math.floor(elapsed / 60)).padStart(2, "0");
-  const ss = String(Math.floor(elapsed % 60)).padStart(2, "0");
-  $("timerText").textContent = `${mm}:${ss}`;
+  const t = $("timerText");
+  if (t) t.textContent = `${String(Math.floor(elapsed/60)).padStart(2,"0")}:${String(Math.floor(elapsed%60)).padStart(2,"0")}`;
   if (elapsed >= MAX_RECORD_SECONDS) stopRecording();
 }
 function setupLevelMeter(stream){
   try{
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioCtx.createMediaStreamSource(stream);
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    source.connect(analyser);
+    analyser = audioCtx.createAnalyser(); analyser.fftSize = 256;
+    audioCtx.createMediaStreamSource(stream).connect(analyser);
     const data = new Uint8Array(analyser.frequencyBinCount);
-    const ring = $("recRing");
     const tick = () => {
       analyser.getByteFrequencyData(data);
       const avg = data.reduce((a,b)=>a+b,0) / data.length;
-      ring.style.setProperty("--level", (1 + Math.min(avg / 130, 0.22)).toFixed(3));
+      const ring = $("recRing");
+      if (ring) ring.style.setProperty("--level", (1 + Math.min(avg/130, 0.18)).toFixed(3));
       rafId = requestAnimationFrame(tick);
     };
     tick();
-  } catch(e){ /* chỉ là hiệu ứng */ }
+  } catch(e){}
 }
 function teardownLevelMeter(){
-  if (rafId) cancelAnimationFrame(rafId);
-  rafId = null;
+  if (rafId) cancelAnimationFrame(rafId); rafId = null;
   if (audioCtx){ audioCtx.close().catch(()=>{}); audioCtx = null; }
   analyser = null;
 }
@@ -919,41 +589,44 @@ function onRecordingStopped(){
 }
 
 /* ---------------------------------------------------------------------
-   Nhận ra thủ tục: POST /turn → màn hình xác nhận → /flow/start
+   «Bác cần làm gì?» → nhận ra thủ tục → xác nhận
    --------------------------------------------------------------------- */
+function askAgain(text){
+  kioskSay(`<p class="qtext">${esc(text)}</p>`, { hint: GREETING_HINT, speech: text });
+  composerListen("Bấm micro rồi nói lại", { context:"query", extra: NO_VOICE_BTN });
+}
+
 async function sendTurn(blob){
-  $("processingText").textContent = "Cháu đang nghe xem bác cần gì.";
-  showScreen("processing-screen");
+  composerWaiting("Cháu đang nghe…");
+  showTyping();
   const fd = new FormData();
   fd.append("audio", blob, "cauhoi.webm");
   fd.append("session_id", sessionId());
   let data;
-  try{ data = await api("/turn", { method: "POST", body: fd }); }
-  catch(e){ showError(e.message); return; }
+  try{ data = await api("/turn", { method:"POST", body: fd }); }
+  catch(e){ hideTyping(); showError(e.message); return; }
+  hideTyping();
+  const asr = data.asr || {}, answer = data.answer || {};
 
-  const asr = data.asr || {};
-  const answer = data.answer || {};
-
-  if (asr.no_speech || (answer.handoff && !asr.text)){
-    $("retryText").textContent = answer.answer || "Máy chưa nghe rõ, bác nói lại giúp cháu.";
-    showScreen("retry-screen");
-    speak(answer.speech || answer.answer);
+  if (asr.no_speech || !asr.text){
+    kioskSay(`<p>${esc(answer.answer || "Cháu chưa nghe rõ ạ. Bác nói lại giúp cháu một lần nữa.")}</p>`,
+      { hint: "Bác nói to, rõ, gần micro. Nói xong bấm «Nói xong rồi».", speech: answer.speech || answer.answer });
+    composerListen("Bấm micro rồi nói lại", { context:"query", extra: NO_VOICE_BTN });
     return;
   }
+  userSay(asr.text);
   if (answer.handoff || !answer.procedure_id){
-    $("handoffText").textContent = asr.text
-      ? `Bác nói: “${asr.text}”. ${answer.answer || ""}`
-      : (answer.answer || "Cháu mời bác gặp cán bộ hỗ trợ.");
-    showScreen("handoff-screen");
-    speak(answer.speech || answer.answer);
+    kioskSay(`<p>${esc(answer.answer || "Cháu chưa hiểu bác cần gì.")}</p>`, { speech: answer.speech || answer.answer });
+    await offerProcedureList();
     return;
   }
-
   pendingProc = { id: answer.procedure_id, name: answer.procedure_name };
-  $("heardText").innerHTML = asr.text ? `Bác nói: <b>“${escapeHtml(asr.text)}”</b>` : "";
-  $("confirmName").textContent = answer.procedure_name || "";
-  showScreen("confirm-screen");
-  speak(answer.confirm || `Cháu hiểu bác cần làm thủ tục ${answer.procedure_name}. Đúng không ạ?`);
+  kioskSay(`<p>Cháu hiểu bác cần làm thủ tục <b class="proc">${esc(answer.procedure_name)}</b>. Đúng không ạ?</p>`,
+    { hint: "Bác bấm «Đúng rồi» để cháu hướng dẫn từng bước, hoặc «Không phải» để nói lại.",
+      speech: answer.confirm || `Cháu hiểu bác cần làm thủ tục ${answer.procedure_name}. Đúng không ạ?` });
+  setComposer(`<div class="row">${btn("yesBtn", "primary", "Đúng rồi, hướng dẫn cháu nhé", ICON_CHECK)}${btn("noBtn", "outline", "Không phải, tôi nói lại")}</div>`);
+  $("yesBtn").addEventListener("click", () => { userSay("Đúng rồi"); startFlow(pendingProc.id); });
+  $("noBtn").addEventListener("click", () => { userSay("Không phải"); askAgain("Vậy bác nói lại giúp cháu, bác cần làm gì ạ?"); });
 }
 
 /* ---------------------------------------------------------------------
@@ -961,16 +634,16 @@ async function sendTurn(blob){
    --------------------------------------------------------------------- */
 async function startFlow(procedureId){
   stopSpeaking();
-  $("processingText").textContent = "Cháu đang chuẩn bị hướng dẫn cho bác.";
-  showScreen("processing-screen");
+  composerWaiting("Cháu đang chuẩn bị…");
+  showTyping();
   answerOrder = [];
   try{
     const st = await postJson("/flow/start", { procedure_id: procedureId, session_id: sessionId() });
+    hideTyping();
     applyState(st);
-  } catch(e){ showError(e.message); }
+  } catch(e){ hideTyping(); showError(e.message); }
 }
 
-// Nhận FlowState từ máy chủ, vẽ đúng màn hình theo `stage`, rồi đọc.
 function applyState(st, opts = {}){
   flowState = st;
   updateStepper();
@@ -982,265 +655,206 @@ function applyState(st, opts = {}){
     case "done":    renderDone(st); break;
     default: showError("Máy chủ trả về trạng thái lạ: " + st.stage);
   }
-  if (!opts.silent) speak(st.speech);
 }
 
-/* --- Bước 1 --- */
+/* --- Bước 1: hỏi từng câu, mỗi câu kèm cách trả lời --- */
 function renderQuestion(st, opts){
   const q = st.question || {};
-  // Lời dẫn của bước 1: máy chủ chỉ gửi ở câu đầu tiên.
-  $("qIntro").textContent = st.intro || "";
-  $("qIntro").hidden = !st.intro;
-  $("qCount").textContent = `Bước 1 · Câu ${q.index || 1}/${q.total || 1}`;
-  $("qText").textContent = q.text || "";
-  const box = $("qOptions");
-  box.innerHTML = "";
-  (q.options || []).forEach(o => {
-    const b = document.createElement("button");
-    b.className = "opt-btn";
-    b.textContent = o.label;
-    b.addEventListener("click", () => chooseOption(q.id, o.value));
-    box.appendChild(b);
-  });
-  const hint = $("qHint");
+  if (st.intro){
+    kioskSay(`<span class="stephead">Bước 1 · Kiểm tra điều kiện</span><p>${esc(st.intro)}</p>`);
+  }
   if (st.matched === false && st.message){
-    hint.textContent = (st.asr && st.asr.text ? `Cháu nghe: “${st.asr.text}”. ` : "") + st.message;
-    hint.hidden = false;
-  } else { hint.hidden = true; }
-  $("qBackBtn").hidden = answerOrder.length === 0;
-  showScreen("question-screen");
+    kioskSay(`<p>${st.asr && st.asr.text ? `Cháu nghe là: «${esc(st.asr.text)}». ` : ""}${esc(st.message)}</p>`);
+  } else {
+    kioskSay(`<p class="qtext">${esc(q.text)}</p>`, { hint: q.hint });
+  }
+  if (!opts.silent) speak(st.speech);
+
+  const options = (q.options || []).map(o => `<button class="opt-btn" data-v="${esc(o.value)}">${esc(o.label)}</button>`).join("");
+  setComposer(`
+    <p class="lead">Câu ${q.index || 1}/${q.total || 1} · Bác bấm chọn một ô, hoặc bấm micro rồi nói</p>
+    <div class="options">${options}</div>
+    <div class="row">
+      ${btn("qVoiceBtn", "outline", "Trả lời bằng lời", ICON_MIC)}
+      ${btn("qReplayBtn", "outline", "🔊 Nghe lại")}
+      ${answerOrder.length ? btn("qBackBtn", "link", "← Quay lại câu trước") : ""}
+    </div>`);
+  composer.querySelectorAll(".opt-btn").forEach(b => b.addEventListener("click", () => chooseOption(q, b.dataset.v, b.textContent)));
+  $("qVoiceBtn").addEventListener("click", () => startRecording("answer", `Bác trả lời câu: «${q.text}»`));
+  $("qReplayBtn").addEventListener("click", () => speak(lastSpeech));
+  if ($("qBackBtn")) $("qBackBtn").addEventListener("click", goBackOneQuestion);
 }
 
-async function chooseOption(questionId, value){
+async function chooseOption(q, value, label){
   if (!flowState) return;
   stopSpeaking();
-  const answers = { ...(flowState.answers || {}) };
+  userSay(label);
+  composerWaiting("…");
   try{
-    const st = await postJson("/flow/answer", {
-      procedure_id: flowState.procedure_id, answers, question_id: questionId, value, session_id: sessionId()
-    });
-    answerOrder.push(questionId);
+    const st = await postJson("/flow/answer", { procedure_id: flowState.procedure_id, answers: { ...(flowState.answers || {}) },
+                                                question_id: q.id, value, session_id: sessionId() });
+    answerOrder.push(q.id);
     applyState(st);
   } catch(e){ showError(e.message); }
 }
 
 async function sendVoiceAnswer(blob){
-  if (!flowState || !flowState.question){ showScreen("idle-screen"); return; }
-  $("processingText").textContent = "Cháu đang nghe câu trả lời của bác.";
-  showScreen("processing-screen");
+  if (!flowState || !flowState.question) return startConversation();
+  composerWaiting("Cháu đang nghe câu trả lời…");
+  showTyping();
   const fd = new FormData();
   fd.append("audio", blob, "traloi.webm");
   fd.append("procedure_id", flowState.procedure_id);
   fd.append("question_id", flowState.question.id);
   fd.append("answers", JSON.stringify(flowState.answers || {}));
   fd.append("session_id", sessionId());
+  const qid = flowState.question.id;
   try{
-    const qid = flowState.question.id;
-    const st = await api("/flow/answer-voice", { method: "POST", body: fd });
+    const st = await api("/flow/answer-voice", { method:"POST", body: fd });
+    hideTyping();
+    if (st.asr && st.asr.text) userSay(st.asr.text);
     if (st.matched) answerOrder.push(qid);
     applyState(st);
-  } catch(e){ showError(e.message); }
+  } catch(e){ hideTyping(); showError(e.message); }
 }
 
 async function goBackOneQuestion(){
   if (!flowState || !answerOrder.length) return;
   stopSpeaking();
   const answers = { ...(flowState.answers || {}) };
-  const last = answerOrder.pop();
-  delete answers[last];
+  delete answers[answerOrder.pop()];
+  userSay("Quay lại câu trước");
   try{
-    const st = await postJson("/flow/next", {
-      procedure_id: flowState.procedure_id, answers, stage: "check", session_id: sessionId()
-    });
-    applyState(st, { silent: true });
+    const st = await postJson("/flow/next", { procedure_id: flowState.procedure_id, answers, stage:"check", session_id: sessionId() });
+    st.intro = null;
+    applyState(st, { silent:true });
   } catch(e){ showError(e.message); }
 }
 
 /* --- Kết luận không đáp ứng / cần cán bộ / thủ tục khác --- */
 function renderStop(st){
-  const badge = $("stopBadge");
-  badge.className = "badge " + ({ ineligible: "", consult: "warn", redirect: "info" }[st.verdict] || "");
-  $("stopTitle").textContent = st.title || "Chưa đủ điều kiện";
-  $("stopReason").textContent = st.reason || st.prompt || "";
-  const sb = $("suggestBtn");
-  if (st.suggest_procedure_id){
-    sb.hidden = false;
-    sb.textContent = "Xem thủ tục: " + (st.suggest_procedure_name || st.suggest_procedure_id);
-    sb.onclick = () => startFlow(st.suggest_procedure_id);
-  } else { sb.hidden = true; sb.onclick = null; }
-  showScreen("stop-screen");
+  const cls = { ineligible:"bad", consult:"warn", redirect:"warn" }[st.verdict] || "bad";
+  kioskSay(`<span class="stephead ${cls}">${esc(st.title || "Chưa đủ điều kiện")}</span><p>${esc(st.reason || st.prompt)}</p>`,
+    { speech: st.speech });
+  setComposer(`<div class="row">
+      ${st.suggest_procedure_id ? btn("suggestBtn", "primary", "Xem thủ tục: " + esc(st.suggest_procedure_name || "")) : ""}
+      ${btn("replayBtn", "outline", "🔊 Nghe lại")}
+      ${btn("restartBtn", "outline", "↺ Làm lại từ đầu")}
+      ${btn("endBtn", "link", "Kết thúc")}
+    </div>`);
+  if ($("suggestBtn")) $("suggestBtn").addEventListener("click", () => { userSay("Xem thủ tục " + st.suggest_procedure_name); startFlow(st.suggest_procedure_id); });
+  $("replayBtn").addEventListener("click", () => speak(lastSpeech));
+  $("restartBtn").addEventListener("click", () => { userSay("Làm lại từ đầu"); startFlow(st.procedure_id); });
+  $("endBtn").addEventListener("click", startConversation);
 }
 
 /* --- Bước 2 --- */
-function fillChecklist(el, items, checked){
-  el.innerHTML = "";
-  (items || []).forEach(t => {
-    const li = document.createElement("li");
-    li.innerHTML = `<span class="box">${checked ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : ""}</span><span>${escapeHtml(t)}</span>`;
-    el.appendChild(li);
-  });
-}
-function fillBullets(el, items){
-  el.innerHTML = (items || []).map(t => `<li>${escapeHtml(t)}</li>`).join("");
-}
+const checklist = (items, cls = "", checked = false) =>
+  `<ul class="checklist ${cls}">${(items || []).map(t => `<li><span class="box">${checked ? ICON_CHECK : ""}</span><span>${esc(t)}</span></li>`).join("")}</ul>`;
+const bullets = (items) => `<ul class="bullets">${(items || []).map(t => `<li>${esc(t)}</li>`).join("")}</ul>`;
 
 function renderPrepare(st){
-  $("prepNote").innerHTML = `<b>Kết quả bước 1:</b> ${escapeHtml(st.note || "Bác có thể chuẩn bị hồ sơ.")}`;
-  $("prepSay").textContent = st.prompt || "";
-  fillChecklist($("prepDocs"), st.documents, false);
-  const hasNotes = (st.notes || []).length > 0;
-  $("prepNotesCard").hidden = !hasNotes;
-  fillChecklist($("prepNotes"), st.notes, true);
-  const hasTips = (st.tips || []).length > 0;
-  $("prepTipsCard").hidden = !hasTips;
-  fillBullets($("prepTips"), st.tips);
-  $("prepQa").hidden = true;
-  showScreen("prepare-screen");
+  kioskSay(`
+    <span class="stephead ok">Bước 1 xong</span>
+    <p>${esc(st.note || "Bác có thể chuẩn bị hồ sơ.")}</p>`);
+  kioskSay(`
+    <span class="stephead">Bước 2 · Chuẩn bị hồ sơ</span>
+    <p>${esc(st.prompt)}</p>
+    <div class="card"><h3>Giấy tờ cần chuẩn bị</h3>${checklist(st.documents)}</div>
+    ${(st.notes || []).length ? `<div class="card"><h3>Lưu ý theo trường hợp của bác</h3>${checklist(st.notes, "notes", true)}</div>` : ""}
+    ${(st.tips || []).length ? `<div class="card"><h3>Thông tin thêm</h3>${bullets(st.tips)}</div>` : ""}`,
+    { hint: "Bác có gì chưa rõ về hồ sơ thì bấm «Hỏi thêm» rồi nói. Chuẩn bị xong bác bấm «Sang bước 3».", speech: st.speech });
+  composerStage("prepare");
 }
 
 /* --- Bước 3 --- */
 function renderSubmit(st){
-  $("subSay").textContent = st.prompt || "";
-  fillBullets($("subPlaces"), st.places);
-  fillBullets($("subMethods"), st.methods);
-  fillChecklist($("subBring"), st.bring, false);
-  const hasNotes = (st.notes || []).length > 0;
-  $("subNotesCard").hidden = !hasNotes;
-  fillChecklist($("subNotes"), st.notes, true);
-  const meta = $("subMeta");
-  meta.innerHTML = "";
-  [["Cơ quan xử lý", st.agency], ["Thời hạn", st.processing_time], ["Kết quả", st.result], ["Phí", st.fee]]
-    .filter(([, v]) => v)
-    .forEach(([k, v]) => {
-      const row = document.createElement("div");
-      row.className = "meta-row";
-      row.innerHTML = `<span class="k">${k}</span><span class="v">${escapeHtml(v)}</span>`;
-      meta.appendChild(row);
-    });
-  const src = $("subSource");
-  if (st.source && st.source.title){
-    src.hidden = false;
-    src.href = st.source.url || "#";
-    src.textContent = "Nguồn: " + st.source.title;
-  } else src.hidden = true;
-  $("subQa").hidden = true;
-  showScreen("submit-screen");
+  const meta = [["Cơ quan xử lý", st.agency], ["Thời hạn", st.processing_time], ["Kết quả", st.result], ["Phí", st.fee]]
+    .filter(([,v]) => v).map(([k,v]) => `<div class="meta"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`).join("");
+  kioskSay(`
+    <span class="stephead">Bước 3 · Nộp hồ sơ</span>
+    <p>${esc(st.prompt)}</p>
+    <div class="card"><h3>Nộp ở đâu</h3>${bullets(st.places)}<h3 style="margin-top:10px">Cách nộp</h3>${bullets(st.methods)}</div>
+    <div class="card"><h3>Khi đi bác mang theo</h3>${checklist(st.bring)}</div>
+    ${(st.notes || []).length ? `<div class="card"><h3>Lưu ý theo trường hợp của bác</h3>${checklist(st.notes, "notes", true)}</div>` : ""}
+    <div class="card"><h3>Quá trình xử lý và thời hạn</h3>${meta}
+      ${st.source && st.source.title ? `<a class="source" href="${esc(st.source.url || "#")}" target="_blank" rel="noopener">Nguồn: ${esc(st.source.title)}</a>` : ""}
+    </div>`,
+    { hint: "Bác còn thắc mắc thì bấm «Hỏi thêm» rồi nói. Đã rõ thì bấm «Kết thúc».", speech: st.speech });
+  composerStage("submit");
 }
 
-/* --- Kết thúc --- */
-function renderDone(st){
-  $("doneText").textContent = st.prompt || "Cháu đã hướng dẫn xong. Chúc bác làm thủ tục thuận lợi ạ.";
-  showScreen("done-screen");
-  clearTimeout(doneTimer);
-  doneTimer = setTimeout(endConversation, DONE_AUTO_HOME_MS);
+function composerStage(stage){
+  const next = stage === "prepare" ? btn("nextBtn", "primary", "Đã rõ, sang bước 3 →") : btn("nextBtn", "green", "Đã rõ, kết thúc", ICON_CHECK);
+  setComposer(`<div class="row">${btn("askBtn", "outline", "Hỏi thêm", ICON_MIC)}${btn("replayBtn", "outline", "🔊 Nghe lại")}${next}</div>`);
+  $("askBtn").addEventListener("click", () => startRecording("ask", stage === "prepare" ? "Bác hỏi gì về hồ sơ, cháu nghe đây." : "Bác hỏi gì về việc nộp hồ sơ, cháu nghe đây."));
+  $("replayBtn").addEventListener("click", () => speak(lastSpeech));
+  $("nextBtn").addEventListener("click", nextStage);
 }
 
 async function nextStage(){
   if (!flowState) return;
   stopSpeaking();
+  userSay(flowState.stage === "prepare" ? "Đã rõ, sang bước 3" : "Đã rõ, kết thúc");
+  composerWaiting("…");
   try{
-    const st = await postJson("/flow/next", {
-      procedure_id: flowState.procedure_id, answers: flowState.answers || {}, stage: flowState.stage, session_id: sessionId()
-    });
+    const st = await postJson("/flow/next", { procedure_id: flowState.procedure_id, answers: flowState.answers || {}, stage: flowState.stage, session_id: sessionId() });
     applyState(st);
   } catch(e){ showError(e.message); }
 }
 
 /* --- Hỏi thêm ở bước 2 / 3 --- */
 async function sendAsk(blob){
-  if (!flowState) { showScreen("idle-screen"); return; }
-  const stageBefore = flowState.stage;
-  $("processingText").textContent = "Cháu đang tìm câu trả lời trong kho tri thức của thủ tục này.";
-  showScreen("processing-screen");
+  if (!flowState) return startConversation();
+  const stage = flowState.stage;
+  composerWaiting("Cháu đang tìm trong kho tri thức của thủ tục này…");
+  showTyping();
   const fd = new FormData();
   fd.append("audio", blob, "hoithem.webm");
   fd.append("procedure_id", flowState.procedure_id);
   fd.append("session_id", sessionId());
   let d;
-  try{ d = await api("/flow/ask", { method: "POST", body: fd }); }
-  catch(e){ showError(e.message); return; }
-
-  const box = $(stageBefore === "submit" ? "subQa" : "prepQa");
+  try{ d = await api("/flow/ask", { method:"POST", body: fd }); }
+  catch(e){ hideTyping(); showError(e.message); return; }
+  hideTyping();
   const heard = d.question || (d.asr && d.asr.text) || "";
-  box.innerHTML = `
-    <div class="q">${heard ? `Bác hỏi: “${escapeHtml(heard)}”` : "Cháu chưa nghe rõ câu hỏi."}</div>
-    <div class="a">${escapeHtml(d.answer || "")}</div>
-    ${d.switch_to ? `<div class="switch"><button class="secondary-btn" id="switchBtn">Chuyển sang: ${escapeHtml(d.switch_name || d.switch_to)}</button></div>` : ""}`;
-  box.hidden = false;
-  if (d.switch_to) $("switchBtn").addEventListener("click", () => startFlow(d.switch_to));
-  showScreen(stageBefore === "submit" ? "submit-screen" : "prepare-screen");
-  screens[stageBefore === "submit" ? "submit-screen" : "prepare-screen"].scrollTop = 0;
-  speak(d.speech || d.answer);
+  if (heard) userSay(heard);
+  const el = kioskSay(`<p>${esc(d.answer)}</p>${d.switch_to ? `<div class="chips"><button class="chip" id="switchBtn">Chuyển sang: ${esc(d.switch_name || d.switch_to)}</button></div>` : ""}`,
+    { speech: d.speech || d.answer });
+  if (d.switch_to) el.querySelector("#switchBtn").addEventListener("click", () => { userSay("Chuyển sang " + d.switch_name); startFlow(d.switch_to); });
+  composerStage(stage);
 }
 
-/* ---------------------------------------------------------------------
-   Lỗi & điều hướng
-   --------------------------------------------------------------------- */
-function showError(message){
-  $("errorText").textContent = message;
-  showScreen("error-screen");
-}
-// "Thử lại": quay về màn hình gần nhất có ý nghĩa mà không mất trạng thái.
-function retryFromError(){
-  stopSpeaking();
-  if (flowState) applyState(flowState, { silent: true });
-  else showScreen("idle-screen");
-}
-function goHomeKeepSession(){
-  stopSpeaking();
+/* --- Kết thúc --- */
+function renderDone(st){
+  kioskSay(`<span class="stephead ok">Kết thúc</span><p>${esc(st.prompt)}</p>`, { speech: st.speech });
+  setComposer(`<div class="row">${btn("homeBtn2", "primary", "Xong, về màn hình chính")}</div>`);
+  $("homeBtn2").addEventListener("click", startConversation);
   clearTimeout(doneTimer);
-  flowState = null; answerOrder = []; pendingProc = null;
-  updateStepper();
-  showScreen("idle-screen");
+  doneTimer = setTimeout(startConversation, DONE_AUTO_HOME_MS);
 }
 
-/* ---------------------------------------------------------------------
-   Gắn sự kiện
-   --------------------------------------------------------------------- */
-$("micBtn").addEventListener("click", () => startRecording("query"));
-$("micBtnRetry").addEventListener("click", () => startRecording("query"));
-$("handoffAgainBtn").addEventListener("click", () => startRecording("query"));
-$("stopBtn").addEventListener("click", stopRecording);
-$("retryBackBtn").addEventListener("click", goHomeKeepSession);
+/* --- Lỗi --- */
+function showError(message){
+  kioskSay(`<span class="stephead bad">Có lỗi xảy ra</span><p>${esc(message)}</p>`);
+  setComposer(`<div class="row">${btn("retryBtn", "primary", "Thử lại")}${btn("homeBtn3", "link", "Về màn hình chính")}</div>`);
+  $("retryBtn").addEventListener("click", () => {
+    if (flowState) applyState(flowState, { silent:true });
+    else askAgain("Bác nói lại giúp cháu, bác cần làm gì ạ?");
+  });
+  $("homeBtn3").addEventListener("click", startConversation);
+}
 
-$("confirmYesBtn").addEventListener("click", () => { if (pendingProc) startFlow(pendingProc.id); });
-$("confirmNoBtn").addEventListener("click", goHomeKeepSession);
-
-$("qVoiceBtn").addEventListener("click", () => {
-  const q = flowState && flowState.question;
-  startRecording("answer", q ? `Bác trả lời: “${q.text}”` : "Bác trả lời giúp cháu.");
-});
-$("qReplayBtn").addEventListener("click", () => speak(lastSpeech));
-$("qBackBtn").addEventListener("click", goBackOneQuestion);
-
-$("stopReplayBtn").addEventListener("click", () => speak(lastSpeech));
-$("stopRestartBtn").addEventListener("click", () => { if (flowState) startFlow(flowState.procedure_id); });
-$("stopEndBtn").addEventListener("click", endConversation);
-
-$("prepAskBtn").addEventListener("click", () => startRecording("ask", "Bác hỏi gì về hồ sơ, cháu nghe đây."));
-$("prepReplayBtn").addEventListener("click", () => speak(lastSpeech));
-$("prepNextBtn").addEventListener("click", nextStage);
-
-$("subAskBtn").addEventListener("click", () => startRecording("ask", "Bác hỏi gì về việc nộp hồ sơ, cháu nghe đây."));
-$("subReplayBtn").addEventListener("click", () => speak(lastSpeech));
-$("subDoneBtn").addEventListener("click", nextStage);
-
-$("doneHomeBtn").addEventListener("click", endConversation);
-$("homeBtn").addEventListener("click", goHomeKeepSession);
-$("errorRetryBtn").addEventListener("click", retryFromError);
-$("errorHomeBtn").addEventListener("click", goHomeKeepSession);
+$("homeBtn").addEventListener("click", startConversation);
 
 // Phím cách: bắt đầu / dừng ghi âm khi thử trên máy tính.
 document.addEventListener("keydown", (e) => {
   if (e.code !== "Space" || e.target.tagName === "INPUT") return;
-  const active = Object.values(screens).find(s => s.classList.contains("active"));
-  if (!active) return;
   e.preventDefault();
-  if (active.id === "idle-screen" || active.id === "retry-screen" || active.id === "handoff-screen") startRecording("query");
-  else if (active.id === "question-screen") $("qVoiceBtn").click();
-  else if (active.id === "prepare-screen") $("prepAskBtn").click();
-  else if (active.id === "submit-screen") $("subAskBtn").click();
-  else if (active.id === "recording-screen") stopRecording();
+  if ($("stopBtn")) stopRecording();
+  else if ($("micBtn")) $("micBtn").click();
+  else if ($("qVoiceBtn")) $("qVoiceBtn").click();
+  else if ($("askBtn")) $("askBtn").click();
 });
 
 /* ---------------------------------------------------------------------
@@ -1248,25 +862,14 @@ document.addEventListener("keydown", (e) => {
    --------------------------------------------------------------------- */
 let tapCount = 0, tapTimer = null;
 function handleBrandTap(){
-  tapCount++;
-  clearTimeout(tapTimer);
-  tapTimer = setTimeout(() => tapCount = 0, 600);
-  if (tapCount >= 3){
-    tapCount = 0;
-    $("baseInput").value = BASE || location.origin;
-    $("debug").classList.add("open");
-  }
+  tapCount++; clearTimeout(tapTimer); tapTimer = setTimeout(() => tapCount = 0, 600);
+  if (tapCount >= 3){ tapCount = 0; $("baseInput").value = BASE || location.origin; $("debug").classList.add("open"); }
 }
 $("closeDebugBtn").addEventListener("click", () => $("debug").classList.remove("open"));
-$("saveBaseBtn").addEventListener("click", () => {
-  localStorage.setItem("kiosk_base", $("baseInput").value.trim());
-  location.reload();
-});
+$("saveBaseBtn").addEventListener("click", () => { localStorage.setItem("kiosk_base", $("baseInput").value.trim()); location.reload(); });
 $("checkHealthBtn").addEventListener("click", async () => {
-  try{
-    const res = await fetch(BASE + "/health");
-    $("debugOut").textContent = JSON.stringify(await res.json(), null, 2);
-  } catch(e){ $("debugOut").textContent = "Lỗi: " + e.message; }
+  try{ $("debugOut").textContent = JSON.stringify(await (await fetch(BASE + "/health")).json(), null, 2); }
+  catch(e){ $("debugOut").textContent = "Lỗi: " + e.message; }
 });
 </script>
 </body>

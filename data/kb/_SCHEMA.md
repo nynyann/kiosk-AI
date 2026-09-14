@@ -43,6 +43,7 @@ khởi động lại. Nếu file sai cú pháp JSON, máy chủ in cảnh báo r
       {
         "id": "age",
         "text": "Bác năm nay bao nhiêu tuổi ạ?",
+        "hint": "(tuỳ chọn) cách trả lời; bỏ trống thì máy tự sinh theo kiểu câu hỏi",
         "ask_if": { "purpose": ["new"] },
         "options": [
           { "value": "lt70",  "label": "Dưới 70 tuổi", "range": [0, 69], "match": ["dưới 70"] },

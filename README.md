@@ -16,14 +16,19 @@ máy chủ FastAPI phục vụ luôn trang kiosk ở `/`, còn API nằm ở `/h
 
 ## Kiosk chạy như thế nào
 
-Theo sơ đồ luồng và tài liệu «trực quan» của nhóm. Bác đứng trước kiosk:
+Theo sơ đồ luồng và tài liệu «trực quan» của nhóm. Giao diện là một cuộc
+trò chuyện: máy nói một câu, bác trả lời một câu, cứ thế từng bước. Bác
+đứng trước kiosk:
 
-1. **Nói điều mình cần** bằng lời thường («tôi 76 tuổi, không có lương hưu
-   thì được hỗ trợ gì») — hoặc bấm chọn một trong 6 thủ tục trên màn hình.
-   Máy nhận ra thủ tục, hỏi lại «Cháu hiểu bác cần làm thủ tục X, đúng không
-   ạ?».
-2. **Bước 1. Kiểm tra điều kiện** — kiosk hỏi từng câu (tuổi, công dân, lương
-   hưu, trợ cấp BHXH, hộ nghèo…), bác bấm chọn hoặc trả lời bằng lời.
+0. Máy chào: «Xin chào bác! … Bác cần làm gì ạ?» kèm hướng dẫn cách nói.
+1. **Bác nói điều mình cần** bằng lời thường («tôi 76 tuổi, không có lương
+   hưu thì được hỗ trợ gì»). Máy nhận ra thủ tục, hỏi lại «Cháu hiểu bác cần
+   làm thủ tục X, đúng không ạ?». Màn hình chính **không** liệt kê thủ tục;
+   danh sách chỉ hiện khi máy không hiểu, hoặc bác bấm «không nói được».
+2. **Bước 1. Kiểm tra điều kiện** — kiosk hỏi từng câu một, bắt đầu từ tuổi
+   (rồi công dân, lương hưu, trợ cấp BHXH, hộ nghèo…). Mỗi câu kèm hướng dẫn
+   cách trả lời («bác nói số tuổi, ví dụ "tôi bảy mươi sáu tuổi", hoặc bấm
+   chọn»); bác bấm chọn hoặc trả lời bằng lời.
    - Đáp ứng → sang bước 2. Máy nói «bác có khả năng thuộc diện», không bao
      giờ nói «chắc chắn được hưởng».
    - Không đáp ứng → giải thích điều kiện nào chưa đạt, kết luận, **không bắt
@@ -182,7 +187,7 @@ chỉ 1,6 giây — nên hạn giờ lúc hâm nóng (45 giây) để rộng hơ
 
 ```bash
 pip install -r requirements-dev.txt   # một lần, chỉ có pytest
-python -m pytest tests/ -q            # 43 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
+python -m pytest tests/ -q            # 45 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
 python -m app.normalize               # in bảng 10 câu trước/sau, ảnh cho mục 4.3
 ```
 

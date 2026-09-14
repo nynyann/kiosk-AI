@@ -121,6 +121,10 @@ class FlowOption(BaseModel):
 class FlowQuestion(BaseModel):
     id: str
     text: str
+    # Hướng dẫn bác trả lời thế nào: «Bác nói số tuổi, ví dụ "tôi bảy mươi sáu
+    # tuổi", hoặc bấm chọn bên dưới». Lấy từ `hint` trong file JSON, không có
+    # thì máy chủ tự sinh theo kiểu câu hỏi.
+    hint: str = ""
     options: List[FlowOption] = []
     # Câu thứ mấy / trong bao nhiêu câu SẼ hỏi theo các câu trả lời hiện có.
     index: int = 1
