@@ -1,0 +1,507 @@
+# Tổng hợp giải pháp Kiosk hướng dẫn thủ tục hành chính
+
+Cập nhật ngày 14/09/2026, theo commit `df008fd` trên nhánh `main` của repo
+`nynyann/kiosk-backend`. Tài liệu này gom mọi thông tin kỹ thuật và mọi con
+số đã đo để cả nhóm đọc và điền vào bản đề xuất giải pháp. Con số nào là đo
+thật thì ghi "đo thật", con số nào chưa có thì ghi "chưa có", không ước lượng.
+
+Mục lục
+
+1. Giải pháp là gì
+2. Kiến trúc chung
+3. Mô hình nhận dạng giọng nói
+4. Chuẩn hoá văn bản sau nhận dạng
+5. Đọc thành tiếng
+6. Kho tri thức 6 thủ tục
+7. Luồng hướng dẫn 3 bước (backend)
+8. Giao diện kiosk (frontend)
+9. Bảng số đo
+10. Triển khai
+11. Giới hạn phải nói thật trong bài
+12. Lịch sử phát triển trên git
+13. Việc còn lại và ai làm
+14. Gợi ý lấy số nào cho mục nào của bản đề xuất
+
+---
+
+## 1. Giải pháp là gì
+
+Một kiosk đặt tại bộ phận một cửa, nghe người cao tuổi nói nhu cầu bằng lời
+thường ("tôi 76 tuổi, không có lương hưu thì được hỗ trợ gì"), nhận ra thủ
+tục hành chính tương ứng, rồi hướng dẫn theo từng bước đúng sơ đồ nhóm đã
+vẽ:
+
+    Bắt đầu
+      -> Bước 1. Kiểm tra điều kiện (kiosk hỏi từng câu: tuổi, công dân,
+         lương hưu, trợ cấp BHXH, hộ nghèo ...)
+           -> Đáp ứng: Bước 2. Chuẩn bị hồ sơ (giấy tờ theo đúng trường hợp,
+              hỏi thêm thì trả lời từ kho tri thức của thủ tục đó)
+              -> Bước 3. Nộp hồ sơ (nộp ở đâu, mang gì, cơ quan xử lý,
+                 thời hạn) -> Kết thúc
+           -> Không đáp ứng: giải thích điều kiện chưa đạt, kết luận
+              không đủ điều kiện -> Kết thúc
+
+Toàn bộ chạy trên một máy chủ, không dùng dịch vụ AI trả phí, không gửi âm
+thanh ra ngoài, không lưu âm thanh xuống đĩa.
+
+Phạm vi: người cao tuổi và người dân tộc thiểu số nói tiếng Việt (có thể kèm
+giọng vùng). Không nhận dạng tiếng dân tộc (Tày, H'Mông, Khmer ...). Người
+không nói được vẫn dùng được bằng cách bấm chọn trên màn hình.
+
+---
+
+## 2. Kiến trúc chung
+
+Một dịch vụ duy nhất, viết bằng Python (FastAPI), phục vụ luôn trang giao
+diện ở `/` và API ở các đường dẫn còn lại. Không cần build frontend, không
+npm, không cơ sở dữ liệu.
+
+    Trình duyệt (kiosk, điện thoại)
+      |  ghi âm webm/opus, gửi lên
+      v
+    FastAPI (app/main.py)
+      |-- /turn            nghe -> nhận ra thủ tục
+      |-- /flow/*          luồng 3 bước
+      |-- /tts             chữ -> mp3 giọng Việt
+      |-- /health, /warmup, /procedures, /kb/reload
+      |
+      |-- app/asr.py       ffmpeg -> wav 16 kHz -> PhoWhisper (CTranslate2)
+      |-- app/normalize.py chuẩn hoá văn bản nhận dạng
+      |-- app/kb.py        nạp data/kb/*.json, tra cứu thủ tục
+      |-- app/flow.py      máy trạng thái bước 1 -> 2 -> 3
+      |-- app/tts.py       edge-tts, có bộ đệm
+      |
+      v
+    data/kb/*.json          6 thủ tục, mỗi thủ tục một file
+
+Kích thước mã nguồn (đếm ngày 14/09/2026): backend `app/` 2.202 dòng Python,
+giao diện `web/index.html` khoảng 870 dòng, công cụ đo `eval/` 875 dòng,
+test 3 file với 45 test. Tổng khoảng 4.600 dòng.
+
+Thư viện chính (ghim phiên bản trong `requirements.txt`): fastapi 0.115.6,
+uvicorn 0.34.0, faster-whisper 1.1.1, ctranslate2 4.8.2, edge-tts 7.2.8.
+
+Giao kèo API viết ở `API_CONTRACT.md`, phiên bản 2.0. Mọi phản hồi đều có
+trường `ok`; lỗi thì có `error` là câu tiếng Việt hiển thị thẳng cho người
+dân được.
+
+---
+
+## 3. Mô hình nhận dạng giọng nói
+
+### Chọn gì
+
+PhoWhisper của VinAI (`vinai/PhoWhisper-small` và `vinai/PhoWhisper-base`),
+là Whisper của OpenAI được tinh chỉnh thêm trên 844 giờ tiếng Việt đa vùng
+miền. Nhóm tự chuyển sang định dạng CTranslate2, lượng tử hoá int8, chạy
+bằng faster-whisper trên CPU, không cần GPU.
+
+Hai bản đã chuyển và đưa lên HuggingFace công khai:
+
+| Bản | Repo | Dung lượng | Dùng ở đâu |
+|---|---|---|---|
+| PhoWhisper-small | `owmeowmeownyny/PhoWhisper-small-ct2` | 240 MB | máy nhà, hôm chấm, mọi số đo WER |
+| PhoWhisper-base | `owmeowmeownyny/PhoWhisper-base-ct2` | 77 MB | bản triển khai trên Render |
+
+Mô hình đối chứng: Whisper-small gốc của OpenAI (bản CTranslate2
+`Systran/faster-whisper-small`, 464 MB).
+
+Lý do chọn PhoWhisper thay vì Whisper gốc: đo trên 5 bộ dữ liệu công khai
+(bảng ở mục 9), PhoWhisper-small thấp hơn Whisper-small từ 8 đến 19 điểm WER
+tuyệt đối, 4 trên 5 bộ có khoảng tin cậy tách rời.
+
+Lý do bản triển khai dùng base chứ không phải small: gói máy chủ miễn phí
+512 MB RAM. PhoWhisper-small đỉnh 371 MB, cộng FastAPI và bộ đệm tiếng là
+tràn, đã bị giết thật giữa lượt nhận dạng thứ hai. PhoWhisper-base đỉnh
+244 MB và nhanh gấp 8 lần ở 1 luồng CPU. Số đo WER trong bài là của small,
+link Render chạy base, hai cái không phải một, phải ghi rõ.
+
+### Cách chạy
+
+- Trình duyệt gửi webm/opus, ffmpeg đổi sang wav 16 kHz mono.
+- faster-whisper, beam size 5, ngôn ngữ cố định `vi`, compute type int8.
+- Điểm tin cậy lấy từ xác suất trung bình của các đoạn; dưới 0,45 coi như
+  nghe không rõ, mời nói lại. Xác suất "không có tiếng nói" trên 0,6 coi
+  như im lặng.
+- Nạp mô hình một lần lúc khởi động (hoặc lười, nạp ở lượt đầu, rồi
+  `POST /warmup` để nạp trước). Nạp hỏng thì `/health` nói lý do trong
+  `asr_error`, gọi `/warmup` thử lại được.
+
+---
+
+## 4. Chuẩn hoá văn bản sau nhận dạng
+
+`app/normalize.py`, 4 việc theo thứ tự:
+
+1. Dọn thô: bỏ dấu câu thừa, gộp khoảng trắng, hạ chữ thường.
+2. Bỏ từ đệm người cao tuổi hay nói: "ờ", "à", "thì là", "nói chung là" ...
+   Giữ nguyên từ xưng hô "ạ", "dạ", "bác", "cô", "chú" và tiểu từ cuối câu
+   ("bác à").
+3. Số viết bằng chữ thành chữ số: "bảy mươi sáu" thành "76". Cẩn thận với
+   "ba năm" (ba cái năm, không phải 3 rồi 5).
+4. Sửa cụm hành chính bị nghe nhầm: bảng `HARD_FIXES` 38 cụm ("cư chú" thành
+   "cư trú", "hộ tích" thành "hộ tịch" ...), cộng so khớp mờ cho các cụm
+   gần giống.
+
+Chiều ngược lại `for_speech()` đổi chữ số thành chữ để đọc thành tiếng
+("15 giờ" thành "mười lăm giờ", "41/2024/QH15" thành "bốn mươi mốt trên hai
+nghìn hai mươi bốn trên QH mười lăm").
+
+Số đo: trên các bộ công khai, chuẩn hoá chỉ giảm WER 0 đến 0,4 điểm (FLEURS
+12,4% xuống 12,0%), vì các bộ đó không có từ vựng hành chính. Hai lỗi chuẩn
+hoá tìm được nhờ đo thật (nuốt số trong "ba năm", bỏ mất "à" cuối câu) đã
+sửa và có test. Mức cải thiện trên tập tự thu có từ vựng hành chính: chưa
+có, vì tập tự thu chưa thu (mục 11).
+
+---
+
+## 5. Đọc thành tiếng
+
+Máy chủ tự sinh mp3 bằng edge-tts (giọng neural tiếng Việt của Microsoft
+Edge, miễn phí, không cần khoá, nhưng cần mạng lúc chạy). Giọng mặc định
+`vi-VN-HoaiMyNeural` (nữ), tốc độ chậm hơn gốc 8% cho người già nghe kịp,
+đổi được bằng biến môi trường.
+
+Vì sao không để trình duyệt tự đọc: Web Speech API chỉ đọc được thứ tiếng
+hệ điều hành đã cài giọng, máy Windows ở ta thường chỉ có giọng tiếng Anh
+nên đọc chữ Việt bằng giọng Mỹ, không nghe ra. Giọng trình duyệt vẫn giữ
+làm đường lùi khi máy chủ mất mạng.
+
+Số đo (đo thật ở trình duyệt):
+
+| Khoản | Số |
+|---|---|
+| Từ lúc chữ hiện tới lúc có tiếng, không sinh sẵn | 2,5 giây im lặng |
+| Cùng khoản, có sinh sẵn lúc khởi động | 0,02 đến 0,3 giây |
+| Sinh một câu lúc nguội | 1,6 đến 13,9 giây, có lúc 55,8 giây |
+| Sinh cùng câu lần sau | 1 đến 2 giây |
+| Số câu sinh sẵn lúc khởi động | khoảng 125 câu cho 6 thủ tục, chạy nền |
+
+---
+
+## 6. Kho tri thức 6 thủ tục
+
+Mỗi thủ tục một file JSON trong `data/kb/`, do Mian đối chiếu văn bản gốc,
+ghi `verified_by` và `verified_date`. Nguyên tắc: không có nguồn thì không
+viết; máy chỉ đọc lại đúng những gì có trong file, không sinh thêm.
+
+| Mã | Thủ tục | Căn cứ chính | Thời hạn |
+|---|---|---|---|
+| `tro-cap-huu-tri-xa-hoi` | Trợ cấp hưu trí xã hội | Điều 21 Luật BHXH 41/2024/QH15; NĐ 176/2025 | 10 ngày làm việc |
+| `tro-cap-xa-hoi-hang-thang` | Trợ cấp xã hội hằng tháng | NĐ 20/2021 và sửa đổi | 10 ngày làm việc |
+| `cap-the-bao-hiem-y-te` | Cấp thẻ bảo hiểm y tế | NĐ 188/2025 | 5 ngày làm việc |
+| `cap-ban-sao-trich-luc-ho-tich` | Cấp bản sao trích lục hộ tịch | Luật Hộ tịch 60/2014/QH13 | trong ngày, sau 15 giờ thì hôm sau |
+| `chung-thuc-ban-sao` | Chứng thực bản sao từ bản chính | NĐ 23/2015 | trong ngày, sau 15 giờ thì hôm sau |
+| `cap-the-can-cuoc` | Cấp thẻ căn cước từ đủ 14 tuổi | Luật Căn cước 26/2023/QH15 | 7 ngày làm việc |
+
+Mỗi file có hai phần:
+
+- Phần tra cứu: tên, các cách người dân gọi (`aliases`), từ khoá, hồ sơ,
+  nơi nộp, phí, thời hạn, nguồn.
+- Phần luồng (`flow`), lắp ngày 14/09: câu hỏi kiểm tra điều kiện bước 1
+  (tổng 24 câu cho 6 thủ tục), quy tắc kết luận (20 quy tắc), lời dẫn bước 2
+  và bước 3, câu hỏi thường gặp (30 mục FAQ). Cách viết ghi ở
+  `data/kb/_SCHEMA.md`.
+
+Thủ tục thứ 7 "xác nhận cư trú" viết lúc đầu để chạy thử, chưa kiểm chứng,
+đã chuyển sang `data/kb-draft/`, không nạp vào kiosk.
+
+Tra cứu thủ tục từ câu nói: so từ khoá và cụm gọi thông thường, có trọng số,
+ngưỡng 0,55. Dưới ngưỡng thì mời gặp cán bộ và đưa danh sách để bấm chọn.
+Chỗ này Kim thay bằng so khớp ngữ nghĩa nếu kịp (mục 13).
+
+---
+
+## 7. Luồng hướng dẫn 3 bước (backend)
+
+`app/flow.py` là máy chạy, không chứa câu chữ hành chính nào. Máy chủ không
+giữ phiên: giao diện gửi lại các câu đã trả lời mỗi lượt, máy chủ tính lại
+từ đầu, nên máy chủ miễn phí khởi động lại giữa chừng cũng không mất trạng
+thái của người dân.
+
+Đường dẫn:
+
+| Đường dẫn | Việc |
+|---|---|
+| `GET /procedures` | danh sách 6 thủ tục |
+| `POST /flow/start` | vào bước 1, trả câu hỏi đầu |
+| `POST /flow/answer` | người dân bấm chọn một lựa chọn |
+| `POST /flow/answer-voice` | người dân trả lời bằng lời, máy ánh xạ sang lựa chọn |
+| `POST /flow/next` | sang bước 3, kết thúc, hoặc quay lại câu trước |
+| `POST /flow/ask` | hỏi thêm ở bước 2, 3, chỉ trả lời từ kho của thủ tục đó |
+
+Bước 1 rẽ nhánh theo 4 loại kết luận:
+
+- `eligible`: có khả năng thuộc diện, sang bước 2 với hồ sơ đúng trường
+  hợp (điều chỉnh trợ cấp thì hồ sơ khác xin mới).
+- `ineligible`: giải thích điều kiện nào chưa đạt, không bắt chuẩn bị hồ sơ.
+- `consult`: không đủ thông tin, mời gặp cán bộ, máy không đoán.
+- `redirect`: thực ra là thủ tục khác (đổi hoặc mất căn cước, đăng ký lại
+  khai sinh), nói rõ và gợi ý thủ tục phù hợp nếu kho có.
+
+Trả lời bằng lời ở bước 1: máy đọc số tuổi ("bảy mươi sáu tuổi" thành 76,
+"dưới bảy mươi" thành 69), cụm đặc trưng của từng lựa chọn, và có/không (từ
+phủ định thắng từ khẳng định để "không có" không thành "có"). Không ánh xạ
+được thì giữ nguyên câu hỏi, mời bấm chọn.
+
+Hỏi thêm ở bước 2, 3: tìm trong FAQ của thủ tục (ngưỡng 0,6), nếu câu hỏi
+khớp rõ với thủ tục khác thì gợi ý chuyển, rồi mới tới các ý định chung
+(nộp ở đâu, bao lâu, phí, mang gì). Không có gì khớp thì nói "chưa có trong
+kho, bác hỏi cán bộ", không bịa.
+
+Mọi câu máy có thể nói đều được liệt kê để sinh tiếng sẵn lúc khởi động.
+
+---
+
+## 8. Giao diện kiosk (frontend)
+
+`web/index.html`, một file, không build. Dạng hội thoại: máy nói một câu
+bên trái, người dân trả lời một câu bên phải, khung dưới cùng chỉ hiện đúng
+việc cần làm lúc đó.
+
+Trình tự màn hình:
+
+1. Chào: "Xin chào bác! Cháu là máy hướng dẫn làm thủ tục hành chính."
+2. "Bác cần làm gì ạ?" kèm hướng dẫn cách nói và nút micro to. Không liệt
+   kê thủ tục. Dòng nhỏ "Bác không nói được? Bấm đây để chọn bằng tay" mở
+   danh sách khi cần.
+3. Máy hỏi lại để xác nhận: "Cháu hiểu bác cần làm thủ tục X. Đúng không ạ?"
+4. Bước 1: hỏi từng câu, bắt đầu từ tuổi. Mỗi câu kèm dòng hướng dẫn cách
+   trả lời ("Bác nói số tuổi, ví dụ tôi bảy mươi sáu tuổi, hoặc bấm chọn
+   một ô bên dưới"). Trả lời xong mới hiện câu tiếp. Có nút "Trả lời bằng
+   lời", "Nghe lại", "Quay lại câu trước".
+5. Kết luận bước 1 (đủ hoặc chưa đủ điều kiện), rồi Bước 2, Bước 3 hiện
+   thành thẻ trong bong bóng: danh sách giấy tờ có ô đánh dấu, lưu ý theo
+   trường hợp, nơi nộp, cách nộp, cơ quan xử lý, thời hạn, nguồn văn bản.
+   Có nút "Hỏi thêm" bằng lời.
+6. Kết thúc, tự về màn hình chào sau 15 giây. Không ai chạm gì trong 2 phút
+   thì cũng tự về, xoá sạch trạng thái cho người tiếp theo.
+
+Thanh tiến trình 1, 2, 3 ở đầu trang. Chữ to (cỡ chữ thân 1,1 đến 1,45 rem
+tuỳ màn hình), nút bấm tối thiểu 68 px, tương phản cao, chạy được khổ điện
+thoại 375 px đến màn hình kiosk. Mọi câu máy nói đều được đọc thành tiếng.
+
+Bảng gỡ lỗi ẩn: bấm 3 lần vào chữ "Kiosk thủ tục" để đổi địa chỉ máy chủ.
+
+Ràng buộc kỹ thuật quan trọng: micro chỉ mở được trên https hoặc đúng chữ
+`localhost`. Gửi nhau địa chỉ `192.168.x.x` cùng Wi-Fi là micro hỏng (đo
+thật: `navigator.mediaDevices` là `undefined`).
+
+---
+
+## 9. Bảng số đo
+
+### 9.1 WER trên bộ dữ liệu công khai (đo thật, PhoWhisper-small so với Whisper-small)
+
+Cả hai chạy cùng cấu hình (CTranslate2 int8, beam 5, CPU), cùng số câu mỗi
+bộ, ngày đo 10 đến 11/09/2026. KTC là khoảng tin cậy 95% bootstrap.
+
+| Bộ dữ liệu | n | PhoWhisper-small | KTC 95% | Whisper-small | KTC 95% | Chênh | Kết luận |
+|---|---|---|---|---|---|---|---|
+| VIVOS | 50 | 4,9% | 2,4 đến 7,9 | 18,1% | 13,7 đến 23,3 | 13,1 điểm | KTC tách rời |
+| Common Voice 26.0 | 60 | 10,0% | 6,0 đến 14,8 | 29,2% | 22,4 đến 36,6 | 19,2 điểm | KTC tách rời |
+| FLEURS (vi) | 50 | 12,0% | 9,1 đến 15,2 | 21,3% | 17,4 đến 25,9 | 9,3 điểm | KTC tách rời |
+| ViMD | 60 | 12,9% | 10,7 đến 15,3 | 27,6% | 23,9 đến 31,3 | 14,6 điểm | KTC tách rời |
+| VietMed | 63 | 28,3% | 24,3 đến 32,6 | 36,4% | 32,4 đến 40,4 | 8,0 điểm | KTC chồng nhau, chưa đủ căn cứ nói tốt hơn |
+
+Đọc số này phải kèm ba cảnh báo: các bộ này là người trưởng thành đọc trong
+phòng yên tĩnh (trừ VietMed), không có nhãn tuổi dùng được, và không có câu
+từ vựng hành chính nào. Nó là mức nền "điều kiện lý tưởng", không thay được
+tập tự thu.
+
+### 9.2 WER tách theo nhóm (PhoWhisper-small)
+
+Theo vùng miền, bộ ViMD (bộ duy nhất có nhãn tỉnh):
+
+| Vùng | n | PhoWhisper-small | Whisper-small |
+|---|---|---|---|
+| Bắc | 20 | 8,0% | 18,9% |
+| Nam | 20 | 14,5% | 27,8% |
+| Trung | 20 | 16,2% | 36,0% |
+
+Theo điều kiện thu, bộ VietMed (tiếng nói tự nhiên, lĩnh vực y tế):
+
+| Điều kiện | n | PhoWhisper-small | Whisper-small |
+|---|---|---|---|
+| Podcast | 9 | 14,7% | 18,8% |
+| Bản tin | 9 | 18,2% | 33,8% |
+| Chẩn đoán (bệnh nhân nói với bác sĩ) | 9 | 24,8% | 33,5% |
+| Tư vấn | 9 | 27,1% | 42,1% |
+| Qua điện thoại | 9 | 32,6% | 38,6% |
+| Talkshow | 9 | 39,1% | 44,9% |
+| Bài giảng | 9 | 41,9% | 42,8% |
+
+"Chẩn đoán" và "Tư vấn" là người dân nói chuyện với cán bộ chuyên môn về việc
+của mình, cấu trúc giống kiosk nhất chỉ khác lĩnh vực. Đó là con số gần
+kiosk nhất đang có: khoảng 25 đến 27% với PhoWhisper-small.
+
+Theo tuổi, bộ Common Voice: nhóm 60+ ra 3,9% (n=30) và nhóm 18 đến 44 ra
+16,2% (n=30). KHÔNG được dùng số này để kết luận về người già: toàn bộ nhóm
+"Sixties" của Common Voice tiếng Việt là 1 người nói, nhóm "Seventies" là 3
+người. Số thấp là vì một người đọc chuẩn, không phải vì mô hình nghe người
+già tốt hơn.
+
+### 9.3 Tương quan giữa điểm tin cậy và lỗi
+
+Hệ số tương quan giữa điểm tin cậy mô hình trả về và WER từng câu, âm là
+đúng chiều (tin cậy cao thì lỗi thấp): PhoWhisper-small từ -0,25 (Common
+Voice) đến -0,58 (VietMed); Whisper-small từ -0,64 đến -0,81. Điểm tin cậy
+có dùng được để quyết định mời nói lại, nhưng không mạnh; ngưỡng 0,45 hiện
+đặt tay, Kim tính lại bằng hàm chi phí kỳ vọng nếu kịp.
+
+### 9.4 Tốc độ và tài nguyên (đo thật)
+
+| Khoản | Số | Điều kiện |
+|---|---|---|
+| Một lượt hỏi đáp trọn vẹn (nghe + tra cứu) | 2,1 đến 2,8 giây | máy nhà, PhoWhisper-small, nhiều luồng CPU |
+| Nhận dạng một câu, 8 luồng CPU | 5,6 giây | cùng câu, cùng model small |
+| Nhận dạng một câu, 2 luồng CPU | 6,7 giây | |
+| Nhận dạng một câu, 1 luồng CPU, small | 11,7 đến 12,6 giây | |
+| Nhận dạng một câu, 1 luồng CPU, base | 1,5 giây | bản triển khai |
+| Nạp model từ đĩa | 0,5 giây | |
+| Nạp model từ HuggingFace lần đầu | khoảng 40 giây (bản tiny), lâu hơn với small | chỉ lần đầu, giờ nướng vào ảnh Docker |
+| RAM đỉnh, PhoWhisper-small | 371 MB | bị giết thật trên gói 512 MB |
+| RAM đỉnh, PhoWhisper-base | 244 MB | |
+| RAM lúc chạy thật sau 5 lượt | 320 đến 380 MB | small |
+| Kích thước model trên đĩa | small 240 MB, base 77 MB | int8 |
+| Trên Render Free (ít hơn 1 nhân CPU) | mỗi câu khoảng 10 đến 15 giây với small; lượt đầu từng mất 130 giây | lý do đổi sang base |
+
+### 9.5 Kiểm thử tự động
+
+45 test, chạy dưới 3 giây, không cần mô hình: 12 test giao kèo API, 23 test
+luồng 3 bước (cả 6 file kho tri thức đủ trường, rẽ nhánh đúng sơ đồ, ánh xạ
+lời nói sang lựa chọn, hỏi thêm không bịa), 10 test chuẩn hoá và tính WER.
+
+### 9.6 Con số chưa có
+
+- WER trên tập tự thu (người cao tuổi, từ vựng hành chính, có ồn): chưa
+  thu. Mẫu manifest `data/eval/testset.csv` có 10 dòng, chưa có file âm
+  thanh. Đây là việc quan trọng nhất còn lại (mục 13).
+- Tỷ lệ nhận đúng thủ tục từ câu nói tự nhiên trên người thật: chưa đo.
+- Mức cải thiện WER nhờ chuẩn hoá trên từ vựng hành chính: chưa đo, vì phụ
+  thuộc tập tự thu.
+- Thời gian một người cao tuổi hoàn thành 3 bước trên kiosk: chưa đo.
+
+---
+
+## 10. Triển khai
+
+- Docker, một ảnh, model nướng sẵn vào ảnh lúc build (Render xoá ổ đĩa mỗi
+  lần ngủ dậy nên không tải lúc chạy). `Dockerfile` ghi đè sang
+  PhoWhisper-base và `ASR_CPU_THREADS=1`.
+- Đặt trên Render gói Free: 512 MB RAM, ít hơn 1 nhân CPU, ngủ sau 15 phút
+  vắng khách, thức dậy mất khoảng 1 phút, 750 giờ/tháng. Có
+  `scripts/keepalive.py` để giữ máy thức từ hôm nộp tới hôm chấm.
+- HuggingFace Spaces bản Docker cần gói trả phí nên không dùng; kho model
+  trên HuggingFace thì miễn phí.
+- Chỉ một dịch vụ vì giao diện và API cùng tên miền, không vướng CORS,
+  không phải ghi địa chỉ máy chủ vào giao diện.
+- Hôm chấm chạy trên máy nhà (small, nhanh, đúng model đã đo); link Render
+  chỉ để gửi trước cho mọi người xem. Phương án dự phòng: chạy `MOCK=1` để
+  ít nhất có link mở được, và quay sẵn video màn hình bản thật.
+
+Lỗi đã gặp thật lúc triển khai (đều đã sửa, ghi trong `DEPLOY.md`):
+ctranslate2 4.5.0 không nạp được trên Linux vì cờ executable stack (ghim
+4.8.2); tràn RAM với small (đổi base); nạp model hỏng một lần thì hỏng mãi
+(giờ `/warmup` thử lại được).
+
+---
+
+## 11. Giới hạn phải nói thật trong bài
+
+1. Chỉ nhận dạng tiếng Việt. Người dân tộc nói tiếng mẹ đẻ không được hỗ
+   trợ; họ dùng kiosk qua phần chữ trên màn hình và nút bấm chọn, hoặc
+   được chuyển cán bộ.
+2. Số WER trong bài là trên bộ công khai, điều kiện lý tưởng, không có từ
+   vựng hành chính, không có nhãn tuổi dùng được. Tập tự thu chưa có. Gọi
+   đúng tên "tập kiểm thử nội bộ" khi có, không gọi là "bộ dữ liệu".
+3. Số đo là của PhoWhisper-small; bản chạy trên Render là base, nghe kém
+   hơn và chậm hơn vì máy chủ miễn phí.
+4. Trên VietMed, hai khoảng tin cậy chồng nhau, chưa đủ căn cứ nói PhoWhisper
+   tốt hơn Whisper gốc ở điều kiện tự nhiên.
+5. Tra cứu thủ tục hiện bằng từ khoá, chưa phải so khớp ngữ nghĩa. Câu nói
+   ngoài các cách gọi đã liệt kê có thể không nhận ra.
+6. Kiosk không kết luận "chắc chắn được hưởng"; luôn nói "có khả năng thuộc
+   diện" và cơ quan có thẩm quyền xem xét. Không đủ thông tin thì mời gặp
+   cán bộ. Kho tri thức là 6 thủ tục thử nghiệm, không thay cơ sở dữ liệu
+   thủ tục hành chính của Nhà nước.
+7. Đọc thành tiếng cần mạng; mất mạng thì rơi về giọng trình duyệt, có thể
+   không phải giọng Việt.
+8. Không lưu âm thanh; chỉ ghi nhật ký văn bản để cải tiến.
+
+---
+
+## 12. Lịch sử phát triển trên git
+
+Repo `nynyann/kiosk-backend`, nhánh `main`, 16 commit từ 05/09 đến 14/09/2026.
+
+| Commit | Nội dung |
+|---|---|
+| f034503 | Khởi tạo backend: FastAPI, PhoWhisper, kho tri thức 1 thủ tục, chuẩn hoá, giao kèo API 1.0 |
+| a619798 | Dọn README |
+| d489140 | Sửa hai lỗi chuẩn hoá tìm được khi đo WER thật |
+| 6e568ee | Bộ công cụ đo trên dữ liệu công khai (VIVOS, FLEURS, VietMed, ViMD, Common Voice) |
+| ac422c1 | Ép lỗi kiểm tra dữ liệu về đúng định dạng giao kèo |
+| 86203cd | Gộp giao diện vào chung repo, máy chủ phục vụ luôn trang kiosk |
+| de8f5cc | Thêm .dockerignore, tách pytest ra requirements-dev |
+| 7a0e61a | Máy chủ tự sinh tiếng Việt (edge-tts) thay vì nhờ trình duyệt đọc; API 1.1 |
+| 21b7e67 | Sửa câu báo lỗi micro gây hiểu nhầm, thêm hướng dẫn triển khai |
+| 391e8fb | Nướng model vào ảnh Docker, viết lại hướng dẫn Render |
+| e885bb2 | Nạp mô hình hỏng không còn hỏng vĩnh viễn, /health nói lý do; API 1.2 |
+| 34c33b6 | Ghim ctranslate2 4.8.2 vì 4.5.0 không nạp được trên Linux |
+| 89625c7 | Bản triển khai đổi sang PhoWhisper-base, ghim 1 luồng CPU |
+| a308283 | Lắp 6 thủ tục của Mian vào kho tri thức |
+| e95a025 | Luồng 3 bước theo sơ đồ: kiểm tra điều kiện, chuẩn bị hồ sơ, nộp hồ sơ; API 2.0 |
+| df008fd | Giao diện thành hội thoại từng bước: chào, hỏi bác cần gì, rồi mới hỏi từng điều kiện |
+
+Lần cập nhật 14/09/2026 (hai commit cuối) thay đổi gì:
+
+- Trước: nói một câu, máy đổ cả 4 bước và toàn bộ hồ sơ ra một màn hình;
+  màn hình chính liệt kê sẵn 6 thủ tục.
+- Sau: hội thoại từng bước đúng sơ đồ. Máy chào, hỏi cần gì, xác nhận thủ
+  tục, hỏi từng điều kiện một (câu nào cũng kèm cách trả lời), kết luận,
+  rồi mới hồ sơ và nộp. Không đáp ứng thì giải thích, không bắt chuẩn bị hồ
+  sơ thừa. Người dân trả lời bằng lời hoặc bấm.
+- Kho tri thức 6 file thêm phần `flow` (24 câu hỏi, 20 quy tắc kết luận,
+  30 FAQ). Thủ tục thứ 7 chưa kiểm chứng đưa ra ngoài.
+- Backend thêm 6 đường dẫn `/procedures`, `/flow/*`, không đổi trường cũ.
+  Chế độ giả chỉ giả phần nghe, kho và luồng chạy thật.
+- Test từ 20 lên 45.
+
+---
+
+## 13. Việc còn lại và ai làm
+
+| Việc | Ai | Ở đâu | Mức quan trọng |
+|---|---|---|---|
+| Thu tập kiểm thử nội bộ: 30 câu, người cao tuổi, từ vựng hành chính, có ồn, ghi đủ nhãn tuổi, giới, vùng, ồn | cả nhóm | `data/eval/README.md` có mẫu và cách ghi | cao nhất, quyết định mục 4 của bài |
+| Chạy `eval.wer` trên tập tự thu, ghi WER và tỷ lệ bắt đúng cụm hành chính | Lia | `results/` | cao |
+| Bổ sung `HARD_FIXES` từ cụm nghe nhầm thật, chạy `eval.rescore`, ghi chuỗi số cải thiện | Lia | `app/normalize.py` | cao, là nội dung mục 4.3 |
+| Đọc lại 24 câu hỏi bước 1 và 20 kết luận, đối chiếu văn bản | Mian | `data/kb/*.json` mục `flow.check` | cao |
+| Thêm FAQ sau mỗi buổi thử với người thật | Mian | `flow.faq` | vừa |
+| Thay tra cứu từ khoá bằng so khớp ngữ nghĩa | Kim | `app/kb.py`, hàm `score()` | vừa |
+| Tính ngưỡng tin cậy bằng hàm chi phí kỳ vọng | Kim | `config.KB_MATCH_THRESHOLD`, `ASR_CONFIDENCE_FLOOR` | vừa |
+| Thử với 3 đến 5 người cao tuổi thật, ghi thời gian hoàn thành và chỗ vấp | cả nhóm | | cao |
+| Quay video màn hình bản thật để dự phòng hôm chấm | Kns | | vừa |
+
+---
+
+## 14. Gợi ý lấy số nào cho mục nào của bản đề xuất
+
+- Mục tổng quan giải pháp: mục 1 và 2 của tài liệu này, sơ đồ luồng 3
+  bước.
+- Mục lựa chọn mô hình: bảng 9.1 (5 bộ, chênh 8 đến 19 điểm, 4/5 tách
+  rời), lý do CTranslate2 int8 chạy CPU, lý do base trên máy chủ miễn phí.
+- Mục đối tượng người cao tuổi và vùng miền: bảng 9.2 (ViMD theo vùng,
+  VietMed theo điều kiện thu), kèm cảnh báo Common Voice ở 9.2.
+- Mục chuẩn hoá và cải tiến: mục 4, số 0 đến 0,4 điểm trên bộ công khai,
+  và chuỗi số trên tập tự thu khi có.
+- Mục kho tri thức: bảng mục 6, nguyên tắc không có nguồn thì không viết,
+  cấu trúc 9 trường theo tài liệu "kho tri thức" của nhóm.
+- Mục thiết kế tương tác cho người cao tuổi: mục 8 (hội thoại từng bước,
+  hướng dẫn cách trả lời, bấm hoặc nói, chữ to, nút to, đọc thành tiếng),
+  và mục 5 số đo độ trễ tiếng.
+- Mục triển khai và chi phí: mục 10 và bảng 9.4 (RAM, tốc độ, gói máy chủ
+  miễn phí đủ chạy).
+- Mục hạn chế và hướng phát triển: mục 11 và 13, đừng bỏ mục nào.
+- Mục kiểm thử: 9.5 (45 test tự động) và 9.6 (những gì chưa đo, nói thật).

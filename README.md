@@ -12,6 +12,7 @@ máy chủ FastAPI phục vụ luôn trang kiosk ở `/`, còn API nằm ở `/h
 | Máy chủ     | `app/`              | FastAPI + PhoWhisper                      |
 | Nội dung    | `data/kb/`          | Mỗi thủ tục một file JSON, kèm mục `flow` |
 | Giao kèo API| `API_CONTRACT.md`   | Chốt rồi, đổi phải tăng phiên bản         |
+| Tổng hợp    | `TONG-HOP.md`       | Toàn bộ thông tin và số đo để điền vào bản đề xuất |
 | Triển khai  | `DEPLOY.md`         | Cách đưa lên mạng cho người khác test     |
 
 ## Kiosk chạy như thế nào
