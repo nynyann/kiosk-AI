@@ -17,7 +17,7 @@ Mục lục
 8. Giao diện kiosk (frontend)
 9. Bảng số đo
 10. Triển khai
-11. Giới hạn phải nói thật trong bài
+11. Giới hạn trong bài
 12. Lịch sử phát triển trên git
 13. Việc còn lại và ai làm
 14. Gợi ý lấy số nào cho mục nào của bản đề xuất
