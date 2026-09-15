@@ -433,7 +433,7 @@ ctranslate2 4.5.0 không nạp được trên Linux vì cờ executable stack (g
 
 ---
 
-## 11. Giới hạn phải nói thật trong bài
+## 11. Giới hạn của bài
 
 1. Chỉ nhận dạng tiếng Việt. Người dân tộc nói tiếng mẹ đẻ không được hỗ
    trợ; họ dùng kiosk qua phần chữ trên màn hình và nút bấm chọn, hoặc
