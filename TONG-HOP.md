@@ -1,9 +1,9 @@
 # Tổng hợp giải pháp Kiosk hướng dẫn thủ tục hành chính
 
 Cập nhật ngày 15/09/2026, theo commit `56f40dd` trên nhánh `main` của repo
-`nynyann/kiosk-backend`. Tài liệu này gom mọi thông tin kỹ thuật và mọi con
+`nynyann/kiosk-backend`. Tài liệu bao gồm mọi thông tin kỹ thuật và mọi con
 số đã đo để cả nhóm đọc và điền vào bản đề xuất giải pháp. Con số nào là đo
-thật thì ghi "đo thật", con số nào chưa có thì ghi "chưa có", không ước lượng.
+thật thì ghi "đo thật", con số nào chưa có thì ghi "chưa có", không ước lượng -> sẽ quyết định điền hoặc bỏ.
 
 Mục lục
 
