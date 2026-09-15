@@ -243,6 +243,16 @@ def test_hoi_them_thieu_ca_audio_lan_text():
     assert r.status_code == 400 and r.json()["ok"] is False
 
 
+def test_cau_chao_cua_giao_dien_khop_voi_may_chu():
+    """Máy chủ sinh sẵn tiếng cho câu chào theo flow.GREETING_TEXTS; giao diện
+    hiện và phát đúng chuỗi đó. Lệch một chữ là câu chào không có sẵn tiếng,
+    phải gọi ra mạng lúc bác vừa chạm màn hình."""
+    html = (Path(__file__).resolve().parent.parent / "web" / "index.html").read_text(encoding="utf-8")
+    for t in flow.GREETING_TEXTS:
+        assert t in html, t
+    assert flow.GREETING_SPEECH in kb.all_speech_texts()
+
+
 def test_moi_cau_may_doc_deu_duoc_liet_ke_de_sinh_san():
     texts = kb.all_speech_texts()
     assert len(texts) > 60

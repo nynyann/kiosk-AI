@@ -175,7 +175,9 @@ Số đo (đo thật ở trình duyệt):
 | Cùng khoản, có sinh sẵn lúc khởi động | 0,02 đến 0,3 giây |
 | Sinh một câu lúc nguội | 1,6 đến 13,9 giây, có lúc 55,8 giây |
 | Sinh cùng câu lần sau | 1 đến 2 giây |
-| Số câu sinh sẵn lúc khởi động | khoảng 125 câu cho 6 thủ tục, chạy nền |
+| Số câu sinh sẵn lúc khởi động | khoảng 130 câu cho 6 thủ tục, chạy nền |
+| Kho mp3 đi theo repo (`data/tts/`) | sinh một lần ở máy nhà bằng `scripts/build_tts_cache.py`, máy chủ đọc từ đĩa trước, không phụ thuộc mạng cho câu quen |
+| Tỷ lệ dịch vụ Edge trả lỗi với giọng Việt, đo 15/09/2026 | có đợt 5/6 lần liên tiếp, là lý do phải có kho mp3 |
 
 ---
 
@@ -425,8 +427,11 @@ ctranslate2 4.5.0 không nạp được trên Linux vì cờ executable stack (g
    diện" và cơ quan có thẩm quyền xem xét. Không đủ thông tin thì mời gặp
    cán bộ. Kho tri thức là 6 thủ tục thử nghiệm, không thay cơ sở dữ liệu
    thủ tục hành chính của Nhà nước.
-7. Đọc thành tiếng cần mạng; mất mạng thì rơi về giọng trình duyệt, có thể
-   không phải giọng Việt.
+7. Đọc thành tiếng: câu quen đã có mp3 sẵn trong repo, không cần mạng. Câu
+   lạ (kho tri thức vừa sửa mà chưa sinh lại) mới cần mạng, và dịch vụ Edge
+   hỏng ngẫu nhiên; mất mạng hoặc hỏng thì rơi về giọng trình duyệt, có thể
+   không phải giọng Việt. Trình duyệt chặn phát tiếng trước thao tác chạm đầu
+   tiên, nên có màn «Chạm vào màn hình để bắt đầu».
 8. Không lưu âm thanh; chỉ ghi nhật ký văn bản để cải tiến.
 
 ---

@@ -172,8 +172,26 @@ TTS_RATE=-15%                   # đọc chậm hơn nữa
 TTS_ENABLED=0                   # tắt hẳn, quay về giọng trình duyệt
 ```
 
-**Cần mạng lúc chạy.** Gọi hỏng thì giao diện tự rơi về Web Speech API — thà
-giọng chưa chuẩn còn hơn để bác đứng nhìn màn hình không nghe gì.
+**Kho mp3 đi theo repo.** Dịch vụ giọng đọc của Edge hỏng ngẫu nhiên với
+giọng tiếng Việt: đo ngày 15/09/2026, cùng một câu có lúc hỏng 5/6 lần liên
+tiếp, và máy chủ thật đã lặng hẳn mấy hôm vì thế. Mọi câu kiosk nói đều
+biết trước (sinh từ `data/kb/`), nên sinh một lần ở máy nhà rồi commit:
+
+```bash
+python scripts/build_tts_cache.py     # thử lại tới khi đủ, ghi vào data/tts/
+```
+
+Máy chủ đọc từ `data/tts/` trước, chỉ gọi ra mạng khi gặp câu chưa có (và
+lúc đó tự thử lại 4 lần, hai lần đầu giữ tốc độ cấu hình, hai lần sau tốc độ
+mặc định). **Sửa kho tri thức xong phải chạy lại lệnh trên rồi commit cả
+mp3**, không thì câu mới phải sinh lúc bác đang đứng chờ.
+
+Gọi mạng hỏng thì giao diện tự rơi về Web Speech API — thà giọng chưa chuẩn
+còn hơn để bác đứng nhìn màn hình không nghe gì.
+
+**Trình duyệt chặn phát tiếng khi trang chưa có thao tác chạm nào**, nên câu
+chào lúc mới vào sẽ bị chặn lặng lẽ. Giao diện hiện màn «Chạm vào màn hình
+để bắt đầu»; chạm một cái là mở khoá tiếng cho cả phiên, và máy chào ngay.
 
 Lúc khởi động, máy chủ sinh sẵn tiếng cho mọi câu trong kho rồi giữ trong bộ
 nhớ đệm, chạy nền nên không làm chậm khởi động. Có đo: không sinh sẵn thì từ

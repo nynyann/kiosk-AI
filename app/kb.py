@@ -198,6 +198,9 @@ def all_speech_texts() -> List[str]:
     """
     from . import flow  # tránh import vòng
     texts = [for_speech(HANDOFF_TEXT), for_speech(RETRY_TEXT)]
+    # Giao diện KHÔNG chuẩn hoá câu chào qua for_speech (nó phát nguyên chuỗi
+    # của nó), nên ở đây cũng để nguyên để khoá bộ đệm khớp nhau.
+    texts += list(flow.UI_TEXTS)
     for proc in _PROCEDURES:
         texts.append(for_speech(confirm_text(proc)))
         texts += flow.all_speech_texts(proc)

@@ -53,6 +53,8 @@ TTS_ENABLED = os.getenv("TTS_ENABLED", "1") == "1"
 TTS_VOICE = os.getenv("TTS_VOICE", "vi-VN-HoaiMyNeural")
 # Chậm hơn mặc định một chút cho người già nghe kịp. Định dạng của edge-tts là
 # phần trăm so với tốc độ gốc, bắt buộc có dấu + hoặc -.
+# LƯU Ý: giọng HoaiMy có lúc từ chối mọi giá trị khác "+0%" (đo 15/09/2026),
+# app/tts.py tự thử lại với tốc độ mặc định khi gặp chuyện đó.
 TTS_RATE = os.getenv("TTS_RATE", "-8%")
 # Hạn giờ lúc đang phục vụ: người dân đứng trước màn hình chờ, quá mức này thì
 # thà bỏ cuộc để giao diện rơi về giọng trình duyệt còn hơn treo im lặng.
@@ -72,6 +74,12 @@ TTS_MAX_CHARS = int(os.getenv("TTS_MAX_CHARS", "2000"))
 TTS_CACHE_SIZE = int(os.getenv("TTS_CACHE_SIZE", "256"))
 # Sinh sẵn tiếng cho mọi câu trong kho ngay lúc khởi động, chạy nền.
 TTS_PREWARM = os.getenv("TTS_PREWARM", "1") == "1"
+# Kho mp3 trên đĩa, ĐI THEO REPO. Mọi câu máy có thể nói đều biết trước
+# (sinh từ data/kb/), nên sinh một lần ở máy nhà bằng scripts/build_tts_cache.py
+# rồi commit; máy chủ đọc từ đây trước, chỉ gọi ra mạng khi gặp câu chưa có.
+# Lý do: dịch vụ giọng đọc của Edge hỏng ngẫu nhiên với giọng tiếng Việt, đo
+# ngày 15/09/2026 có lúc hỏng 5/6 lần liên tiếp. Kiosk không thể im vì thế.
+TTS_CACHE_DIR = Path(os.getenv("TTS_CACHE_DIR", str(DATA_DIR / "tts")))
 
 # --- CORS -------------------------------------------------------------------
 # TRƯỚC KHI NỘP: thay "*" bằng đúng tên miền trang giao diện của Kns.

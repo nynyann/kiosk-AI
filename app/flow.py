@@ -38,6 +38,23 @@ ASK_FALLBACK_TEXT = ("Câu này cháu chưa có trong kho tri thức của thủ
                      "Bác hỏi cán bộ tiếp nhận hồ sơ giúp cháu ạ.")
 ASK_NO_SPEECH_TEXT = "Cháu chưa nghe rõ ạ. Bác nói lại giúp cháu một lần nữa."
 DONE_TEXT = "Cháu đã hướng dẫn xong thủ tục {name}. Chúc bác làm thủ tục thuận lợi ạ."
+# Câu chào ở màn hình đầu. Giao diện (web/index.html) giữ một bản y hệt để
+# hiện chữ; đặt ở đây để máy chủ sinh sẵn tiếng lúc khởi động và lưu vào kho
+# đĩa. tests/test_flow.py kiểm hai bản có khớp nhau không.
+GREETING_TEXTS = [
+    "Xin chào bác! Cháu là máy hướng dẫn làm thủ tục hành chính.",
+    "Bác cần làm gì ạ?",
+    "Bác bấm vào nút micro bên dưới rồi nói, ví dụ: «Tôi 76 tuổi, không có lương hưu thì được hỗ trợ gì?» Nói xong bác bấm «Nói xong rồi».",
+]
+GREETING_SPEECH = " ".join(GREETING_TEXTS)
+# Các câu khác giao diện tự nói (không qua kho tri thức), cũng sinh sẵn.
+UI_TEXTS = [
+    GREETING_SPEECH,
+    "Vậy bác nói lại giúp cháu, bác cần làm gì ạ?",
+    "Bác nói lại giúp cháu, bác cần làm gì ạ?",
+    "Bác bấm chọn việc bác cần làm trên màn hình ạ.",
+]
+
 VERDICT_TITLES = {
     "ineligible": "Chưa đủ điều kiện",
     "consult": "Cần cán bộ xác định",
