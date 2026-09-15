@@ -1,6 +1,6 @@
 # Tổng hợp giải pháp Kiosk hướng dẫn thủ tục hành chính
 
-Cập nhật ngày 15/09/2026, theo commit `56f40dd` trên nhánh `main` của repo
+Cập nhật ngày 16/09/2026, theo nhánh `main` của repo
 `nynyann/kiosk-backend`. Tài liệu bao gồm mọi thông tin kỹ thuật và mọi con
 số đã đo để cả nhóm đọc và điền vào bản đề xuất giải pháp. Con số nào là đo
 thật thì ghi "đo thật", con số nào chưa có thì ghi "chưa có", không ước lượng -> sẽ quyết định điền hoặc bỏ.
@@ -41,8 +41,10 @@ vẽ:
            -> Không đáp ứng: giải thích điều kiện chưa đạt, kết luận
               không đủ điều kiện -> Kết thúc
 
-Toàn bộ chạy trên một máy chủ, không dùng dịch vụ AI trả phí, không gửi âm
-thanh ra ngoài, không lưu âm thanh xuống đĩa.
+Toàn bộ nhận dạng giọng nói, tra kho và đọc thành tiếng chạy trên một máy
+chủ, không gửi âm thanh ra ngoài, không lưu âm thanh xuống đĩa. Từ 16/09 có
+thêm một tầng mô hình ngôn ngữ trên FPT AI Marketplace (trả phí theo lượt,
+chỉ gửi văn bản, tắt được), xem mục 7b.
 
 Phạm vi: người cao tuổi và người dân tộc thiểu số nói tiếng Việt (có thể kèm
 giọng vùng). Không nhận dạng tiếng dân tộc (Tày, H'Mông, Khmer ...). Người
@@ -69,20 +71,22 @@ npm, không cơ sở dữ liệu.
       |-- app/normalize.py chuẩn hoá văn bản nhận dạng
       |-- app/kb.py        nạp data/kb/*.json, tra cứu thủ tục
       |-- app/flow.py      máy trạng thái bước 1 -> 2 -> 3
+      |-- app/llm.py       gọi mô hình ngôn ngữ FPT AI Marketplace, tắt được
       |-- app/tts.py       đọc mp3 từ data/tts/, thiếu mới gọi edge-tts
       |
       v
     data/kb/*.json          6 thủ tục, mỗi thủ tục một file
     data/tts/*.mp3          112 câu đã sinh sẵn tiếng, đi theo repo
 
-Kích thước mã nguồn (đếm ngày 15/09/2026): backend `app/` 2.293 dòng Python,
-giao diện `web/index.html` 959 dòng, công cụ đo `eval/` 875 dòng, kịch bản
-`scripts/` 3 file, test 3 file với 46 test. Tổng khoảng 4.800 dòng.
+Kích thước mã nguồn (đếm ngày 16/09/2026): backend `app/` 2.752 dòng Python,
+giao diện `web/index.html` 981 dòng, công cụ đo `eval/` 875 dòng, kịch bản
+`scripts/` 3 file, test 4 file với 61 test. Tổng khoảng 5.300 dòng.
 
 Thư viện chính (ghim phiên bản trong `requirements.txt`): fastapi 0.115.6,
-uvicorn 0.34.0, faster-whisper 1.1.1, ctranslate2 4.8.2, edge-tts 7.2.8.
+uvicorn 0.34.0, faster-whisper 1.1.1, ctranslate2 4.8.2, edge-tts 7.2.8,
+httpx 0.28.1 (gọi mô hình ngôn ngữ).
 
-Giao kèo API viết ở `API_CONTRACT.md`, phiên bản 2.0. Mọi phản hồi đều có
+Giao kèo API viết ở `API_CONTRACT.md`, phiên bản 2.1. Mọi phản hồi đều có
 trường `ok`; lỗi thì có `error` là câu tiếng Việt hiển thị thẳng cho người
 dân được.
 
@@ -274,6 +278,49 @@ Mọi câu máy có thể nói đều được liệt kê để sinh tiếng s�
 
 ---
 
+## 7b. Mô hình ngôn ngữ (FPT AI Marketplace), thêm ngày 16/09/2026
+
+Làm theo phản hồi của ban giám khảo ngày 15/09: (1) nhớ ngữ cảnh trong
+phiên, (2) hai thành phần nghe và trả lời, (3) thấu cảm khi bác kể hoàn
+cảnh, (4) trả lời câu hỏi diễn đạt khác FAQ, (5) luồng demo dài hơn, (6)
+tiếng Việt tự nhiên hơn.
+
+Gọi API kiểu OpenAI tại `https://mkp-api.fptcloud.com/chat/completions`,
+xác thực bằng khoá `FPT_API_KEY` (tài liệu: github.com/fpt-corp/ai-marketplace).
+Mô hình mặc định `Saola-Small-32B` (mô hình tiếng Việt của FPT), đổi được
+sang `DeepSeek-V4-Flash`, `Qwen3.6-27B` bằng biến `LLM_MODEL`. Hạn giờ 12
+giây. Trong các API trên marketplace, nhóm sinh câu trả lời được là các LLM
+kể trên; `Vietnamese_Embedding`, `multilingual-e5-large`, `bge-reranker` là
+tìm kiếm ngữ nghĩa (chưa dùng, việc của Kim); các `whisper` là nghe (không
+dùng vì phải gửi âm thanh ra ngoài).
+
+Bốn chỗ dùng, chỗ nào cũng có đường lùi về kho tĩnh khi không có khoá, hỏng,
+hết tiền hay quá hạn giờ:
+
+| Chỗ | Có mô hình | Không có mô hình | Phản hồi số |
+|---|---|---|---|
+| Bác mở đầu «tôi 76 tuổi, không có lương hưu, sống một mình» | điền sẵn tuổi, lương hưu vào bước 1; nói «Cháu hiểu rồi ạ, bác 76 tuổi, chưa có lương hưu và sống một mình»; chỉ hỏi phần còn thiếu | điền sẵn bằng luật (số tuổi, cụm phủ định rõ), nói «Cháu ghi nhận: …» | 1, 3, 5 |
+| Câu nói không khớp từ khoá («tôi già rồi nhà nước có cho đồng nào không») | mô hình chọn trong 6 thủ tục, máy hỏi lại mềm «Nếu cháu hiểu đúng thì…» | chuyển cán bộ, đưa danh sách bấm chọn | 4 |
+| Trả lời câu bước 1 bằng lời mà so cụm từ không ra | mô hình ánh xạ sang một lựa chọn có sẵn, không được bịa lựa chọn | mời bấm chọn | 4 |
+| Hỏi thêm ở bước 2, 3 diễn đạt khác FAQ, hoặc kể thêm hoàn cảnh | mô hình đọc toàn bộ kho tri thức của thủ tục + tuổi, lương hưu đã trả lời + các lượt hỏi trước, viết câu trả lời tối đa 3 câu | ý định chung (nộp đâu, bao lâu, phí, mang gì) hoặc mời hỏi cán bộ | 1, 3, 4, 6 |
+
+Nguyên tắc giữ nguyên: prompt chỉ chứa kho tri thức của đúng thủ tục đó;
+mô hình bị ép trả mã `KHONG_CO_TRONG_KHO` khi kho không có, máy chủ thay bằng
+câu mời gặp cán bộ; không được thêm giấy tờ, điều kiện, con số ngoài kho;
+không kết luận «chắc chắn được hưởng». FAQ khớp rõ vẫn lấy nguyên văn kho
+(có sẵn tiếng, không tốn lượt gọi). Máy chủ vẫn không giữ phiên: ngữ cảnh
+(câu mở đầu, các câu đã trả lời, các lượt hỏi thêm) do giao diện gửi lại
+mỗi lượt.
+
+Số đo: chưa có khoá nên chưa đo độ trễ và chất lượng câu trả lời thật. 15
+test với mô hình giả kiểm đúng đường đi: điền sẵn, không điền giá trị ngoài
+lựa chọn, mô hình trả rác thì lùi về luật, ngoài kho thì mời cán bộ, FAQ
+khớp rõ thì không gọi mô hình. Việc phải làm ngay: tạo khoá, đặt
+`FPT_API_KEY` trên Render, ghi độ trễ và đọc 20 câu trả lời sinh ra để kiểm
+không câu nào nhắc thứ không có trong kho.
+
+---
+
 ## 8. Giao diện kiosk (frontend)
 
 `web/index.html`, một file, không build. Dạng hội thoại: máy nói một câu
@@ -392,10 +439,11 @@ có dùng được để quyết định mời nói lại, nhưng không mạnh;
 
 ### 9.5 Kiểm thử tự động
 
-46 test, chạy dưới 3 giây, không cần mô hình: 12 test giao kèo API, 24 test
-luồng 3 bước (cả 6 file kho tri thức đủ trường, rẽ nhánh đúng sơ đồ, ánh xạ
-lời nói sang lựa chọn, hỏi thêm không bịa, câu chào của giao diện khớp với
-chuỗi máy chủ sinh sẵn), 10 test chuẩn hoá và tính WER.
+61 test, chạy dưới 4 giây, không cần mô hình nhận dạng và không gọi mạng:
+12 test giao kèo API, 24 test luồng 3 bước (cả 6 file kho tri thức đủ
+trường, rẽ nhánh đúng sơ đồ, ánh xạ lời nói sang lựa chọn, hỏi thêm không
+bịa, câu chào của giao diện khớp với chuỗi máy chủ sinh sẵn), 15 test mô
+hình ngôn ngữ với mô hình giả (mục 7b), 10 test chuẩn hoá và tính WER.
 
 ### 9.6 Con số chưa có
 
@@ -445,8 +493,11 @@ ctranslate2 4.5.0 không nạp được trên Linux vì cờ executable stack (g
    hơn và chậm hơn vì máy chủ miễn phí.
 4. Trên VietMed, hai khoảng tin cậy chồng nhau, chưa đủ căn cứ nói PhoWhisper
    tốt hơn Whisper gốc ở điều kiện tự nhiên.
-5. Tra cứu thủ tục hiện bằng từ khoá, chưa phải so khớp ngữ nghĩa. Câu nói
-   ngoài các cách gọi đã liệt kê có thể không nhận ra.
+5. Tra cứu thủ tục bằng từ khoá; câu diễn đạt lạ chỉ nhận ra được khi bật
+   mô hình ngôn ngữ (cần khoá trả phí). Chưa dùng embedding ngữ nghĩa.
+5b. Tầng mô hình ngôn ngữ chưa được đo trên khoá thật: chưa có số độ trễ,
+   chưa đọc kiểm câu trả lời sinh ra. Trong bài nói là «đã nối, kiểm bằng
+   mô hình giả, đang chờ khoá để đo».
 6. Kiosk không kết luận "chắc chắn được hưởng"; luôn nói "có khả năng thuộc
    diện" và cơ quan có thẩm quyền xem xét. Không đủ thông tin thì mời gặp
    cán bộ. Kho tri thức là 6 thủ tục thử nghiệm, không thay cơ sở dữ liệu
@@ -462,7 +513,7 @@ ctranslate2 4.5.0 không nạp được trên Linux vì cờ executable stack (g
 
 ## 12. Lịch sử phát triển trên git
 
-Repo `nynyann/kiosk-backend`, nhánh `main`, 18 commit từ 05/09 đến 15/09/2026.
+Repo `nynyann/kiosk-backend`, nhánh `main`, 23 commit từ 05/09 đến 16/09/2026.
 
 | Commit | Nội dung |
 |---|---|
@@ -484,6 +535,10 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 18 commit từ 05/09 đến 15/09/2
 | df008fd | Giao diện thành hội thoại từng bước: chào, hỏi bác cần gì, rồi mới hỏi từng điều kiện |
 | cf16318 | Thêm TONG-HOP.md, tài liệu này |
 | 56f40dd | Màn chạm để bắt đầu (mở khoá tiếng), kho mp3 đi theo repo, thử lại khi Edge hỏng |
+| b67f9e4 | Cập nhật TONG-HOP.md theo lần sửa 15/09 |
+| b53df86, 044fd9a | Sunny: sửa tài liệu và tên người kiểm chứng kho tri thức |
+| d7b545c | Bỏ cấu hình riêng của máy cá nhân khỏi repo |
+| (16/09) | Nối mô hình ngôn ngữ FPT AI Marketplace theo phản hồi giám khảo: nhớ ngữ cảnh, hiểu hoàn cảnh, trả lời ngoài FAQ, lời tự nhiên; API 2.1; 61 test |
 
 Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 
@@ -509,6 +564,22 @@ Lần cập nhật 15/09/2026 (56f40dd) thay đổi gì:
   theo repo; máy chủ đọc từ đĩa trước, gọi mạng thì thử lại 4 lần.
 - Test từ 45 lên 46.
 
+Lần cập nhật 16/09/2026 (nối mô hình ngôn ngữ) thay đổi gì:
+
+- Phản hồi giám khảo 15/09: kiosk phải nhớ ngữ cảnh, hiểu hoàn cảnh bác
+  kể, trả lời câu hỏi diễn đạt khác FAQ, lời tự nhiên hơn, luồng demo dài
+  hơn. Mọi điểm đều nằm ở tầng «hiểu và trả lời», tầng nghe và kho không đổi.
+- Thêm `app/llm.py` gọi FPT AI Marketplace ở 4 chỗ (bảng mục 7b), mỗi chỗ
+  có đường lùi về kho tĩnh. Không có khoá thì máy chạy y như trước, chỉ thêm
+  điền sẵn bằng luật từ câu bác mở đầu.
+- `/flow/start` nhận câu bác mở đầu, trả `ack` (xác nhận đã hiểu) và
+  `prefilled` (điều kiện điền sẵn), chỉ hỏi phần còn thiếu; giao diện hiện
+  bong bóng «Cháu đã hiểu» và cho «Quay lại» sửa. `/flow/ask` nhận ngữ cảnh
+  phiên (các câu đã trả lời, câu mở đầu, các lượt hỏi trước, bước đang đứng).
+- Kho tri thức: thêm cụm phủ định rõ («không có lương hưu», «hộ nghèo») cho
+  hai thủ tục trợ cấp để luật điền sẵn bắt được.
+- Giao kèo API 2.1, chỉ thêm trường. Test từ 46 lên 61.
+
 ---
 
 ## 13. Việc còn lại và ai làm
@@ -521,7 +592,9 @@ Lần cập nhật 15/09/2026 (56f40dd) thay đổi gì:
 | Đọc lại 24 câu hỏi bước 1 và 20 kết luận, đối chiếu văn bản | Mian | `data/kb/*.json` mục `flow.check` | cao |
 | Thêm FAQ sau mỗi buổi thử với người thật | Mian | `flow.faq` | vừa |
 | Sau mỗi lần sửa kho tri thức: chạy `python scripts/build_tts_cache.py` rồi commit cả `data/tts/` | Lia | `scripts/build_tts_cache.py` | cao, quên là câu mới không có tiếng |
-| Thay tra cứu từ khoá bằng so khớp ngữ nghĩa | Kim | `app/kb.py`, hàm `score()` | vừa |
+| Tạo khoá FPT AI Marketplace, đặt `FPT_API_KEY` trên Render và `.env`, nạp số dư | Lia | marketplace.fptcloud.com, My API Keys | cao nhất, không có thì tầng mô hình chưa chạy thật |
+| Đo tầng mô hình trên khoá thật: độ trễ mỗi chỗ gọi, đọc 20 câu trả lời sinh ra kiểm không bịa | Lia | `data/logs/turns.jsonl` có `via_llm` | cao |
+| Thay tra cứu từ khoá bằng so khớp ngữ nghĩa (`Vietnamese_Embedding` trên cùng marketplace) | Kim | `app/kb.py`, hàm `score()` | vừa |
 | Tính ngưỡng tin cậy bằng hàm chi phí kỳ vọng | Kim | `config.KB_MATCH_THRESHOLD`, `ASR_CONFIDENCE_FLOOR` | vừa |
 | Thử với 3 đến 5 người cao tuổi thật, ghi thời gian hoàn thành và chỗ vấp | cả nhóm | | cao |
 | Quay video màn hình bản thật để dự phòng hôm chấm | Kns | | vừa |
@@ -546,4 +619,6 @@ Lần cập nhật 15/09/2026 (56f40dd) thay đổi gì:
 - Mục triển khai và chi phí: mục 10 và bảng 9.4 (RAM, tốc độ, gói máy chủ
   miễn phí đủ chạy).
 - Mục hạn chế và hướng phát triển: mục 11 và 13, đừng bỏ mục nào.
-- Mục kiểm thử: 9.5 (46 test tự động) và 9.6 (những gì chưa đo, nói thật).
+- Mục kiểm thử: 9.5 (61 test tự động) và 9.6 (những gì chưa đo, nói thật).
+- Mục trả lời phản hồi giám khảo: mục 7b, bảng 4 chỗ dùng mô hình ứng với 6
+  điểm phản hồi, kèm giới hạn 5b.

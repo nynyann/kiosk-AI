@@ -56,6 +56,8 @@ class AnswerResult(BaseModel):
     processing_time: Optional[str] = None
     source: Optional[Source] = None
     speech: str = ""
+    # true khi thủ tục do mô hình ngôn ngữ nhận ra (tra từ khoá không bắt được).
+    via_llm: bool = False
     # Câu ngắn để máy hỏi lại «Cháu hiểu bác cần làm thủ tục X. Đúng không ạ?»
     # trước khi vào luồng từng bước. Giao diện 2.0 đọc câu này thay vì `speech`.
     confirm: str = ""
@@ -82,6 +84,9 @@ class HealthResult(BaseModel):
     tts_voice: Optional[str] = None
     # Chỉ có giá trị khi asr_ready = false: câu lỗi lúc nạp mô hình.
     asr_error: Optional[str] = None
+    # Mô hình ngôn ngữ (FPT AI Marketplace) có bật không, và tên mô hình.
+    llm_enabled: bool = False
+    llm_model: Optional[str] = None
 
 
 class ErrorResult(BaseModel):
@@ -153,6 +158,12 @@ class FlowState(BaseModel):
     question: Optional[FlowQuestion] = None
     # Lời dẫn của bước 1, chỉ có ở câu hỏi đầu tiên.
     intro: Optional[str] = None
+    # Câu máy xác nhận đã hiểu hoàn cảnh bác kể («Cháu hiểu rồi ạ, bác 76 tuổi
+    # và chưa có lương hưu»), chỉ có ở /flow/start khi gửi kèm `utterance`.
+    ack: Optional[str] = None
+    # Những câu điều kiện đã được điền sẵn từ lời bác kể, để giao diện hiện và
+    # để «Quay lại» sửa được. Máy chỉ hỏi phần còn thiếu.
+    prefilled: List["PrefilledAnswer"] = []
     # Chỉ có khi stage = stop (ineligible | consult | redirect) hoặc prepare (eligible).
     verdict: Optional[str] = None
     reason: Optional[str] = None
@@ -178,9 +189,19 @@ class FlowState(BaseModel):
     message: Optional[str] = None
 
 
+class PrefilledAnswer(BaseModel):
+    question_id: str
+    question: str
+    value: str
+    label: str
+
+
 class FlowStartRequest(BaseModel):
     procedure_id: str
     session_id: Optional[str] = None
+    # Câu bác nói lúc mở đầu («tôi 76 tuổi, không có lương hưu…»). Máy đọc để
+    # điền sẵn điều kiện và xác nhận đã hiểu, không bắt bác nói lại.
+    utterance: Optional[str] = None
 
 
 class FlowAnswerRequest(BaseModel):
@@ -212,3 +233,6 @@ class FlowAskResult(BaseModel):
     switch_to: Optional[str] = None
     switch_name: Optional[str] = None
     asr: Optional[AsrResult] = None
+    # true khi câu trả lời do mô hình ngôn ngữ viết từ kho tri thức (câu hỏi
+    # diễn đạt khác FAQ). false là lấy nguyên văn từ kho.
+    via_llm: bool = False

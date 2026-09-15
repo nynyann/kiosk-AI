@@ -485,6 +485,10 @@ function composerWaiting(lead){ setComposer(`<p class="lead">${esc(lead)}</p>`);
    --------------------------------------------------------------------- */
 let flowState = null;      // FlowState mới nhất
 let answerOrder = [];      // thứ tự câu đã trả lời (cho «Quay lại»)
+// Ngữ cảnh phiên, gửi kèm mọi lượt để máy không bắt bác nói lại: câu bác mở
+// đầu («tôi 76 tuổi, không có lương hưu…») và các lượt hỏi thêm trước đó.
+let lastUtterance = "";
+let askHistory = [];
 let pendingProc = null;    // thủ tục vừa nhận ra, chờ bác xác nhận
 let procedures = [];       // GET /procedures — chỉ đem ra khi máy không hiểu
 let recordContext = "query";
@@ -511,6 +515,7 @@ async function startConversation(){
   stopSpeaking();
   clearTimeout(doneTimer);
   flowState = null; answerOrder = []; pendingProc = null; window._sid = null;
+  lastUtterance = ""; askHistory = [];
   updateStepper();
   clearChat();
   composerWaiting("Bác đợi cháu một chút…");
@@ -698,13 +703,16 @@ async function sendTurn(blob){
     return;
   }
   userSay(asr.text);
+  lastUtterance = asr.text;
   if (answer.handoff || !answer.procedure_id){
     kioskSay(`<p>${esc(answer.answer || "Cháu chưa hiểu bác cần gì.")}</p>`, { speech: answer.speech || answer.answer });
     await offerProcedureList();
     return;
   }
   pendingProc = { id: answer.procedure_id, name: answer.procedure_name };
-  kioskSay(`<p>Cháu hiểu bác cần làm thủ tục <b class="proc">${esc(answer.procedure_name)}</b>. Đúng không ạ?</p>`,
+  // via_llm: từ khoá không bắt được, mô hình ngôn ngữ đoán. Nói mềm hơn.
+  const lead = answer.via_llm ? "Nếu cháu hiểu đúng thì bác cần làm thủ tục" : "Cháu hiểu bác cần làm thủ tục";
+  kioskSay(`<p>${lead} <b class="proc">${esc(answer.procedure_name)}</b>. Đúng không ạ?</p>`,
     { hint: "Bác bấm «Đúng rồi» để cháu hướng dẫn từng bước, hoặc «Không phải» để nói lại.",
       speech: answer.confirm || `Cháu hiểu bác cần làm thủ tục ${answer.procedure_name}. Đúng không ạ?` });
   setComposer(`<div class="row">${btn("yesBtn", "primary", "Đúng rồi, hướng dẫn cháu nhé", ICON_CHECK)}${btn("noBtn", "outline", "Không phải, tôi nói lại")}</div>`);
@@ -719,10 +727,18 @@ async function startFlow(procedureId){
   stopSpeaking();
   composerWaiting("Cháu đang chuẩn bị…");
   showTyping();
-  answerOrder = [];
+  answerOrder = []; askHistory = [];
   try{
-    const st = await postJson("/flow/start", { procedure_id: procedureId, session_id: sessionId() });
+    // Gửi kèm câu bác mở đầu: máy đọc để điền sẵn điều kiện bác đã nói rõ
+    // và xác nhận đã hiểu hoàn cảnh, rồi chỉ hỏi phần còn thiếu.
+    const st = await postJson("/flow/start", { procedure_id: procedureId, session_id: sessionId(), utterance: lastUtterance || null });
     hideTyping();
+    if (st.ack){
+      const chips = (st.prefilled || []).map(x => `<li><span class="box">${ICON_CHECK}</span><span>${esc(x.question)} <b>${esc(x.label)}</b></span></li>`).join("");
+      kioskSay(`<span class="stephead ok">Cháu đã hiểu</span><p>${esc(st.ack)}</p>${chips ? `<ul class="checklist notes">${chips}</ul>` : ""}`,
+        { hint: (st.prefilled || []).length ? "Cháu điền sẵn những điều bác vừa kể. Có gì chưa đúng, bác bấm «Quay lại câu trước» để sửa." : null });
+      answerOrder = (st.prefilled || []).map(x => x.question_id);
+    }
     applyState(st);
   } catch(e){ hideTyping(); showError(e.message); }
 }
@@ -896,12 +912,18 @@ async function sendAsk(blob){
   fd.append("audio", blob, "hoithem.webm");
   fd.append("procedure_id", flowState.procedure_id);
   fd.append("session_id", sessionId());
+  // Ngữ cảnh phiên: để máy trả lời theo đúng hoàn cảnh bác, không hỏi lại.
+  fd.append("answers", JSON.stringify(flowState.answers || {}));
+  fd.append("utterance", lastUtterance || "");
+  fd.append("history", JSON.stringify(askHistory.slice(-6)));
+  fd.append("stage", stage);
   let d;
   try{ d = await api("/flow/ask", { method:"POST", body: fd }); }
   catch(e){ hideTyping(); showError(e.message); return; }
   hideTyping();
   const heard = d.question || (d.asr && d.asr.text) || "";
   if (heard) userSay(heard);
+  if (heard && d.answer) askHistory.push({ q: heard, a: d.answer });
   const el = kioskSay(`<p>${esc(d.answer)}</p>${d.switch_to ? `<div class="chips"><button class="chip" id="switchBtn">Chuyển sang: ${esc(d.switch_name || d.switch_to)}</button></div>` : ""}`,
     { speech: d.speech || d.answer });
   if (d.switch_to) el.querySelector("#switchBtn").addEventListener("click", () => { userSay("Chuyển sang " + d.switch_name); startFlow(d.switch_to); });

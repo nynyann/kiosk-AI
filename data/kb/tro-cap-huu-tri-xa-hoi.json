@@ -110,7 +110,12 @@
           "options": [
             {
               "value": "yes",
-              "label": "Có, tôi là công dân Việt Nam"
+              "label": "Có, tôi là công dân Việt Nam",
+              "match": [
+                "công dân việt nam",
+                "người việt nam",
+                "quốc tịch việt nam"
+              ]
             },
             {
               "value": "no",
@@ -124,11 +129,24 @@
           "options": [
             {
               "value": "no",
-              "label": "Không nhận lương hưu"
+              "label": "Không nhận lương hưu",
+              "match": [
+                "không có lương hưu",
+                "không lương hưu",
+                "chưa có lương hưu",
+                "không được lương hưu",
+                "không nhận lương hưu"
+              ]
             },
             {
               "value": "yes",
-              "label": "Có, đang nhận lương hưu"
+              "label": "Có, đang nhận lương hưu",
+              "match": [
+                "có lương hưu",
+                "đang nhận lương hưu",
+                "đang hưởng lương hưu",
+                "lương hưu rồi"
+              ]
             }
           ]
         },
@@ -138,7 +156,12 @@
           "options": [
             {
               "value": "no",
-              "label": "Không nhận"
+              "label": "Không nhận",
+              "match": [
+                "không có trợ cấp bảo hiểm",
+                "không nhận trợ cấp bảo hiểm",
+                "không có bảo hiểm xã hội"
+              ]
             },
             {
               "value": "yes",
@@ -157,7 +180,12 @@
           "options": [
             {
               "value": "yes",
-              "label": "Có, thuộc hộ nghèo hoặc cận nghèo"
+              "label": "Có, thuộc hộ nghèo hoặc cận nghèo",
+              "match": [
+                "hộ nghèo",
+                "cận nghèo",
+                "nhà nghèo"
+              ]
             },
             {
               "value": "no",

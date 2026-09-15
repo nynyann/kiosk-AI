@@ -31,3 +31,6 @@ data/eval/audio/
 # kèm điều khoản "forbidden to re-host or re-share". Không bao giờ commit.
 *.tar.gz
 data/eval/public/
+
+# Cấu hình riêng của công cụ trên máy cá nhân, không thuộc dự án
+.claude/

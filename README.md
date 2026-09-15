@@ -8,6 +8,7 @@ máy chủ FastAPI phục vụ luôn trang kiosk ở `/`, còn API nằm ở `/h
 | ----------- | ------------------- | ----------------------------------------- |
 | Giao diện   | `web/index.html`    | Một file HTML, không cần build, không npm |
 | Luồng 3 bước| `app/flow.py`       | Máy chạy sơ đồ Bước 1 → 2 → 3, không chứa nội dung |
+| Mô hình ngôn ngữ | `app/llm.py`   | FPT AI Marketplace, hiểu hoàn cảnh và trả lời tự nhiên, tắt được |
 | Đọc tiếng   | `app/tts.py`        | Máy chủ tự sinh mp3 giọng tiếng Việt      |
 | Máy chủ     | `app/`              | FastAPI + PhoWhisper                      |
 | Nội dung    | `data/kb/`          | Mỗi thủ tục một file JSON, kèm mục `flow` |
@@ -48,6 +49,33 @@ trò chuyện: máy nói một câu, bác trả lời một câu, cứ thế t�
 Mọi câu hỏi, kết luận, hồ sơ nằm trong `data/kb/<thủ tục>.json` mục `flow`;
 `app/flow.py` chỉ là máy chạy. Sửa nội dung thì sửa JSON rồi gọi
 `POST /kb/reload`, không đụng code.
+
+## Mô hình ngôn ngữ (FPT AI Marketplace)
+
+Theo phản hồi của ban giám khảo ngày 15/09: kiosk phải nhớ ngữ cảnh, hiểu
+hoàn cảnh bác kể, trả lời được câu hỏi diễn đạt khác FAQ, và nói tiếng Việt
+tự nhiên hơn. `app/llm.py` gọi mô hình trên `mkp-api.fptcloud.com` (API kiểu
+OpenAI) ở bốn chỗ, chỗ nào cũng có đường lùi về kho tĩnh:
+
+| Chỗ | Có mô hình | Không có mô hình (như trước) |
+|---|---|---|
+| Bác mở đầu «tôi 76 tuổi, không có lương hưu, sống một mình» | điền sẵn tuổi, lương hưu; nói «Cháu hiểu rồi ạ, bác 76 tuổi, chưa có lương hưu và sống một mình»; chỉ hỏi phần còn thiếu | điền sẵn bằng luật (số tuổi, cụm phủ định rõ), nói «Cháu ghi nhận: …» |
+| Câu nói không khớp từ khoá («tôi già rồi nhà nước có cho đồng nào không») | mô hình chọn thủ tục trong 6 thủ tục, máy hỏi lại «Nếu cháu hiểu đúng thì…» | chuyển cán bộ, đưa danh sách bấm chọn |
+| Trả lời câu bước 1 bằng lời mà so cụm từ không ra | mô hình ánh xạ sang một lựa chọn, không được tự bịa lựa chọn | mời bấm chọn |
+| Hỏi thêm ở bước 2, 3 diễn đạt khác FAQ, hoặc kể thêm hoàn cảnh | mô hình đọc toàn bộ kho tri thức của thủ tục + những gì bác đã trả lời rồi viết câu trả lời, tối đa 3 câu | ý định chung (nộp đâu, bao lâu, phí, mang gì) hoặc mời hỏi cán bộ |
+
+Nguyên tắc không đổi: prompt chỉ đưa kho tri thức của đúng thủ tục đó, mô
+hình bị ép trả mã `KHONG_CO_TRONG_KHO` khi kho không có, máy chủ thay bằng
+câu mời gặp cán bộ. FAQ khớp rõ thì vẫn lấy nguyên văn kho (có sẵn tiếng),
+không tốn lượt gọi. Mô hình hỏng, hết tiền, quá 12 giây: lùi về kho tĩnh,
+kiosk không treo.
+
+Bật: điền `FPT_API_KEY` vào `.env` (máy nhà) hoặc biến môi trường trên
+Render. `/health` trả `llm_enabled` và `llm_model`. Mặc định
+`LLM_MODEL=Saola-Small-32B` (mô hình tiếng Việt của FPT); đổi sang
+`DeepSeek-V4-Flash` hay `Qwen3.6-27B` nếu cần nhanh hơn. Câu mô hình sinh ra
+không có sẵn mp3 nên phải gọi Edge lúc đọc; hỏng thì rơi về giọng trình
+duyệt.
 
 ## Phạm vi hỗ trợ
 
@@ -203,7 +231,7 @@ chỉ 1,6 giây — nên hạn giờ lúc hâm nóng (45 giây) để rộng hơ
 
 ```bash
 pip install -r requirements-dev.txt   # một lần, chỉ có pytest
-python -m pytest tests/ -q            # 45 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
+python -m pytest tests/ -q            # 61 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
 python -m app.normalize               # in bảng 10 câu trước/sau, ảnh cho mục 4.3
 ```
 

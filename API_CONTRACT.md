@@ -1,6 +1,6 @@
 # Giao kèo API — Kiosk hướng dẫn thủ tục hành chính
 
-Phiên bản 2.0 — chốt ngày 14/09/2026. **Chốt rồi không đổi tên trường nữa.**
+Phiên bản 2.1 — chốt ngày 16/09/2026. **Chốt rồi không đổi tên trường nữa.**
 
 Đổi so với 1.0, **chỉ thêm, không đổi và không bỏ trường nào**, nên giao diện
 viết theo 1.0 vẫn chạy nguyên:
@@ -14,6 +14,11 @@ viết theo 1.0 vẫn chạy nguyên:
   `/turn`. Giao diện 2.0 dùng `/turn` chỉ để NHẬN RA thủ tục rồi vào luồng,
   không hiện cả 4 bước một lượt như 1.x nữa. Lên số lớn vì cách dùng đổi hẳn,
   còn trường cũ vẫn nguyên.
+- 2.1: nối mô hình ngôn ngữ (FPT AI Marketplace), chỉ thêm trường:
+  `/health` thêm `llm_enabled`, `llm_model`; `/answer`, `/turn` thêm
+  `via_llm`; `/flow/start` nhận thêm `utterance` và trả `ack`, `prefilled`;
+  `/flow/ask` nhận thêm `answers`, `utterance`, `history`, `stage` và trả
+  `via_llm`. Không có khoá thì mọi trường mới rỗng và máy chạy như 2.0.
 Nếu buộc phải đổi, tăng số phiên bản và báo trong nhóm chat trước khi đẩy code.
 
 Địa chỉ máy chủ:
@@ -186,6 +191,10 @@ Từ 2.0 có thêm `confirm`: câu ngắn «Cháu hiểu bác cần làm thủ t
 không ạ?» để giao diện đọc ở màn hình xác nhận trước khi gọi `/flow/start`.
 Chỉ có khi `handoff = false`.
 
+Từ 2.1 có thêm `via_llm`: `true` khi tra từ khoá dưới ngưỡng nhưng mô hình
+ngôn ngữ nhận ra thủ tục. Giao diện nên hỏi lại mềm hơn («Nếu cháu hiểu đúng
+thì…»). Không có khoá mô hình thì luôn `false`.
+
 ---
 
 ## 4. `POST /turn`
@@ -327,8 +336,20 @@ Giao diện chỉ cần nhìn `stage` để biết vẽ màn hình nào:
 ### 7.1 `POST /flow/start`
 
 ```json
-{ "procedure_id": "tro-cap-huu-tri-xa-hoi", "session_id": "kiosk-01-..." }
+{ "procedure_id": "tro-cap-huu-tri-xa-hoi", "session_id": "kiosk-01-...",
+  "utterance": "tôi 76 tuổi, không có lương hưu, sống một mình" }
 ```
+
+`utterance` (tuỳ chọn, từ 2.1) là câu bác mở đầu, tức `asr.text` của `/turn`.
+Máy đọc câu đó để **điền sẵn** các điều kiện bác đã nói rõ và trả thêm:
+
+- `ack`: câu xác nhận đã hiểu («Cháu hiểu rồi ạ, bác 76 tuổi, chưa có lương
+  hưu và sống một mình»), đã ghép vào đầu `speech`. Có mô hình ngôn ngữ thì
+  câu này theo hoàn cảnh; không có thì «Cháu ghi nhận: …».
+- `prefilled`: `[{question_id, question, value, label}]` các câu đã điền
+  sẵn. Giao diện hiện cho bác xem và đưa vào thứ tự «Quay lại» để sửa được.
+- `answers` đã chứa các giá trị điền sẵn; `question` là câu đầu tiên **còn
+  thiếu**. Đủ hết thì trả thẳng `stage = prepare`.
 
 Mã không có trong kho → `404`, `code = procedure_not_found`.
 
@@ -365,7 +386,11 @@ câu trả lời cuối rồi gửi lên).
 ### 7.5 `POST /flow/ask` — hỏi thêm ở bước 2 / bước 3
 
 `multipart/form-data`: `procedure_id`, và **một trong hai** `audio` (file)
-hoặc `text` (chuỗi). Trả về:
+hoặc `text` (chuỗi). Từ 2.1 gửi thêm ngữ cảnh phiên (tuỳ chọn, nhưng nên
+gửi): `answers` (chuỗi JSON các câu đã trả lời), `utterance` (câu bác mở
+đầu), `history` (chuỗi JSON `[{q, a}]` các lượt hỏi thêm trước, tối đa 6),
+`stage` (`prepare` hoặc `submit`). Máy dùng để trả lời đúng hoàn cảnh bác,
+không hỏi lại. Trả về:
 
 ```json
 {
@@ -377,9 +402,16 @@ hoặc `text` (chuỗi). Trả về:
   "matched": true,
   "match_score": 1.0,
   "switch_to": null, "switch_name": null,
-  "asr": { … }
+  "asr": { … },
+  "via_llm": false
 }
 ```
+
+`via_llm = true` khi câu trả lời do mô hình ngôn ngữ viết từ kho tri thức
+(câu hỏi diễn đạt khác FAQ, hoặc bác kể thêm hoàn cảnh); `false` là lấy
+nguyên văn kho. Thứ tự: FAQ khớp rõ → nguyên văn; thủ tục khác → gợi ý
+chuyển; còn lại có mô hình thì mô hình, mô hình bảo ngoài kho hoặc hỏng thì
+câu tĩnh.
 
 **Chỉ trả lời từ kho tri thức của thủ tục đang làm** (mục `flow.faq` và các
 trường nơi nộp / thời hạn / phí / giấy tờ). Không có thì `matched = false` và

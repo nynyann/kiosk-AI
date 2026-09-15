@@ -50,6 +50,11 @@ def count() -> int:
     return len(_PROCEDURES)
 
 
+def procedures() -> List[dict]:
+    """Toàn bộ thủ tục đã nạp (đọc thôi, đừng sửa)."""
+    return list(_PROCEDURES)
+
+
 def get(procedure_id: str) -> dict | None:
     """Một thủ tục theo mã (tên file). None nếu không có."""
     for p in _PROCEDURES:
@@ -138,6 +143,11 @@ def build_answer(query: str, session_id: str | None = None) -> AnswerResult:
             handoff=True, match_score=s, answer=HANDOFF_TEXT,
             speech=for_speech(HANDOFF_TEXT),
         )
+    return answer_for(proc, s)
+
+
+def answer_for(proc: dict, s: float) -> AnswerResult:
+    """AnswerResult cho một thủ tục đã chọn xong (tra từ khoá hoặc mô hình chọn)."""
 
     steps = [
         Step(order=i + 1, title=st.get("title", ""), detail=st.get("detail", ""))

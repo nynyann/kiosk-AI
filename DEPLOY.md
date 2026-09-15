@@ -134,6 +134,12 @@ nhà cho nhanh, link Render chỉ để gửi trước cho mọi người xem.
 
 Muốn đổi giọng đọc thì thêm biến `TTS_VOICE=vi-VN-NamMinhNeural`.
 
+Muốn bật mô hình ngôn ngữ (hiểu hoàn cảnh, trả lời tự nhiên, xem README mục
+«Mô hình ngôn ngữ») thì thêm biến `FPT_API_KEY=<khoá lấy ở
+marketplace.fptcloud.com>`. **Đặt trong Environment của Render, không bao giờ
+ghi vào code hay commit.** Không đặt thì kiosk chạy bằng kho tĩnh, vẫn đủ
+demo.
+
 Không cần đặt `ALLOWED_ORIGINS`: giao diện và API cùng một tên miền.
 
 **Lần build đầu lâu** — phải cài ffmpeg, cài thư viện, tải 240 MB model. Cứ để

@@ -81,6 +81,21 @@ TTS_PREWARM = os.getenv("TTS_PREWARM", "1") == "1"
 # ngày 15/09/2026 có lúc hỏng 5/6 lần liên tiếp. Kiosk không thể im vì thế.
 TTS_CACHE_DIR = Path(os.getenv("TTS_CACHE_DIR", str(DATA_DIR / "tts")))
 
+# --- Mô hình ngôn ngữ lớn (FPT AI Marketplace) -------------------------------
+# Để trống khoá là TẮT: kiosk chạy bằng kho tri thức tĩnh y như trước. Có khoá
+# thì máy hiểu hoàn cảnh bác kể, nhận ra thủ tục khi từ khoá không bắt được,
+# hiểu câu trả lời tự do ở bước 1 và trả lời câu hỏi thêm bằng lời tự nhiên
+# nhưng chỉ dựa trên kho tri thức. Xem app/llm.py. Tạo khoá ở
+# marketplace.fptcloud.com, mục My account / My API Keys; tài khoản phải có
+# số dư lớn hơn 0 mới gọi được.
+FPT_API_KEY = os.getenv("FPT_API_KEY", "").strip()
+FPT_BASE_URL = os.getenv("FPT_BASE_URL", "https://mkp-api.fptcloud.com")
+# Tên mô hình đúng như hiện trên marketplace. Saola-Small-32B là mô hình tiếng
+# Việt của FPT; đổi sang DeepSeek-V4-Flash hay Qwen3.6-27B nếu cần nhanh hơn.
+LLM_MODEL = os.getenv("LLM_MODEL", "Saola-Small-32B")
+# Người dân đang đứng chờ: quá hạn thì lùi về câu trả lời tĩnh, không treo.
+LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "12"))
+
 # --- CORS -------------------------------------------------------------------
 # TRƯỚC KHI NỘP: thay "*" bằng đúng tên miền trang giao diện của Kns.
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")

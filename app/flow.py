@@ -195,9 +195,12 @@ def _base_state(proc: dict, answers: Dict[str, str], stage: str, step: int) -> F
 # ---------------------------------------------------------------------------
 # Bước 1
 # ---------------------------------------------------------------------------
-def evaluate(proc: dict, answers: Dict[str, str]) -> FlowState:
+def evaluate(proc: dict, answers: Dict[str, str], first: bool = False) -> FlowState:
     """Từ các câu đã trả lời, quyết định: hỏi tiếp, dừng (không đáp ứng), hay
-    sang bước 2. Gọi lại từ đầu mỗi lượt — không có trạng thái ẩn."""
+    sang bước 2. Gọi lại từ đầu mỗi lượt — không có trạng thái ẩn.
+
+    `first=True` là lượt /flow/start: đọc lời dẫn bước 1 kể cả khi vài câu đã
+    được điền sẵn từ lời bác kể."""
     outcome = _matched_outcome(proc, answers)
 
     if outcome and outcome.get("verdict") != "eligible":
@@ -206,17 +209,18 @@ def evaluate(proc: dict, answers: Dict[str, str]) -> FlowState:
     if outcome is None:
         nxt = _next_question(proc, answers)
         if nxt is not None:
-            return _question_state(proc, answers, *nxt)
+            return _question_state(proc, answers, *nxt, first=first)
         outcome = _check(proc).get("eligible") or {}
 
     return _prepare_state(proc, answers, outcome)
 
 
-def _question_state(proc: dict, answers, q: dict, index: int, total: int) -> FlowState:
+def _question_state(proc: dict, answers, q: dict, index: int, total: int,
+                    first: bool = False) -> FlowState:
     st = _base_state(proc, answers, "check", 1)
     st.question = _question_model(q, index, total)
     # Câu đầu tiên đọc thêm lời dẫn của bước 1 để bác biết mình đang ở đâu.
-    intro = _check(proc).get("intro") if not answers else None
+    intro = _check(proc).get("intro") if (first or not answers) else None
     st.intro = intro
     st.prompt = q.get("text", "")
     parts = [intro, q.get("text", "")]
@@ -349,6 +353,55 @@ def match_option(q: dict, text: str) -> Optional[str]:
             if _contains_phrase(tf, p) and len(_flat(p)) > best_len:
                 best, best_len = o["value"], len(_flat(p))
     return best
+
+
+def prefill_by_rules(proc: dict, utterance: str) -> Dict[str, str]:
+    """Điền sẵn điều kiện từ câu bác mở đầu, KHÔNG cần mô hình ngôn ngữ.
+
+    Chỉ dùng hai nguồn chắc chắn: con số rơi vào `range` («tôi 76 tuổi») và cụm
+    trong `match` của lựa chọn («không có lương hưu»). KHÔNG dùng từ có/không
+    chung chung: «tôi có 76 tuổi» mà điền «công dân = có» là điền bừa.
+    """
+    t = normalize(utterance or "")
+    tf = _flat(t)
+    out: Dict[str, str] = {}
+    if not tf.strip():
+        return out
+    for q in _questions(proc):
+        opts = q.get("options", [])
+        if any(o.get("range") for o in opts):
+            m = re.search(r"\d+", t)
+            if m:
+                n = int(m.group())
+                if re.search(r"(dưới|chưa đến|chưa tới|chưa đầy|chưa được|gần)\s*$", t[:m.start()]):
+                    n -= 1
+                for o in opts:
+                    r = o.get("range")
+                    if r and r[0] <= n <= r[1]:
+                        out[q["id"]] = o["value"]
+            continue
+        best, best_len = None, 0
+        for o in opts:
+            for p in o.get("match") or []:
+                if _contains_phrase(tf, p) and len(_flat(p)) > best_len:
+                    best, best_len = o["value"], len(_flat(p))
+        if best:
+            out[q["id"]] = best
+    return out
+
+
+def prefilled_list(proc: dict, answers: Dict[str, str]) -> List[dict]:
+    """Mô tả các câu đã điền sẵn để giao diện hiện cho bác xem và sửa."""
+    items = []
+    for q in _questions(proc):
+        v = answers.get(q["id"])
+        if v is None:
+            continue
+        for o in q.get("options", []):
+            if o.get("value") == v:
+                items.append({"question_id": q["id"], "question": q.get("text", ""),
+                              "value": v, "label": o.get("label", v)})
+    return items
 
 
 def find_question(proc: dict, qid: str) -> Optional[dict]:

@@ -25,11 +25,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from . import config, flow, kb, tts
+from . import config, flow, kb, llm, tts
 from .asr import AsrError, is_ready, last_error, load_model, transcribe_bytes
 from .schemas import (AnswerRequest, AnswerResult, AsrResult, FlowAnswerRequest,
                       FlowAskResult, FlowNextRequest, FlowStartRequest, FlowState,
-                      HealthResult, ProceduresResult, TtsRequest, TurnResult)
+                      HealthResult, PrefilledAnswer, ProceduresResult, TtsRequest,
+                      TurnResult)
 
 if config.MOCK:
     from .mock import mock_asr
@@ -159,6 +160,8 @@ def health():
         uptime_seconds=round(time.time() - _started, 1),
         tts_ready=config.TTS_ENABLED,
         tts_voice=config.TTS_VOICE if config.TTS_ENABLED else None,
+        llm_enabled=llm.enabled(),
+        llm_model=config.LLM_MODEL if llm.enabled() else None,
     )
 
 
@@ -181,6 +184,20 @@ def warmup():
 def kb_reload():
     """Nạp lại 6 file JSON sau khi Mian sửa nội dung, không phải khởi động lại."""
     return {"ok": True, "procedures": len(kb.load_kb())}
+
+
+async def _recognize(text: str, session_id: Optional[str]) -> AnswerResult:
+    """Nhận ra thủ tục từ câu nói: tra từ khoá trước, dưới ngưỡng thì hỏi mô
+    hình ngôn ngữ (nếu bật). Câu diễn đạt lạ («tôi già rồi nhà nước có cho
+    tiền không») vẫn vào được luồng thay vì bị đẩy sang cán bộ."""
+    ans = kb.build_answer(text, session_id)
+    if ans.handoff and llm.enabled():
+        pid = await llm.pick_procedure(text, kb.procedures())
+        proc = kb.get(pid) if pid else None
+        if proc:
+            ans = kb.answer_for(proc, max(ans.match_score, config.KB_MATCH_THRESHOLD))
+            ans.via_llm = True
+    return ans
 
 
 # ---------------------------------------------------------------------------
@@ -208,12 +225,12 @@ async def asr_endpoint(
 
 
 @app.post("/answer", response_model=AnswerResult)
-def answer_endpoint(req: AnswerRequest):
+async def answer_endpoint(req: AnswerRequest):
     # Chế độ giả chỉ giả phần NGHE; kho tri thức không cần mô hình nên tra
     # thật luôn, để giao diện demo thấy đúng thủ tục ứng với câu đã "nghe".
     if not req.text.strip():
         return kb.retry_answer()
-    result = kb.build_answer(req.text, req.session_id)
+    result = await _recognize(req.text, req.session_id)
     _log_turn({"session": req.session_id, "query": req.text,
                "procedure": result.procedure_id, "score": result.match_score,
                "handoff": result.handoff})
@@ -230,7 +247,7 @@ async def turn_endpoint(
 
     if config.MOCK:
         a = mock_asr()
-        ans = kb.retry_answer() if a.no_speech else kb.build_answer(a.text, session_id)
+        ans = kb.retry_answer() if a.no_speech else await _recognize(a.text, session_id)
         return TurnResult(asr=a, answer=ans,
                           total_latency_seconds=round(time.time() - t0, 2))
 
@@ -252,7 +269,7 @@ async def turn_endpoint(
     if a.no_speech or a.confidence < config.ASR_CONFIDENCE_FLOOR:
         ans = kb.retry_answer()
     else:
-        ans = kb.build_answer(a.text, session_id)
+        ans = await _recognize(a.text, session_id)
 
     _log_turn({"session": session_id, "raw": a.text_raw, "norm": a.text,
                "asr_conf": a.confidence, "procedure": ans.procedure_id,
@@ -309,14 +326,38 @@ def procedures():
 
 
 @app.post("/flow/start", response_model=FlowState)
-def flow_start(req: FlowStartRequest):
+async def flow_start(req: FlowStartRequest):
     """Vào bước 1 của một thủ tục. Trả câu hỏi đầu tiên (hoặc thẳng bước 2
-    nếu thủ tục không có câu hỏi điều kiện)."""
+    nếu thủ tục không có câu hỏi điều kiện).
+
+    Gửi kèm `utterance` (câu bác mở đầu) thì máy đọc câu đó để điền sẵn các
+    điều kiện bác đã nói rõ («tôi 76 tuổi, không có lương hưu») và trả `ack`
+    xác nhận đã hiểu; máy chỉ hỏi phần còn thiếu. Có mô hình ngôn ngữ thì
+    hiểu được cả câu kể dài; không có thì điền bằng luật (số tuổi, cụm phủ
+    định rõ) và không có `ack`."""
     proc, err = _proc_or_err(req.procedure_id)
     if err:
         return err
-    st = flow.evaluate(proc, {})
-    _log_turn({"session": req.session_id, "flow": "start", "procedure": proc["id"]})
+    answers: dict = {}
+    ack = None
+    if (req.utterance or "").strip():
+        got = await llm.prefill_from_utterance(proc, req.utterance)
+        if got:
+            answers, ack = got["answers"], (got["ack"] or None)
+        else:
+            answers = flow.prefill_by_rules(proc, req.utterance)
+    st = flow.evaluate(proc, answers, first=True)
+    st.prefilled = [PrefilledAnswer(**x) for x in flow.prefilled_list(proc, answers)]
+    if ack:
+        st.ack = ack
+        st.speech = flow.for_speech(ack) + " " + st.speech
+    elif st.prefilled:
+        # Không có mô hình: vẫn nhắc lại những gì đã ghi nhận, cho bác biết
+        # mình không phải nói lại.
+        st.ack = "Cháu ghi nhận: " + "; ".join(x.label.lower() for x in st.prefilled) + "."
+        st.speech = flow.for_speech(st.ack) + " " + st.speech
+    _log_turn({"session": req.session_id, "flow": "start", "procedure": proc["id"],
+               "utterance": req.utterance, "prefilled": answers, "llm_ack": bool(ack)})
     return st
 
 
@@ -367,6 +408,10 @@ async def flow_answer_voice(
     value = None
     if not a.no_speech and a.confidence >= config.ASR_CONFIDENCE_FLOOR:
         value = flow.match_option(q, a.text)
+        if value is None:
+            # So cụm từ không ra («dạ cháu nó nói tôi sinh năm năm mươi») thì
+            # nhờ mô hình ngôn ngữ đọc; vẫn phải trả đúng một trong các lựa chọn.
+            value = await llm.classify_answer(q, a.text, prev)
 
     if value is None:
         # Giữ nguyên câu hỏi, chỉ báo là chưa hiểu.
@@ -413,13 +458,33 @@ async def flow_ask(
     audio: Optional[UploadFile] = File(None),
     text: Optional[str] = Form(None),
     session_id: Optional[str] = Form(None),
+    # Ngữ cảnh phiên: các câu đã trả lời ở bước 1, câu bác mở đầu, các lượt
+    # hỏi thêm trước, bước đang đứng. Mô hình dùng để không bắt bác nói lại.
+    answers: str = Form("{}"),
+    utterance: Optional[str] = Form(None),
+    history: str = Form("[]"),
+    stage: Optional[str] = Form(None),
 ):
     """Hỏi thêm trong bước 2 / bước 3. Gửi `audio` (nói) hoặc `text` (gõ).
-    Chỉ trả lời từ kho tri thức của thủ tục đang làm; không có thì mời hỏi
-    cán bộ, và gợi ý chuyển nếu câu hỏi thuộc thủ tục khác."""
+
+    Thứ tự: khớp rõ một câu FAQ → lấy nguyên văn kho (có sẵn tiếng); câu thuộc
+    thủ tục khác → gợi ý chuyển; còn lại, có mô hình ngôn ngữ thì mô hình đọc
+    kho tri thức + ngữ cảnh rồi trả lời tự nhiên (câu diễn đạt khác FAQ, bác
+    kể thêm hoàn cảnh); mô hình bảo ngoài kho hoặc hỏng thì về câu tĩnh: ý
+    định chung (nộp đâu, bao lâu, phí, mang gì) hoặc mời hỏi cán bộ. Không
+    đường nào được bịa."""
     proc, err = _proc_or_err(procedure_id)
     if err:
         return err
+    try:
+        prev = _clean_answers(json.loads(answers or "{}"))
+    except ValueError:
+        prev = {}
+    try:
+        hist = json.loads(history or "[]")
+        hist = [h for h in hist if isinstance(h, dict)][-6:]
+    except ValueError:
+        hist = []
 
     a: Optional[AsrResult] = None
     if audio is not None:
@@ -432,9 +497,15 @@ async def flow_ask(
 
     res = flow.answer_question(proc, text)
     res.asr = a
+    strong_faq = res.matched and res.match_score >= 0.8
+    if llm.enabled() and (text or "").strip() and not res.switch_to and not strong_faq:
+        out = await llm.answer_from_kb(proc, text, prev, utterance or "", hist, stage or "")
+        if out and out != llm.NOT_IN_KB:
+            res.answer, res.speech, res.matched, res.via_llm = out, flow.for_speech(out), True, True
+            res.match_score = max(res.match_score, 0.5)
     _log_turn({"session": session_id, "flow": "ask", "procedure": proc["id"],
                "query": res.question, "matched": res.matched, "score": res.match_score,
-               "switch_to": res.switch_to})
+               "switch_to": res.switch_to, "via_llm": res.via_llm})
     return res
 
 

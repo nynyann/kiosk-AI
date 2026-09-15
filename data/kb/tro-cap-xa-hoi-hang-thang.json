@@ -60,79 +60,236 @@
           "id": "purpose",
           "text": "Bác đang muốn đăng ký hưởng trợ cấp mới, hay điều chỉnh, hay thôi hưởng trợ cấp đang nhận ạ?",
           "options": [
-            { "value": "new", "label": "Đăng ký hưởng mới", "match": ["mới", "đăng ký", "xin trợ cấp", "chưa nhận"] },
-            { "value": "adjust", "label": "Điều chỉnh trợ cấp đang nhận", "match": ["điều chỉnh", "thay đổi", "đổi", "sửa"], "note": "Bác đang hưởng và muốn điều chỉnh: cần văn bản đề nghị điều chỉnh trợ cấp xã hội hằng tháng theo trường hợp cụ thể." },
-            { "value": "stop", "label": "Thôi hưởng trợ cấp", "match": ["thôi", "không nhận nữa", "dừng", "ngừng"], "note": "Bác muốn thôi hưởng: cần văn bản đề nghị thôi hưởng trợ cấp xã hội hằng tháng." }
+            {
+              "value": "new",
+              "label": "Đăng ký hưởng mới",
+              "match": [
+                "mới",
+                "đăng ký",
+                "xin trợ cấp",
+                "chưa nhận"
+              ]
+            },
+            {
+              "value": "adjust",
+              "label": "Điều chỉnh trợ cấp đang nhận",
+              "match": [
+                "điều chỉnh",
+                "thay đổi",
+                "đổi",
+                "sửa"
+              ],
+              "note": "Bác đang hưởng và muốn điều chỉnh: cần văn bản đề nghị điều chỉnh trợ cấp xã hội hằng tháng theo trường hợp cụ thể."
+            },
+            {
+              "value": "stop",
+              "label": "Thôi hưởng trợ cấp",
+              "match": [
+                "thôi",
+                "không nhận nữa",
+                "dừng",
+                "ngừng"
+              ],
+              "note": "Bác muốn thôi hưởng: cần văn bản đề nghị thôi hưởng trợ cấp xã hội hằng tháng."
+            }
           ]
         },
         {
           "id": "receiving",
           "text": "Hiện bác có đang nhận trợ cấp xã hội hằng tháng rồi không ạ?",
-          "ask_if": { "purpose": ["new"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ]
+          },
           "options": [
-            { "value": "no", "label": "Chưa nhận" },
-            { "value": "yes", "label": "Có, đang nhận rồi" }
+            {
+              "value": "no",
+              "label": "Chưa nhận"
+            },
+            {
+              "value": "yes",
+              "label": "Có, đang nhận rồi"
+            }
           ]
         },
         {
           "id": "pension",
           "text": "Hiện bác có đang nhận lương hưu hoặc trợ cấp bảo hiểm xã hội hằng tháng không ạ?",
-          "ask_if": { "purpose": ["new"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ]
+          },
           "options": [
-            { "value": "no", "label": "Không nhận" },
-            { "value": "yes", "label": "Có, đang nhận" }
+            {
+              "value": "no",
+              "label": "Không nhận",
+              "match": [
+                "không có lương hưu",
+                "không lương hưu",
+                "chưa có lương hưu",
+                "không được lương hưu",
+                "không nhận lương hưu"
+              ]
+            },
+            {
+              "value": "yes",
+              "label": "Có, đang nhận",
+              "match": [
+                "có lương hưu",
+                "đang nhận lương hưu",
+                "đang hưởng lương hưu",
+                "lương hưu rồi"
+              ]
+            }
           ]
         },
         {
           "id": "age",
           "text": "Bác năm nay bao nhiêu tuổi ạ?",
-          "ask_if": { "purpose": ["new"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ]
+          },
           "options": [
-            { "value": "lt60", "label": "Dưới 60 tuổi", "range": [0, 59], "match": ["dưới 60", "chưa 60"] },
-            { "value": "60_79", "label": "Từ 60 đến dưới 80 tuổi", "range": [60, 79], "match": ["ngoài 60", "hơn 60", "70", "75"] },
-            { "value": "ge80", "label": "Từ 80 tuổi trở lên", "range": [80, 200], "match": ["trên 80", "hơn 80", "ngoài 80", "80 trở lên", "90"] }
+            {
+              "value": "lt60",
+              "label": "Dưới 60 tuổi",
+              "range": [
+                0,
+                59
+              ],
+              "match": [
+                "dưới 60",
+                "chưa 60"
+              ]
+            },
+            {
+              "value": "60_79",
+              "label": "Từ 60 đến dưới 80 tuổi",
+              "range": [
+                60,
+                79
+              ],
+              "match": [
+                "ngoài 60",
+                "hơn 60",
+                "70",
+                "75"
+              ]
+            },
+            {
+              "value": "ge80",
+              "label": "Từ 80 tuổi trở lên",
+              "range": [
+                80,
+                200
+              ],
+              "match": [
+                "trên 80",
+                "hơn 80",
+                "ngoài 80",
+                "80 trở lên",
+                "90"
+              ]
+            }
           ]
         },
         {
           "id": "special",
           "text": "Bác có thuộc trường hợp đặc biệt được pháp luật quy định hưởng trợ cấp xã hội không ạ? Ví dụ: người cao tuổi thuộc hộ nghèo không có người phụng dưỡng, người khuyết tật nặng.",
-          "ask_if": { "purpose": ["new"], "age": ["lt60", "60_79"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ],
+            "age": [
+              "lt60",
+              "60_79"
+            ]
+          },
           "options": [
-            { "value": "yes", "label": "Có, tôi thuộc trường hợp đặc biệt", "note": "Bác thuộc trường hợp đặc biệt: cơ quan tiếp nhận sẽ xác minh cụ thể, bác chuẩn bị thêm giấy tờ liên quan nếu cán bộ yêu cầu." },
-            { "value": "no", "label": "Không thuộc" },
-            { "value": "unsure", "label": "Tôi không rõ", "match": ["không rõ", "không biết", "chưa rõ"] }
+            {
+              "value": "yes",
+              "label": "Có, tôi thuộc trường hợp đặc biệt",
+              "note": "Bác thuộc trường hợp đặc biệt: cơ quan tiếp nhận sẽ xác minh cụ thể, bác chuẩn bị thêm giấy tờ liên quan nếu cán bộ yêu cầu."
+            },
+            {
+              "value": "no",
+              "label": "Không thuộc"
+            },
+            {
+              "value": "unsure",
+              "label": "Tôi không rõ",
+              "match": [
+                "không rõ",
+                "không biết",
+                "chưa rõ"
+              ]
+            }
           ]
         }
       ],
       "outcomes": [
         {
-          "when": { "receiving": ["yes"] },
+          "when": {
+            "receiving": [
+              "yes"
+            ]
+          },
           "verdict": "ineligible",
           "reason": "Bác đang nhận trợ cấp xã hội hằng tháng rồi nên không cần đăng ký hưởng mới nữa. Nếu bác muốn điều chỉnh mức hưởng, thay đổi thông tin hoặc thôi hưởng, bác bấm Làm lại rồi chọn mục đó, cháu sẽ hướng dẫn đúng mẫu."
         },
         {
-          "when": { "pension": ["yes"] },
+          "when": {
+            "pension": [
+              "yes"
+            ]
+          },
           "verdict": "ineligible",
           "reason": "Người đang nhận lương hưu hoặc trợ cấp bảo hiểm xã hội hằng tháng thường không thuộc diện trợ cấp xã hội hằng tháng dành cho người cao tuổi. Nếu bác thuộc trường hợp đặc biệt khác theo quy định, bác hỏi cán bộ Uỷ ban nhân dân xã để được xem xét."
         },
         {
-          "when": { "special": ["no"], "age": ["60_79"] },
+          "when": {
+            "special": [
+              "no"
+            ],
+            "age": [
+              "60_79"
+            ]
+          },
           "verdict": "redirect",
           "reason": "Từ 60 đến dưới 80 tuổi mà không thuộc trường hợp đặc biệt thì bác chưa thuộc diện trợ cấp xã hội hằng tháng. Nếu bác từ đủ 75 tuổi, hoặc từ 70 tuổi và thuộc hộ nghèo, cận nghèo, mà không có lương hưu, thì bác có thể xem thủ tục Trợ cấp hưu trí xã hội.",
           "suggest": "tro-cap-huu-tri-xa-hoi"
         },
         {
-          "when": { "special": ["no"], "age": ["lt60"] },
+          "when": {
+            "special": [
+              "no"
+            ],
+            "age": [
+              "lt60"
+            ]
+          },
           "verdict": "ineligible",
           "reason": "Dưới 60 tuổi mà không thuộc trường hợp đặc biệt theo quy định thì bác chưa thuộc nhóm được hưởng trợ cấp xã hội hằng tháng. Bác chưa cần chuẩn bị hồ sơ."
         },
         {
-          "when": { "special": ["unsure"] },
+          "when": {
+            "special": [
+              "unsure"
+            ]
+          },
           "verdict": "consult",
           "reason": "Cháu chưa đủ thông tin để xác định bác có thuộc trường hợp đặc biệt không. Bác gặp cán bộ Lao động – Xã hội tại Uỷ ban nhân dân xã để được xác định trường hợp cụ thể trước khi làm hồ sơ."
         },
         {
-          "when": { "purpose": ["adjust"] },
+          "when": {
+            "purpose": [
+              "adjust"
+            ]
+          },
           "verdict": "eligible",
           "note": "Bác đang hưởng trợ cấp và muốn điều chỉnh. Cháu hướng dẫn bác chuẩn bị hồ sơ điều chỉnh.",
           "documents": [
@@ -141,7 +298,11 @@
           ]
         },
         {
-          "when": { "purpose": ["stop"] },
+          "when": {
+            "purpose": [
+              "stop"
+            ]
+          },
           "verdict": "eligible",
           "note": "Bác muốn thôi hưởng trợ cấp. Cháu hướng dẫn bác chuẩn bị hồ sơ thôi hưởng.",
           "documents": [
@@ -183,23 +344,42 @@
     },
     "faq": [
       {
-        "q": ["khác trợ cấp hưu trí xã hội chỗ nào", "khác hưu trí xã hội", "trợ cấp hưu trí"],
+        "q": [
+          "khác trợ cấp hưu trí xã hội chỗ nào",
+          "khác hưu trí xã hội",
+          "trợ cấp hưu trí"
+        ],
         "a": "Trợ cấp hưu trí xã hội dành cho người từ đủ 75 tuổi (hoặc từ 70 tuổi thuộc hộ nghèo, cận nghèo) không có lương hưu. Trợ cấp xã hội hằng tháng dành cho các đối tượng bảo trợ xã hội theo Nghị định 20/2021, ví dụ người cao tuổi thuộc hộ nghèo không có người phụng dưỡng, người khuyết tật nặng. Hai chính sách có điều kiện và mẫu khác nhau."
       },
       {
-        "q": ["đổi số tài khoản", "thay đổi tài khoản nhận tiền", "đổi cách nhận tiền"],
+        "q": [
+          "đổi số tài khoản",
+          "thay đổi tài khoản nhận tiền",
+          "đổi cách nhận tiền"
+        ],
         "a": "Đây là trường hợp điều chỉnh. Bác làm văn bản đề nghị điều chỉnh trợ cấp xã hội hằng tháng, nêu rõ nội dung muốn thay đổi, rồi nộp tại Uỷ ban nhân dân xã."
       },
       {
-        "q": ["thôi không nhận nữa", "không muốn nhận nữa", "dừng trợ cấp"],
+        "q": [
+          "thôi không nhận nữa",
+          "không muốn nhận nữa",
+          "dừng trợ cấp"
+        ],
         "a": "Bác làm văn bản đề nghị thôi hưởng trợ cấp xã hội hằng tháng và nộp tại Uỷ ban nhân dân xã nơi bác cư trú."
       },
       {
-        "q": ["có phải mang sổ hộ khẩu không", "mang hộ khẩu", "giấy cư trú"],
+        "q": [
+          "có phải mang sổ hộ khẩu không",
+          "mang hộ khẩu",
+          "giấy cư trú"
+        ],
         "a": "Không cần. Thông tin cư trú cơ quan tiếp nhận tự tra trên Cơ sở dữ liệu quốc gia về dân cư. Chỉ khi không tra được, cán bộ mới yêu cầu bác cung cấp giấy tờ chứng minh cư trú."
       },
       {
-        "q": ["được bao nhiêu tiền", "mức trợ cấp bao nhiêu"],
+        "q": [
+          "được bao nhiêu tiền",
+          "mức trợ cấp bao nhiêu"
+        ],
         "a": "Mức trợ cấp tuỳ từng nhóm đối tượng và do quy định hiện hành ấn định. Cháu không nêu con số để tránh sai, bác hỏi cán bộ tiếp nhận để biết mức áp dụng cho trường hợp của mình."
       }
     ]
