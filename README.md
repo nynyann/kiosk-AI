@@ -149,9 +149,6 @@ không khớp, một lượt không nghe rõ), độ trễ giả 0.4 giây. Kho 
 luồng 3 bước chạy **thật** trên `data/kb/`, nên bấm chọn thủ tục rồi đi hết
 bước 1 → 2 → 3 trên máy chủ giả là thấy đúng nội dung sẽ lên máy chủ thật.
 
-Trên máy tính, thư mục `.claude/launch.json` có sẵn cấu hình `kiosk-mock`
-để bật máy chủ giả từ Claude Code.
-
 ---
 
 ## Đọc thành tiếng
