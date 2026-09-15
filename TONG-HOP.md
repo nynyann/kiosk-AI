@@ -1,6 +1,6 @@
 # Tổng hợp giải pháp Kiosk hướng dẫn thủ tục hành chính
 
-Cập nhật ngày 14/09/2026, theo commit `df008fd` trên nhánh `main` của repo
+Cập nhật ngày 15/09/2026, theo commit `56f40dd` trên nhánh `main` của repo
 `nynyann/kiosk-backend`. Tài liệu này gom mọi thông tin kỹ thuật và mọi con
 số đã đo để cả nhóm đọc và điền vào bản đề xuất giải pháp. Con số nào là đo
 thật thì ghi "đo thật", con số nào chưa có thì ghi "chưa có", không ước lượng.
@@ -69,14 +69,15 @@ npm, không cơ sở dữ liệu.
       |-- app/normalize.py chuẩn hoá văn bản nhận dạng
       |-- app/kb.py        nạp data/kb/*.json, tra cứu thủ tục
       |-- app/flow.py      máy trạng thái bước 1 -> 2 -> 3
-      |-- app/tts.py       edge-tts, có bộ đệm
+      |-- app/tts.py       đọc mp3 từ data/tts/, thiếu mới gọi edge-tts
       |
       v
     data/kb/*.json          6 thủ tục, mỗi thủ tục một file
+    data/tts/*.mp3          112 câu đã sinh sẵn tiếng, đi theo repo
 
-Kích thước mã nguồn (đếm ngày 14/09/2026): backend `app/` 2.202 dòng Python,
-giao diện `web/index.html` khoảng 870 dòng, công cụ đo `eval/` 875 dòng,
-test 3 file với 45 test. Tổng khoảng 4.600 dòng.
+Kích thước mã nguồn (đếm ngày 15/09/2026): backend `app/` 2.293 dòng Python,
+giao diện `web/index.html` 959 dòng, công cụ đo `eval/` 875 dòng, kịch bản
+`scripts/` 3 file, test 3 file với 46 test. Tổng khoảng 4.800 dòng.
 
 Thư viện chính (ghim phiên bản trong `requirements.txt`): fastapi 0.115.6,
 uvicorn 0.34.0, faster-whisper 1.1.1, ctranslate2 4.8.2, edge-tts 7.2.8.
@@ -157,15 +158,33 @@ có, vì tập tự thu chưa thu (mục 11).
 
 ## 5. Đọc thành tiếng
 
-Máy chủ tự sinh mp3 bằng edge-tts (giọng neural tiếng Việt của Microsoft
-Edge, miễn phí, không cần khoá, nhưng cần mạng lúc chạy). Giọng mặc định
-`vi-VN-HoaiMyNeural` (nữ), tốc độ chậm hơn gốc 8% cho người già nghe kịp,
-đổi được bằng biến môi trường.
+Giọng đọc lấy từ edge-tts (giọng neural tiếng Việt của Microsoft Edge,
+miễn phí, không cần khoá). Giọng mặc định `vi-VN-HoaiMyNeural` (nữ), tốc độ
+chậm hơn gốc 8% cho người già nghe kịp, đổi được bằng biến môi trường.
 
 Vì sao không để trình duyệt tự đọc: Web Speech API chỉ đọc được thứ tiếng
 hệ điều hành đã cài giọng, máy Windows ở ta thường chỉ có giọng tiếng Anh
 nên đọc chữ Việt bằng giọng Mỹ, không nghe ra. Giọng trình duyệt vẫn giữ
-làm đường lùi khi máy chủ mất mạng.
+làm đường lùi cuối cùng.
+
+Kho mp3 đi theo repo (thêm ngày 15/09/2026). Dịch vụ của Edge hỏng ngẫu
+nhiên với giọng tiếng Việt: đo cùng một câu, cùng giọng, có đợt hỏng 5/6
+lần liên tiếp, câu có "!" hoặc "?" hỏng nhiều hơn, có đợt mọi tốc độ khác
+mặc định đều hỏng; máy chủ thật vì thế đã lặng hẳn mấy hôm mà log chỉ ghi
+`tts_failed`. Mọi câu kiosk nói đều biết trước (sinh từ kho tri thức), nên
+`scripts/build_tts_cache.py` sinh mp3 một lần ở máy nhà, thử lại tới khi
+đủ, ghi vào `data/tts/` và commit theo repo: 112 file, 11,5 MB. Máy chủ đọc
+từ đĩa trước, khởi động xong báo 112/112 câu có sẵn, không cần mạng cho
+câu quen. Chỉ câu chưa có mới gọi Edge, lúc đó đổi "!" "?" thành "." và thử
+4 lần trong hạn giờ (2 lần giữ tốc độ cấu hình, 2 lần tốc độ mặc định),
+được thì ghi luôn xuống đĩa. Sửa kho tri thức xong phải chạy lại kịch bản
+và commit cả mp3.
+
+Trình duyệt chặn phát tiếng khi trang chưa có thao tác chạm nào (chính sách
+autoplay), nên câu chào lúc mới vào từng bị chặn lặng lẽ. Giao diện có màn
+«Chạm vào màn hình để bắt đầu»: chạm một cái là mở khoá tiếng cho cả phiên,
+máy chào ngay; trong lúc màn này hiện, giao diện tải sẵn mp3 câu chào (đo:
+43 ms từ đĩa) nên chạm là nói liền.
 
 Số đo (đo thật ở trình duyệt):
 
@@ -263,7 +282,10 @@ việc cần làm lúc đó.
 
 Trình tự màn hình:
 
-1. Chào: "Xin chào bác! Cháu là máy hướng dẫn làm thủ tục hành chính."
+0. Màn «Chạm vào màn hình để bắt đầu» (mở khoá tiếng, xem mục 5). Hiện trạng
+   thái máy chủ đang khởi động hay đã sẵn sàng.
+1. Chào bằng chữ và bằng tiếng: "Xin chào bác! Cháu là máy hướng dẫn làm
+   thủ tục hành chính."
 2. "Bác cần làm gì ạ?" kèm hướng dẫn cách nói và nút micro to. Không liệt
    kê thủ tục. Dòng nhỏ "Bác không nói được? Bấm đây để chọn bằng tay" mở
    danh sách khi cần.
@@ -370,9 +392,10 @@ có dùng được để quyết định mời nói lại, nhưng không mạnh;
 
 ### 9.5 Kiểm thử tự động
 
-45 test, chạy dưới 3 giây, không cần mô hình: 12 test giao kèo API, 23 test
+46 test, chạy dưới 3 giây, không cần mô hình: 12 test giao kèo API, 24 test
 luồng 3 bước (cả 6 file kho tri thức đủ trường, rẽ nhánh đúng sơ đồ, ánh xạ
-lời nói sang lựa chọn, hỏi thêm không bịa), 10 test chuẩn hoá và tính WER.
+lời nói sang lựa chọn, hỏi thêm không bịa, câu chào của giao diện khớp với
+chuỗi máy chủ sinh sẵn), 10 test chuẩn hoá và tính WER.
 
 ### 9.6 Con số chưa có
 
@@ -389,7 +412,8 @@ lời nói sang lựa chọn, hỏi thêm không bịa), 10 test chuẩn hoá v�
 ## 10. Triển khai
 
 - Docker, một ảnh, model nướng sẵn vào ảnh lúc build (Render xoá ổ đĩa mỗi
-  lần ngủ dậy nên không tải lúc chạy). `Dockerfile` ghi đè sang
+  lần ngủ dậy nên không tải lúc chạy). Kho mp3 `data/tts/` cũng nằm trong
+  ảnh vì đi theo repo. `Dockerfile` ghi đè sang
   PhoWhisper-base và `ASR_CPU_THREADS=1`.
 - Đặt trên Render gói Free: 512 MB RAM, ít hơn 1 nhân CPU, ngủ sau 15 phút
   vắng khách, thức dậy mất khoảng 1 phút, 750 giờ/tháng. Có
@@ -438,7 +462,7 @@ ctranslate2 4.5.0 không nạp được trên Linux vì cờ executable stack (g
 
 ## 12. Lịch sử phát triển trên git
 
-Repo `nynyann/kiosk-backend`, nhánh `main`, 16 commit từ 05/09 đến 14/09/2026.
+Repo `nynyann/kiosk-backend`, nhánh `main`, 18 commit từ 05/09 đến 15/09/2026.
 
 | Commit | Nội dung |
 |---|---|
@@ -458,8 +482,10 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 16 commit từ 05/09 đến 14/09/2
 | a308283 | Lắp 6 thủ tục của Mian vào kho tri thức |
 | e95a025 | Luồng 3 bước theo sơ đồ: kiểm tra điều kiện, chuẩn bị hồ sơ, nộp hồ sơ; API 2.0 |
 | df008fd | Giao diện thành hội thoại từng bước: chào, hỏi bác cần gì, rồi mới hỏi từng điều kiện |
+| cf16318 | Thêm TONG-HOP.md, tài liệu này |
+| 56f40dd | Màn chạm để bắt đầu (mở khoá tiếng), kho mp3 đi theo repo, thử lại khi Edge hỏng |
 
-Lần cập nhật 14/09/2026 (hai commit cuối) thay đổi gì:
+Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 
 - Trước: nói một câu, máy đổ cả 4 bước và toàn bộ hồ sơ ra một màn hình;
   màn hình chính liệt kê sẵn 6 thủ tục.
@@ -473,6 +499,16 @@ Lần cập nhật 14/09/2026 (hai commit cuối) thay đổi gì:
   Chế độ giả chỉ giả phần nghe, kho và luồng chạy thật.
 - Test từ 20 lên 45.
 
+Lần cập nhật 15/09/2026 (56f40dd) thay đổi gì:
+
+- Lỗi báo: máy không nói lời chào khi vào trang. Tìm ra hai nguyên nhân
+  chồng nhau: trình duyệt chặn phát tiếng trước thao tác chạm đầu tiên, và
+  dịch vụ giọng đọc Edge đang hỏng ngẫu nhiên với giọng tiếng Việt nên máy
+  chủ thật thực ra đã lặng toàn bộ, không riêng câu chào.
+- Sửa: màn «Chạm vào màn hình để bắt đầu»; kho mp3 112 câu sinh sẵn đi
+  theo repo; máy chủ đọc từ đĩa trước, gọi mạng thì thử lại 4 lần.
+- Test từ 45 lên 46.
+
 ---
 
 ## 13. Việc còn lại và ai làm
@@ -484,6 +520,7 @@ Lần cập nhật 14/09/2026 (hai commit cuối) thay đổi gì:
 | Bổ sung `HARD_FIXES` từ cụm nghe nhầm thật, chạy `eval.rescore`, ghi chuỗi số cải thiện | Lia | `app/normalize.py` | cao, là nội dung mục 4.3 |
 | Đọc lại 24 câu hỏi bước 1 và 20 kết luận, đối chiếu văn bản | Mian | `data/kb/*.json` mục `flow.check` | cao |
 | Thêm FAQ sau mỗi buổi thử với người thật | Mian | `flow.faq` | vừa |
+| Sau mỗi lần sửa kho tri thức: chạy `python scripts/build_tts_cache.py` rồi commit cả `data/tts/` | người sửa kho | `scripts/build_tts_cache.py` | cao, quên là câu mới không có tiếng |
 | Thay tra cứu từ khoá bằng so khớp ngữ nghĩa | Kim | `app/kb.py`, hàm `score()` | vừa |
 | Tính ngưỡng tin cậy bằng hàm chi phí kỳ vọng | Kim | `config.KB_MATCH_THRESHOLD`, `ASR_CONFIDENCE_FLOOR` | vừa |
 | Thử với 3 đến 5 người cao tuổi thật, ghi thời gian hoàn thành và chỗ vấp | cả nhóm | | cao |
@@ -509,4 +546,4 @@ Lần cập nhật 14/09/2026 (hai commit cuối) thay đổi gì:
 - Mục triển khai và chi phí: mục 10 và bảng 9.4 (RAM, tốc độ, gói máy chủ
   miễn phí đủ chạy).
 - Mục hạn chế và hướng phát triển: mục 11 và 13, đừng bỏ mục nào.
-- Mục kiểm thử: 9.5 (45 test tự động) và 9.6 (những gì chưa đo, nói thật).
+- Mục kiểm thử: 9.5 (46 test tự động) và 9.6 (những gì chưa đo, nói thật).
