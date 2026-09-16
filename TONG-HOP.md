@@ -305,10 +305,19 @@ hết tiền hay quá hạn giờ:
 | Câu ngoài kho, câu máy nghe nhầm thành vô nghĩa, «cháu tên gì» | mô hình viết 1 đến 2 câu tử tế (là máy hướng dẫn nên chỉ giúp về thủ tục này; hỏi cán bộ giúp; mời nói lại), không bịa | câu cứng «Câu này cháu chưa có trong kho» | 6 |
 | Câu nói ứng với nhiều thủ tục («tôi muốn xin trợ cấp») | mô hình liệt kê tối đa 3 thủ tục, giao diện hỏi «cần hỗ trợ thủ tục nào trước» | từ khoá đủ điểm thì một thủ tục, không thì danh sách 6 | 5 |
 
-Nguyên tắc giữ nguyên: prompt chỉ chứa kho tri thức của đúng thủ tục đó;
-mô hình bị ép trả mã `KHONG_CO_TRONG_KHO` khi kho không có, máy chủ thay bằng
-câu mời gặp cán bộ; không được thêm giấy tờ, điều kiện, con số ngoài kho;
-không kết luận «chắc chắn được hưởng». FAQ khớp rõ vẫn lấy nguyên văn kho
+Nguyên lý giới hạn mô hình trong kho (câu hỏi của nhóm 17/09): kiosk KHÔNG
+hỏi mô hình «trợ cấp hưu trí là gì» rồi tin câu trả lời. Mỗi lượt, máy chủ
+nhét toàn bộ kho tri thức của đúng thủ tục đó vào prompt, kèm câu bác hỏi
+và những gì bác đã trả lời, và dặn: chỉ được dùng thông tin trong đây, trả
+JSON `{in_kb, answer}`, `in_kb=false` khi kho không có. Đó là lớp mềm (lời
+dặn). Trên đó có bốn lớp cứng do máy chủ kiểm, mô hình không vượt được:
+(1) điều kiện điền sẵn chỉ nhận đúng mã lựa chọn có trong kho, kèm bằng
+chứng trích nguyên văn từ câu bác nói; (2) thủ tục gợi ý chỉ nhận mã có
+trong 6 thủ tục; (3) câu trả lời có con số (ngày, tuổi, số mẫu, số nghị
+định, mức tiền) mà con số đó không có trong kho thì bỏ cả câu, về câu mời
+gặp cán bộ; (4) hỏng, quá 12 giây, hết số dư thì về kho tĩnh. Kết quả: mô
+hình chỉ diễn đạt lại kho, không được đưa thêm sự kiện. Không kết luận
+«chắc chắn được hưởng». FAQ khớp rõ vẫn lấy nguyên văn kho
 (có sẵn tiếng, không tốn lượt gọi). Máy chủ vẫn không giữ phiên: ngữ cảnh
 (câu mở đầu, các câu đã trả lời, các lượt hỏi thêm) do giao diện gửi lại
 mỗi lượt.
@@ -348,6 +357,11 @@ này chặn đúng lỗi Saola điền bừa. 16 test với mô hình giả ki�
 
 ---
 
+Token mỗi lượt (giảm ngày 17/09 theo yêu cầu bớt tốn): prompt trả lời câu
+hỏi thêm bỏ bảng câu hỏi và bảng kết luận của bước 1 (chỉ cần khi điền
+sẵn), còn khoảng 1.500 token vào, tối đa 220 token ra; nhận thủ tục và hiểu
+câu trả lời tự do mỗi lượt dưới 400 token. Test tự động không gọi mạng.
+
 ### Kho tri thức có hướng dẫn kê khai không (câu hỏi của nhóm ngày 17/09)
 
 Trước 17/09: không. Kho chỉ ghi «xin mẫu tại quầy, cán bộ hướng dẫn điền»,
@@ -383,10 +397,11 @@ Trình tự màn hình:
 0. Trang chủ: thanh menu (Trang chủ, Thủ tục, Hướng dẫn, Góp ý); góc dưới
    trái là hòm thư và số điện thoại góp ý; giữa là nút Bắt đầu (cái chạm
    này mở khoá tiếng, xem mục 5).
-0b. Chọn xưng hô: bác, ông, bà, cô, chú, anh, chị. Máy chủ thay xưng hô vào
-   mọi câu trả về (kể cả câu đọc); với anh, chị thì máy xưng em.
-1. Máy chào bằng chữ và bằng tiếng: "Xin chào ông! Cháu là máy hướng dẫn
-   làm thủ tục hành chính. Ông cần làm gì ạ?" kèm cách nói; micro nhấp nháy.
+1. Máy chào bằng chữ và bằng tiếng: "Xin chào bác! Cháu là máy hướng dẫn
+   làm thủ tục hành chính. Bác cần làm gì ạ?" kèm cách nói; micro nhấp nháy.
+   Xưng hô để trung tính "bác" cho mọi người (nhóm quyết 17/09). Máy chủ
+   vẫn nhận `pronoun` (ông, bà, cô, chú, anh, chị) nếu sau này muốn cho
+   chọn, thay vào mọi câu kể cả câu đọc.
 2. Bác nói. Máy đưa ra thủ tục nó hiểu ở bên phải: một thủ tục thì hỏi
    "đúng không ạ?", nhiều thủ tục thì hỏi "cần hỗ trợ thủ tục nào trước
    ạ?". Danh sách đủ 6 thủ tục chỉ hiện khi máy không hiểu hoặc bác bấm
@@ -494,7 +509,7 @@ có dùng được để quyết định mời nói lại, nhưng không mạnh;
 
 ### 9.5 Kiểm thử tự động
 
-64 test, chạy dưới 4 giây, không cần mô hình nhận dạng và không gọi mạng:
+66 test, chạy dưới 4 giây, không cần mô hình nhận dạng và không gọi mạng:
 12 test giao kèo API, 24 test luồng 3 bước (cả 6 file kho tri thức đủ
 trường, rẽ nhánh đúng sơ đồ, ánh xạ lời nói sang lựa chọn, hỏi thêm không
 bịa, câu chào của giao diện khớp với chuỗi máy chủ sinh sẵn), 18 test mô
@@ -597,7 +612,8 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 23 commit từ 05/09 đến 16/09/2
 | d7b545c | Bỏ cấu hình riêng của máy cá nhân khỏi repo |
 | f269f66 | Nối mô hình ngôn ngữ FPT AI Marketplace theo phản hồi giám khảo: nhớ ngữ cảnh, hiểu hoàn cảnh, trả lời ngoài FAQ, lời tự nhiên; API 2.1; 61 test |
 | 604dda5 | Đo 5 mô hình trên khoá thật, chốt gemma-4-31B-it; chốt bằng chứng khi điền sẵn; sửa FAQ khớp bừa; hỏi mô hình trước gợi ý chuyển; config tự đọc .env; 62 test |
-| (17/09) | Giao diện bản 3: trang chủ có menu và góp ý, chọn xưng hô, trợ lý AI bên trái, thủ tục gợi ý để chọn, mic luôn hiện và nhấp nháy; xưng hô theo lựa chọn; mô hình tự nói câu ngoài kho; kho thêm cách kê khai mẫu; API 2.2; 64 test |
+| 0f6e9ef | Giao diện bản 3: trang chủ có menu và góp ý, chọn xưng hô, trợ lý AI bên trái, thủ tục gợi ý để chọn, mic luôn hiện và nhấp nháy; xưng hô theo lựa chọn; mô hình tự nói câu ngoài kho; kho thêm cách kê khai mẫu; API 2.2; 64 test |
+| (17/09) | Xưng hô trung tính «bác», bỏ bước chọn; chốt cứng con số trong câu trả lời phải có trong kho; prompt gọn hơn 40%; 66 test |
 
 Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 
@@ -709,6 +725,6 @@ thay đổi gì:
 - Mục triển khai và chi phí: mục 10 và bảng 9.4 (RAM, tốc độ, gói máy chủ
   miễn phí đủ chạy).
 - Mục hạn chế và hướng phát triển: mục 11 và 13, đừng bỏ mục nào.
-- Mục kiểm thử: 9.5 (64 test tự động) và 9.6 (những gì chưa đo, nói thật).
+- Mục kiểm thử: 9.5 (66 test tự động) và 9.6 (những gì chưa đo, nói thật).
 - Mục trả lời phản hồi giám khảo: mục 7b, bảng 4 chỗ dùng mô hình ứng với 6
   điểm phản hồi, kèm giới hạn 5b.

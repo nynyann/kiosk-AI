@@ -217,9 +217,29 @@ def test_thu_tuc_khac_thi_hoi_mo_hinh_truoc_ngoai_kho_moi_goi_y_chuyen(fake_llm)
     assert d["switch_to"] == "cap-the-can-cuoc" and d["via_llm"] is False
 
 
+def test_cau_tra_loi_co_so_khong_co_trong_kho_thi_bo(fake_llm):
+    """Lớp chặn cứng: mô hình nói «30 ngày» trong khi kho ghi 10 ngày → bỏ,
+    về câu mời gặp cán bộ. Nói «10 ngày» thì được."""
+    fake_llm('{"in_kb": true, "answer": "Khoảng 30 ngày làm việc là có kết quả bác ạ."}')
+    d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "mấy hôm thì xong"}).json()
+    assert d["via_llm"] is False and "30" not in d["answer"]
+    fake_llm('{"in_kb": true, "answer": "Trong 10 ngày làm việc là có kết quả bác ạ."}')
+    d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "mấy hôm thì xong"}).json()
+    assert d["via_llm"] is True and "10" in d["answer"]
+    assert llm.numbers_grounded("không có số", "") and not llm.numbers_grounded("mẫu 02", "mẫu 01")
+
+
+def test_cau_ngoai_kho_thi_mo_hinh_tu_noi_loi_tu_te(fake_llm):
+    fake_llm('{"in_kb": false, "answer": "Dạ cháu là máy hướng dẫn thủ tục nên chỉ giúp được về việc này thôi ạ."}')
+    d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "cháu ơi cháu tên gì"}).json()
+    assert d["matched"] is False and d["via_llm"] is True and d["answer"].startswith("Dạ cháu là máy")
+
+
 # --- 3. Kho tri thức phẳng cho prompt -----------------------------------------
 def test_kb_context_du_moi_phan():
     t = llm.kb_context(kb.get(HUU_TRI))
-    for phan in ["THỦ TỤC:", "ĐIỀU KIỆN", "KẾT LUẬN", "HỒ SƠ:", "NƠI NỘP:", "THỜI HẠN:", "CÂU HỎI THƯỜNG GẶP", "NGUỒN:"]:
+    for phan in ["THỦ TỤC:", "ĐIỀU KIỆN", "KẾT LUẬN", "HỒ SƠ:", "NƠI NỘP:", "THỜI HẠN:", "CÂU HỎI THƯỜNG GẶP", "NGUỒN:", "CÁCH KÊ KHAI"]:
         assert phan in t, phan
     assert "10 ngày làm việc" in t
+    ngan = llm.kb_context(kb.get(HUU_TRI), full=False)
+    assert "KẾT LUẬN" not in ngan and "CÁCH KÊ KHAI" in ngan and len(ngan) < len(t) * 0.75

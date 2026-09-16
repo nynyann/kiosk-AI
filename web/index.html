@@ -234,7 +234,7 @@
   <section class="page" id="page-guide" hidden><div class="inner">
     <h2>Cách dùng</h2>
     <ul>
-      <li>Bấm <b>Bắt đầu</b>, chọn cách xưng hô để máy nói chuyện cho đúng.</li>
+      <li>Bấm <b>Bắt đầu</b>. Máy gọi chung mọi người là «bác» cho thân mật.</li>
       <li>Bấm nút <b>micro</b> khi nó nhấp nháy, nói điều mình cần rồi bấm <b>Nói xong rồi</b>. Ví dụ: «Tôi 76 tuổi, không có lương hưu thì được hỗ trợ gì?»</li>
       <li>Máy đưa ra thủ tục phù hợp, hỏi từng câu để kiểm tra điều kiện, rồi cho biết cần chuẩn bị gì và nộp ở đâu.</li>
       <li>Nút nào <b>nhấp nháy</b> là nút cần bấm tiếp theo. Không nói được thì bấm chọn trên màn hình.</li>
@@ -476,16 +476,14 @@ function updateStepper(){
 }
 
 /* --- Bắt đầu: chọn xưng hô --- */
+// Xưng hô để trung tính «bác» cho mọi người (quyết định của nhóm 17/09).
+// Máy chủ vẫn nhận `pronoun` nếu sau này muốn cho chọn lại: gọi
+// choosePronoun("ông") là mọi câu đổi theo.
 function startSession(){
   showPage(null); $("session").hidden = false;
   flowState = null; answerOrder = []; lastUtterance = ""; askHistory = []; historyItems.length = 0; pronoun = "bác";
   updateStepper(); $("heard").hidden = true; $("history").hidden = true;
-  aiSay(`<p class="qtext">Xin chào! Mời chọn cách xưng hô để máy nói chuyện cho đúng ạ.</p>`,
-        { hint: "Bấm vào một ô bên phải. Ô nào nhấp nháy là ô cần bấm.", speech: "Xin chào! Mời chọn cách xưng hô để máy nói chuyện cho đúng ạ." });
-  setPanel(`<h2 class="ptitle">Máy nên gọi mình là gì ạ?</h2>
-    <div class="options">${Object.keys(PRONOUNS).map(p => `<button class="opt-btn pron-btn glow" data-p="${p}">${cap(p)}</button>`).join("")}</div>`);
-  panel.querySelectorAll("[data-p]").forEach(b => b.addEventListener("click", () => choosePronoun(b.dataset.p)));
-  setMic("off", "Micro", "Chọn cách xưng hô trước ạ.");
+  greet();
   armInactivity();
 }
 

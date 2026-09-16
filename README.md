@@ -26,10 +26,9 @@ Bác đứng trước kiosk:
 0. Trang chủ: thanh menu (Trang chủ, Thủ tục, Hướng dẫn, Góp ý), góc dưới
    trái là hòm thư và số điện thoại góp ý, giữa là nút **Bắt đầu** (cái
    chạm này cũng là thứ trình duyệt cần để cho phép phát tiếng).
-0b. Chọn **xưng hô** (bác, ông, bà, cô, chú, anh, chị). Mọi câu máy nói
-   sau đó đổi theo, cả câu tĩnh trong kho lẫn câu mô hình sinh.
-0c. Máy chào: «Xin chào ông! … Ông cần làm gì ạ?» kèm hướng dẫn cách nói,
-   micro nhấp nháy.
+0b. Máy chào: «Xin chào bác! … Bác cần làm gì ạ?» kèm hướng dẫn cách nói,
+   micro nhấp nháy. Xưng hô để trung tính «bác» cho mọi người (nhóm quyết
+   17/09); máy chủ vẫn nhận `pronoun` nếu sau này muốn cho chọn.
 1. **Bác nói điều mình cần** bằng lời thường («tôi 76 tuổi, không có lương
    hưu thì được hỗ trợ gì»). Máy đưa ra **thủ tục nó hiểu** để bác bấm
    chọn: một thủ tục thì hỏi «đúng không ạ?», nhiều thủ tục thì hỏi «bác
@@ -262,7 +261,7 @@ chỉ 1,6 giây — nên hạn giờ lúc hâm nóng (45 giây) để rộng hơ
 
 ```bash
 pip install -r requirements-dev.txt   # một lần, chỉ có pytest
-python -m pytest tests/ -q            # 64 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
+python -m pytest tests/ -q            # 66 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
 python -m app.normalize               # in bảng 10 câu trước/sau, ảnh cho mục 4.3
 ```
 

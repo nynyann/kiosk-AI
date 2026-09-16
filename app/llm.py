@@ -136,17 +136,25 @@ STYLE = ("Bạn là kiosk hướng dẫn thủ tục hành chính đặt tại b
 # hình. Nhờ vậy kho mp3 và cache đều theo một bản duy nhất.
 
 
-def kb_context(proc: dict) -> str:
-    """Toàn bộ nội dung kho tri thức của một thủ tục, viết phẳng để đưa vào prompt."""
+def kb_context(proc: dict, full: bool = True) -> str:
+    """Toàn bộ nội dung kho tri thức của một thủ tục, viết phẳng để đưa vào prompt.
+
+    `full=False` bỏ bảng câu hỏi và bảng kết luận của bước 1 (chỉ cần khi
+    điền sẵn điều kiện), giữ tóm tắt điều kiện. Dùng cho trả lời câu hỏi
+    thêm: prompt ngắn đi khoảng 40%, mỗi lượt gọi rẻ và nhanh hơn."""
     fl = proc.get("flow") or {}
     ck = fl.get("check") or {}
     lines = [f"THỦ TỤC: {proc.get('name')}"]
-    if ck.get("questions"):
+    if not full:
+        steps = proc.get("steps") or []
+        if steps:
+            lines.append("ĐIỀU KIỆN (tóm tắt): " + (steps[0].get("detail") or ""))
+    if full and ck.get("questions"):
         lines.append("ĐIỀU KIỆN, HỎI THEO THỨ TỰ:")
         for q in ck["questions"]:
             opts = "; ".join(f"{o['value']} = {o.get('label')}" for o in q.get("options", []))
             lines.append(f"- [{q['id']}] {q.get('text')} Lựa chọn: {opts}")
-    if ck.get("outcomes"):
+    if full and ck.get("outcomes"):
         lines.append("KẾT LUẬN THEO CÂU TRẢ LỜI:")
         for o in ck["outcomes"]:
             lines.append(f"- khi {json.dumps(o.get('when'), ensure_ascii=False)} → {o.get('verdict')}: {o.get('reason') or o.get('note') or ''}")
@@ -337,7 +345,7 @@ async def answer_from_kb(proc: dict, question: str, answers: Dict[str, str],
     if not enabled() or not (question or "").strip():
         return None
     prompt = (
-        f"KHO TRI THỨC (chỉ được dùng thông tin trong đây):\n{kb_context(proc)}\n\n"
+        f"KHO TRI THỨC (chỉ được dùng thông tin trong đây):\n{kb_context(proc, full=False)}\n\n"
         f"NGỮ CẢNH PHIÊN NÀY:\n{citizen_context(proc, answers, utterance, history, stage)}\n\n"
         f"Bác hỏi: «{question}»\n\n"
         "Trả lời bác bằng lời tự nhiên, tối đa 3 câu, dựa ĐÚNG vào kho tri thức và ngữ cảnh ở trên; "
@@ -354,17 +362,41 @@ async def answer_from_kb(proc: dict, question: str, answers: Dict[str, str],
         "Trả lời DUY NHẤT một JSON: {\"in_kb\": true hoặc false, \"answer\": \"<câu trả lời>\"}"
     )
     text = await chat([{"role": "system", "content": STYLE}, {"role": "user", "content": prompt}],
-                      max_tokens=300, temperature=0.3)
+                      max_tokens=220, temperature=0.2)
     if text is None:
         return None
     data = _json_block(text)
     if not data or not str(data.get("answer") or "").strip():
         # Mô hình không theo định dạng: vẫn dùng chữ thô nếu có, coi là trong kho.
         raw = text.strip().strip('"')
-        return NOT_IN_KB if NOT_IN_KB in raw else (raw or None)
-    ans = str(data["answer"]).strip()
-    if not data.get("in_kb", True):
+        if NOT_IN_KB in raw:
+            return NOT_IN_KB
+        ans, in_kb = raw, True
+    else:
+        ans, in_kb = str(data["answer"]).strip(), bool(data.get("in_kb", True))
+    if not ans:
+        return None
+    if in_kb and not numbers_grounded(ans, kb_context(proc) + " " + question + " " + " ".join(answers.values())):
+        # Chốt cứng: câu trả lời có con số (ngày, tuổi, mức tiền, số mẫu, số
+        # nghị định) mà con số đó không có trong kho thì coi như bịa, bỏ.
+        print(f"[llm] bỏ câu trả lời vì có số không có trong kho: {ans[:80]}")
+        return NOT_IN_KB
+    if not in_kb:
         # Câu ngoài kho nhưng đã có lời đáp tử tế: gắn mã ở đầu để máy chủ
         # biết, và vẫn dùng lời đó thay câu cứng.
         return NOT_IN_KB + "\n" + ans
     return ans
+
+
+def numbers_grounded(answer: str, source: str) -> bool:
+    """Mọi con số trong câu trả lời phải xuất hiện trong nguồn cho phép.
+
+    Đây là lớp chặn CỨNG ngoài lời dặn trong prompt: mô hình có thể lỡ nói
+    «15 ngày» hay «500 nghìn» dù kho không có; số là thứ dễ kiểm nhất và cũng
+    là thứ sai thì hại nhất. Chữ thì đã bị ép chỉ dùng kho, nhiệt độ thấp,
+    tối đa 3 câu."""
+    nums = set(re.findall(r"\d+", answer or ""))
+    if not nums:
+        return True
+    have = set(re.findall(r"\d+", source or ""))
+    return nums <= have
