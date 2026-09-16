@@ -424,14 +424,23 @@ _GENERIC_INTENTS = [
 ]
 
 
+# Từ không mang nội dung. «mắt tôi kém lắm có ai điền hộ được không» từng khớp
+# FAQ «có được hưởng không» chỉ vì trùng «có», «được», «không».
+_FAQ_STOP = set("toi bac chau co khong phai la a dang hien nay bao nhieu gi thi ma va hay hoac cua o roi da se den tu duoc cho lam the nao".split())
+
+
 def _faq_score(query_flat: str, variant: str) -> float:
     vf = _flat(variant)
     if not vf.strip():
         return 0.0
     if vf in query_flat:
         return 1.0
-    v_tokens = set(vf.split())
-    q_tokens = set(query_flat.split())
+    v_tokens = {t for t in vf.split() if t not in _FAQ_STOP}
+    q_tokens = {t for t in query_flat.split() if t not in _FAQ_STOP}
+    # Mẫu câu còn dưới 2 từ nội dung («được bao nhiêu tiền» chỉ còn «tiền»)
+    # thì chỉ nhận khi khớp nguyên văn ở trên; «ưu tiên» không phải «tiền».
+    if len(v_tokens) < 2:
+        return 0.0
     return len(v_tokens & q_tokens) / len(v_tokens)
 
 

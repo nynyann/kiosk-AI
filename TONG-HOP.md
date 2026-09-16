@@ -80,7 +80,7 @@ npm, không cơ sở dữ liệu.
 
 Kích thước mã nguồn (đếm ngày 16/09/2026): backend `app/` 2.752 dòng Python,
 giao diện `web/index.html` 981 dòng, công cụ đo `eval/` 875 dòng, kịch bản
-`scripts/` 3 file, test 4 file với 61 test. Tổng khoảng 5.300 dòng.
+`scripts/` 3 file, test 4 file với 62 test. Tổng khoảng 5.400 dòng.
 
 Thư viện chính (ghim phiên bản trong `requirements.txt`): fastapi 0.115.6,
 uvicorn 0.34.0, faster-whisper 1.1.1, ctranslate2 4.8.2, edge-tts 7.2.8,
@@ -287,9 +287,8 @@ tiếng Việt tự nhiên hơn.
 
 Gọi API kiểu OpenAI tại `https://mkp-api.fptcloud.com/chat/completions`,
 xác thực bằng khoá `FPT_API_KEY` (tài liệu: github.com/fpt-corp/ai-marketplace).
-Mô hình mặc định `Saola-Small-32B` (mô hình tiếng Việt của FPT), đổi được
-sang `DeepSeek-V4-Flash`, `Qwen3.6-27B` bằng biến `LLM_MODEL`. Hạn giờ 12
-giây. Trong các API trên marketplace, nhóm sinh câu trả lời được là các LLM
+Mô hình mặc định `gemma-4-31B-it` (chọn sau khi đo, bảng dưới), đổi được
+bằng biến `LLM_MODEL`. Hạn giờ 12 giây. Trong các API trên marketplace, nhóm sinh câu trả lời được là các LLM
 kể trên; `Vietnamese_Embedding`, `multilingual-e5-large`, `bge-reranker` là
 tìm kiếm ngữ nghĩa (chưa dùng, việc của Kim); các `whisper` là nghe (không
 dùng vì phải gửi âm thanh ra ngoài).
@@ -312,12 +311,38 @@ không kết luận «chắc chắn được hưởng». FAQ khớp rõ vẫn l�
 (câu mở đầu, các câu đã trả lời, các lượt hỏi thêm) do giao diện gửi lại
 mỗi lượt.
 
-Số đo: chưa có khoá nên chưa đo độ trễ và chất lượng câu trả lời thật. 15
-test với mô hình giả kiểm đúng đường đi: điền sẵn, không điền giá trị ngoài
-lựa chọn, mô hình trả rác thì lùi về luật, ngoài kho thì mời cán bộ, FAQ
-khớp rõ thì không gọi mô hình. Việc phải làm ngay: tạo khoá, đặt
-`FPT_API_KEY` trên Render, ghi độ trễ và đọc 20 câu trả lời sinh ra để kiểm
-không câu nào nhắc thứ không có trong kho.
+Số đo (đo thật ngày 16/09/2026 trên khoá thật, cùng 8 tác vụ của kiosk):
+
+| Mô hình | Độ trễ mỗi lượt | Điền sẵn từ lời kể | Nhận thủ tục từ câu lạ | Câu ngoài kho | Giá (USD mỗi triệu token vào/ra) | Kết luận |
+|---|---|---|---|---|---|---|
+| gemma-4-31B-it | 0,3 đến 1,1 giây | đúng phần bác nói, không suy diễn | đúng | trả đúng mã | 0,15 / 0,45 | chọn làm mặc định |
+| Saola-Small-32B | 0,2 đến 1,9 giây | điền bừa: tự cho «công dân = có», «BHXH = không» dù bác không nói | không nhận ra | trả lời thay vì báo ngoài kho | 0,13 / 0,15 | không dùng |
+| gemma-3-27b-it | 0,3 đến 1,6 giây | đúng | đúng | dài dòng | 0,11 / 0,17 | dự phòng |
+| DeepSeek-V4-Flash | 1 đến 11 giây | đúng | không | trả rỗng | 0,14 / 0,28 | chậm, không dùng |
+| Qwen3.6-27B | 0,4 đến 2 giây | trả rỗng | trả rỗng | trả rỗng | 0,30 / 3,25 | không dùng |
+
+Sau khi chốt gemma-4-31B-it, chạy 18 câu hỏi thêm thực tế trên máy chủ với
+ngữ cảnh bác 76 tuổi, chồng mất, ở một mình, không lương hưu: 16/18 trả lời
+đúng từ kho và mở đầu bằng câu xác nhận hoàn cảnh («Cháu hiểu bác đi lại khó
+khăn ạ. Bác có thể gửi hồ sơ qua bưu điện…»), 2 câu ngoài kho («giá vàng hôm
+nay», «cháu tên gì») mời gặp cán bộ, 0 câu nhắc giấy tờ hay con số không có
+trong kho. Độ trễ trung bình 2,9 giây, tối đa 3,2 giây, prompt khoảng 2.500
+token vì chứa cả kho tri thức của thủ tục. 5/5 câu nói lạ nhận đúng thủ
+tục («cháu ơi bà muốn có cái thẻ đi khám bệnh cho rẻ» ra bảo hiểm y tế,
+«photo cái sổ đỏ mang lên xã đóng dấu» ra chứng thực). Chi phí khoảng 0,001
+USD một lượt.
+
+Hai lỗi tìm được khi đo và đã sửa: FAQ so khớp theo từ bị lừa bởi «có…
+được… không» và bởi mẫu một từ («tiền» khớp «ưu tiên»), nay bỏ từ rỗng và
+mẫu dưới 2 từ nội dung chỉ khớp nguyên văn; «cần mang căn cước không» hỏi
+giữa lúc làm trợ cấp từng bị gợi ý chuyển sang thủ tục căn cước, nay có mô
+hình thì hỏi mô hình trước, chỉ gợi ý chuyển khi mô hình bảo ngoài kho.
+
+Chốt an toàn khi điền sẵn: mô hình phải trích nguyên văn câu bác nói làm
+bằng chứng cho từng điều kiện; đoạn trích phải có thật trong câu, không
+dùng chung cho hai câu, và phải có từ nội dung trùng với câu hỏi đó. Chốt
+này chặn đúng lỗi Saola điền bừa. 16 test với mô hình giả kiểm các đường
+đi này, không gọi mạng.
 
 ---
 
@@ -439,10 +464,10 @@ có dùng được để quyết định mời nói lại, nhưng không mạnh;
 
 ### 9.5 Kiểm thử tự động
 
-61 test, chạy dưới 4 giây, không cần mô hình nhận dạng và không gọi mạng:
+62 test, chạy dưới 4 giây, không cần mô hình nhận dạng và không gọi mạng:
 12 test giao kèo API, 24 test luồng 3 bước (cả 6 file kho tri thức đủ
 trường, rẽ nhánh đúng sơ đồ, ánh xạ lời nói sang lựa chọn, hỏi thêm không
-bịa, câu chào của giao diện khớp với chuỗi máy chủ sinh sẵn), 15 test mô
+bịa, câu chào của giao diện khớp với chuỗi máy chủ sinh sẵn), 16 test mô
 hình ngôn ngữ với mô hình giả (mục 7b), 10 test chuẩn hoá và tính WER.
 
 ### 9.6 Con số chưa có
@@ -495,9 +520,10 @@ ctranslate2 4.5.0 không nạp được trên Linux vì cờ executable stack (g
    tốt hơn Whisper gốc ở điều kiện tự nhiên.
 5. Tra cứu thủ tục bằng từ khoá; câu diễn đạt lạ chỉ nhận ra được khi bật
    mô hình ngôn ngữ (cần khoá trả phí). Chưa dùng embedding ngữ nghĩa.
-5b. Tầng mô hình ngôn ngữ chưa được đo trên khoá thật: chưa có số độ trễ,
-   chưa đọc kiểm câu trả lời sinh ra. Trong bài nói là «đã nối, kiểm bằng
-   mô hình giả, đang chờ khoá để đo».
+5b. Tầng mô hình ngôn ngữ đã đo trên khoá thật (mục 7b) nhưng mới trên 18
+   câu hỏi và 5 câu nói lạ do nhóm tự đặt, chưa phải người cao tuổi thật.
+   Mỗi lượt hỏi thêm mất 2 đến 3 giây và tốn khoảng 0,001 USD; mất mạng
+   hoặc hết số dư thì tự lùi về kho tĩnh.
 6. Kiosk không kết luận "chắc chắn được hưởng"; luôn nói "có khả năng thuộc
    diện" và cơ quan có thẩm quyền xem xét. Không đủ thông tin thì mời gặp
    cán bộ. Kho tri thức là 6 thủ tục thử nghiệm, không thay cơ sở dữ liệu
@@ -538,7 +564,8 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 23 commit từ 05/09 đến 16/09/2
 | b67f9e4 | Cập nhật TONG-HOP.md theo lần sửa 15/09 |
 | b53df86, 044fd9a | Sunny: sửa tài liệu và tên người kiểm chứng kho tri thức |
 | d7b545c | Bỏ cấu hình riêng của máy cá nhân khỏi repo |
-| (16/09) | Nối mô hình ngôn ngữ FPT AI Marketplace theo phản hồi giám khảo: nhớ ngữ cảnh, hiểu hoàn cảnh, trả lời ngoài FAQ, lời tự nhiên; API 2.1; 61 test |
+| f269f66 | Nối mô hình ngôn ngữ FPT AI Marketplace theo phản hồi giám khảo: nhớ ngữ cảnh, hiểu hoàn cảnh, trả lời ngoài FAQ, lời tự nhiên; API 2.1; 61 test |
+| (16/09) | Đo 5 mô hình trên khoá thật, chốt gemma-4-31B-it; chốt bằng chứng khi điền sẵn; sửa FAQ khớp bừa; hỏi mô hình trước gợi ý chuyển; config tự đọc .env; 62 test |
 
 Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 
@@ -580,6 +607,18 @@ Lần cập nhật 16/09/2026 (nối mô hình ngôn ngữ) thay đổi gì:
   hai thủ tục trợ cấp để luật điền sẵn bắt được.
 - Giao kèo API 2.1, chỉ thêm trường. Test từ 46 lên 61.
 
+Lần cập nhật 16/09/2026 (đo trên khoá thật) thay đổi gì:
+
+- Có khoá FPT AI Marketplace. Đo 5 mô hình trên 8 tác vụ của kiosk, chốt
+  `gemma-4-31B-it` làm mặc định (bảng mục 7b). Saola-Small-32B bị loại vì
+  điền bừa điều kiện và không nhận ra thủ tục từ câu lạ.
+- Chốt bằng chứng khi điền sẵn: mô hình phải trích nguyên văn, đoạn trích
+  phải có thật, không dùng chung, và nói về đúng chuyện câu hỏi.
+- Sửa FAQ khớp bừa theo từ rỗng và mẫu một từ; có mô hình thì hỏi mô hình
+  trước, chỉ gợi ý chuyển thủ tục khi mô hình bảo ngoài kho.
+- `app/config.py` tự đọc `.env` (trước đây README bảo chép `.env` nhưng
+  không có gì đọc file đó). Test từ 61 lên 62.
+
 ---
 
 ## 13. Việc còn lại và ai làm
@@ -592,8 +631,8 @@ Lần cập nhật 16/09/2026 (nối mô hình ngôn ngữ) thay đổi gì:
 | Đọc lại 24 câu hỏi bước 1 và 20 kết luận, đối chiếu văn bản | Mian | `data/kb/*.json` mục `flow.check` | cao |
 | Thêm FAQ sau mỗi buổi thử với người thật | Mian | `flow.faq` | vừa |
 | Sau mỗi lần sửa kho tri thức: chạy `python scripts/build_tts_cache.py` rồi commit cả `data/tts/` | Lia | `scripts/build_tts_cache.py` | cao, quên là câu mới không có tiếng |
-| Tạo khoá FPT AI Marketplace, đặt `FPT_API_KEY` trên Render và `.env`, nạp số dư | Lia | marketplace.fptcloud.com, My API Keys | cao nhất, không có thì tầng mô hình chưa chạy thật |
-| Đo tầng mô hình trên khoá thật: độ trễ mỗi chỗ gọi, đọc 20 câu trả lời sinh ra kiểm không bịa | Lia | `data/logs/turns.jsonl` có `via_llm` | cao |
+| Đặt `FPT_API_KEY` vào Environment trên Render (máy nhà đã có trong `.env`) | Lia | Render, Environment | cao nhất, không có thì bản trên mạng chạy kho tĩnh |
+| Thử tầng mô hình với 3 đến 5 người cao tuổi thật, ghi câu nào trả lời sai hoặc lạnh | cả nhóm | `data/logs/turns.jsonl` có `via_llm` | cao |
 | Thay tra cứu từ khoá bằng so khớp ngữ nghĩa (`Vietnamese_Embedding` trên cùng marketplace) | Kim | `app/kb.py`, hàm `score()` | vừa |
 | Tính ngưỡng tin cậy bằng hàm chi phí kỳ vọng | Kim | `config.KB_MATCH_THRESHOLD`, `ASR_CONFIDENCE_FLOOR` | vừa |
 | Thử với 3 đến 5 người cao tuổi thật, ghi thời gian hoàn thành và chỗ vấp | cả nhóm | | cao |

@@ -70,12 +70,34 @@ câu mời gặp cán bộ. FAQ khớp rõ thì vẫn lấy nguyên văn kho (c�
 không tốn lượt gọi. Mô hình hỏng, hết tiền, quá 12 giây: lùi về kho tĩnh,
 kiosk không treo.
 
-Bật: điền `FPT_API_KEY` vào `.env` (máy nhà) hoặc biến môi trường trên
-Render. `/health` trả `llm_enabled` và `llm_model`. Mặc định
-`LLM_MODEL=Saola-Small-32B` (mô hình tiếng Việt của FPT); đổi sang
-`DeepSeek-V4-Flash` hay `Qwen3.6-27B` nếu cần nhanh hơn. Câu mô hình sinh ra
-không có sẵn mp3 nên phải gọi Edge lúc đọc; hỏng thì rơi về giọng trình
-duyệt.
+Bật: điền `FPT_API_KEY` vào `.env` (máy nhà, `app/config.py` tự đọc file
+này) hoặc biến môi trường trên Render. `/health` trả `llm_enabled` và
+`llm_model`.
+
+**Chọn mô hình**: đo ngày 16/09/2026 trên khoá thật, cùng 8 tác vụ của kiosk:
+
+| Mô hình | Độ trễ | Điền sẵn từ lời kể | Nhận thủ tục từ câu lạ | Ngoài kho | Kết luận |
+|---|---|---|---|---|---|
+| **gemma-4-31B-it** | 0,3 đến 1,1 giây | đúng phần bác nói, không suy diễn | đúng | trả đúng mã | **mặc định** |
+| Saola-Small-32B | 0,2 đến 1,9 giây | điền bừa («công dân = có» dù bác không nói) | không nhận ra | trả lời thay vì báo ngoài kho | không dùng |
+| gemma-3-27b-it | 0,3 đến 1,6 giây | đúng | đúng | dài dòng | dự phòng |
+| DeepSeek-V4-Flash | 1 đến 11 giây | đúng | không | trả rỗng | chậm |
+| Qwen3.6-27B | 0,4 đến 2 giây | trả rỗng | trả rỗng | trả rỗng | không dùng |
+
+Sau khi chốt gemma-4-31B-it, chạy 18 câu hỏi thêm thực tế trên máy chủ
+(«mắt tôi kém, ai điền hộ được không», «con tôi ở xa nộp thay được không»,
+«lỡ họ từ chối thì sao», «cháu tên gì», «giá vàng hôm nay»): 16/18 trả lời
+đúng từ kho và có câu xác nhận hoàn cảnh, 2 câu ngoài kho mời gặp cán bộ,
+độ trễ trung bình 2,9 giây, tối đa 3,2 giây (prompt chứa cả kho tri thức
+của thủ tục, khoảng 2.500 token). 5/5 câu nói lạ nhận đúng thủ tục
+(«cháu ơi bà muốn có cái thẻ đi khám bệnh cho rẻ» ra bảo hiểm y tế).
+Chi phí: khoảng 0,001 USD một lượt hỏi.
+
+Hai chốt an toàn khi điền sẵn: mô hình phải trích nguyên văn câu bác nói làm
+bằng chứng cho từng điều kiện, đoạn trích phải có thật trong câu và phải nói
+về đúng chuyện câu hỏi hỏi («sống một mình» không phải bằng chứng cho «công
+dân Việt Nam»). Câu mô hình sinh ra không có sẵn mp3 nên phải gọi Edge lúc
+đọc; hỏng thì rơi về giọng trình duyệt.
 
 ## Phạm vi hỗ trợ
 
@@ -231,7 +253,7 @@ chỉ 1,6 giây — nên hạn giờ lúc hâm nóng (45 giây) để rộng hơ
 
 ```bash
 pip install -r requirements-dev.txt   # một lần, chỉ có pytest
-python -m pytest tests/ -q            # 61 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
+python -m pytest tests/ -q            # 62 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
 python -m app.normalize               # in bảng 10 câu trước/sau, ảnh cho mục 4.3
 ```
 

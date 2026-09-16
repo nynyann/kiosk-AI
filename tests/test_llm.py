@@ -18,6 +18,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 os.environ["MOCK"] = "1"
+# Test không bao giờ gọi mô hình thật: ghi đè khoá thành rỗng TRƯỚC khi
+# config đọc .env (config chỉ điền biến chưa có).
+os.environ["FPT_API_KEY"] = ""
 
 import pytest  # noqa: E402
 from fastapi.testclient import TestClient  # noqa: E402
@@ -77,9 +80,10 @@ def test_dien_san_bang_luat_khong_dung_co_khong_chung_chung():
 # --- 2. Có mô hình ------------------------------------------------------------
 def test_dien_san_va_xac_nhan_da_hieu_bang_mo_hinh(fake_llm):
     fake_llm('{"answers": {"age": "ge75", "pension": "no", "citizen": "yes"}, '
+             '"evidence": {"age": "76 tuổi", "pension": "chưa có lương hưu", "citizen": "người Việt"}, '
              '"ack": "Cháu hiểu rồi ạ, bác 76 tuổi, chưa có lương hưu và đang sống một mình."}')
     st = client.post("/flow/start", json={"procedure_id": HUU_TRI,
-                                          "utterance": "tôi 76 tuổi sống một mình chưa có lương hưu"}).json()
+                                          "utterance": "tôi 76 tuổi sống một mình chưa có lương hưu, người Việt"}).json()
     assert st["answers"] == {"age": "ge75", "pension": "no", "citizen": "yes"}
     assert st["question"]["id"] == "bhxh"
     assert st["ack"].startswith("Cháu hiểu rồi ạ")
@@ -87,9 +91,24 @@ def test_dien_san_va_xac_nhan_da_hieu_bang_mo_hinh(fake_llm):
     assert len(st["prefilled"]) == 3
 
 
+def test_mo_hinh_dien_ma_khong_co_bang_chung_thi_bo(fake_llm):
+    """Saola từng tự điền «công dân = có», «BHXH = không» dù bác không nói.
+    Bằng chứng phải là đoạn có thật trong câu bác nói, và không dùng chung."""
+    fake_llm('{"answers": {"age": "ge75", "citizen": "yes", "bhxh": "no", "pension": "no"}, '
+             '"evidence": {"age": "76 tuổi", "citizen": "", "bhxh": "không có lương hưu", "pension": "không có lương hưu"}, '
+             '"ack": "Cháu hiểu rồi ạ."}')
+    st = client.post("/flow/start", json={"procedure_id": HUU_TRI,
+                                          "utterance": "tôi 76 tuổi không có lương hưu"}).json()
+    # citizen: không bằng chứng; bhxh: dùng chung bằng chứng với câu trước nó.
+    assert st["answers"] == {"age": "ge75", "bhxh": "no"} or st["answers"] == {"age": "ge75", "pension": "no"}
+    assert "citizen" not in st["answers"]
+    assert not ("bhxh" in st["answers"] and "pension" in st["answers"])
+
+
 def test_mo_hinh_khong_duoc_dien_gia_tri_ngoai_lua_chon(fake_llm):
-    fake_llm('{"answers": {"age": "76", "pension": "no", "bua": "x"}, "ack": "Cháu hiểu rồi ạ."}')
-    st = client.post("/flow/start", json={"procedure_id": HUU_TRI, "utterance": "tôi 76 tuổi"}).json()
+    fake_llm('{"answers": {"age": "76", "pension": "no", "bua": "x"}, '
+             '"evidence": {"age": "76 tuổi", "pension": "không có lương hưu", "bua": "76"}, "ack": "Cháu hiểu rồi ạ."}')
+    st = client.post("/flow/start", json={"procedure_id": HUU_TRI, "utterance": "tôi 76 tuổi không có lương hưu"}).json()
     assert st["answers"] == {"pension": "no"}          # "76" và "bua" bị bỏ
 
 
@@ -161,10 +180,16 @@ def test_mo_hinh_bao_ngoai_kho_thi_moi_gap_can_bo(fake_llm):
     assert d["matched"] is False and d["via_llm"] is False and "cán bộ" in d["answer"]
 
 
-def test_thu_tuc_khac_van_goi_y_chuyen_truoc_khi_hoi_mo_hinh(fake_llm):
-    calls = fake_llm("không được dùng")
+def test_thu_tuc_khac_thi_hoi_mo_hinh_truoc_ngoai_kho_moi_goi_y_chuyen(fake_llm):
+    """«cần mang căn cước không» hỏi giữa lúc làm trợ cấp là hỏi về trợ cấp:
+    mô hình trả lời được thì KHÔNG gợi ý chuyển. Câu thật sự về thủ tục khác
+    thì mô hình bảo ngoài kho, lúc đó mới gợi ý chuyển."""
+    calls = fake_llm("Dạ, bác chỉ mang căn cước công dân để cán bộ đối chiếu khi được yêu cầu thôi ạ.")
+    d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "cần mang căn cước không"}).json()
+    assert d["via_llm"] is True and d["switch_to"] is None and len(calls) == 1
+    fake_llm(llm.NOT_IN_KB)
     d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "làm căn cước công dân cần giấy tờ gì"}).json()
-    assert d["switch_to"] == "cap-the-can-cuoc" and calls == []
+    assert d["switch_to"] == "cap-the-can-cuoc" and d["via_llm"] is False
 
 
 # --- 3. Kho tri thức phẳng cho prompt -----------------------------------------

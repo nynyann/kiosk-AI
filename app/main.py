@@ -183,7 +183,9 @@ def warmup():
 @app.post("/kb/reload")
 def kb_reload():
     """Nạp lại 6 file JSON sau khi Mian sửa nội dung, không phải khởi động lại."""
-    return {"ok": True, "procedures": len(kb.load_kb())}
+    n = len(kb.load_kb())
+    tts.forget_known_texts()
+    return {"ok": True, "procedures": n}
 
 
 async def _recognize(text: str, session_id: Optional[str]) -> AnswerResult:
@@ -498,11 +500,20 @@ async def flow_ask(
     res = flow.answer_question(proc, text)
     res.asr = a
     strong_faq = res.matched and res.match_score >= 0.8
-    if llm.enabled() and (text or "").strip() and not res.switch_to and not strong_faq:
+    if llm.enabled() and (text or "").strip() and not strong_faq:
+        # Có mô hình thì hỏi mô hình TRƯỚC cả gợi ý chuyển thủ tục: «cần mang
+        # căn cước không» hỏi giữa lúc làm trợ cấp là hỏi về trợ cấp, không
+        # phải muốn chuyển sang làm căn cước. Mô hình đọc cả kho mà bảo không
+        # có thì mới tới gợi ý chuyển (nếu có) hoặc câu mời gặp cán bộ.
         out = await llm.answer_from_kb(proc, text, prev, utterance or "", hist, stage or "")
         if out and out != llm.NOT_IN_KB:
             res.answer, res.speech, res.matched, res.via_llm = out, flow.for_speech(out), True, True
             res.match_score = max(res.match_score, 0.5)
+            res.switch_to, res.switch_name = None, None
+        elif out == llm.NOT_IN_KB and not res.switch_to and res.matched and res.match_score < 0.8:
+            # FAQ khớp lờ mờ theo vài từ cũng không đáng tin nữa.
+            res.matched, res.match_score = False, 0.0
+            res.answer, res.speech = flow.ASK_FALLBACK_TEXT, flow.for_speech(flow.ASK_FALLBACK_TEXT)
     _log_turn({"session": session_id, "flow": "ask", "procedure": proc["id"],
                "query": res.question, "matched": res.matched, "score": res.match_score,
                "switch_to": res.switch_to, "via_llm": res.via_llm})

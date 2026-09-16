@@ -7,6 +7,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 KB_DIR = DATA_DIR / "kb"
 
+
+def _load_dotenv(path: Path) -> None:
+    """Đọc file .env ở gốc repo vào biến môi trường, biến nào đã có thì giữ.
+
+    Trước đây README bảo «chép .env.example thành .env» nhưng không có gì đọc
+    file đó cả (uvicorn không tự đọc), nên khoá đặt trong .env bị bỏ qua mà
+    không ai biết. Không dùng thư viện python-dotenv để khỏi thêm phụ thuộc.
+    """
+    if not path.is_file():
+        return
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
+_load_dotenv(BASE_DIR / ".env")
+
 # --- Chế độ chạy ------------------------------------------------------------
 # MOCK=1  -> máy chủ giả, trả dữ liệu mẫu cố định, không nạp mô hình.
 #            Dùng cho Kns làm giao diện và cho lần triển khai đầu tiên.
@@ -90,9 +110,14 @@ TTS_CACHE_DIR = Path(os.getenv("TTS_CACHE_DIR", str(DATA_DIR / "tts")))
 # số dư lớn hơn 0 mới gọi được.
 FPT_API_KEY = os.getenv("FPT_API_KEY", "").strip()
 FPT_BASE_URL = os.getenv("FPT_BASE_URL", "https://mkp-api.fptcloud.com")
-# Tên mô hình đúng như hiện trên marketplace. Saola-Small-32B là mô hình tiếng
-# Việt của FPT; đổi sang DeepSeek-V4-Flash hay Qwen3.6-27B nếu cần nhanh hơn.
-LLM_MODEL = os.getenv("LLM_MODEL", "Saola-Small-32B")
+# Tên mô hình đúng như hiện trên marketplace. Đo ngày 16/09/2026 trên 4 tác vụ
+# của kiosk (điền sẵn từ lời kể, nhận thủ tục, hiểu câu trả lời tự do, trả
+# lời từ kho): gemma-4-31B-it 0,3-1,1 giây, điền đúng phần bác nói, không suy
+# diễn, câu ngoài kho trả đúng mã; Saola-Small-32B 0,2-1,5 giây nhưng điền
+# bừa (tự cho «công dân = có») và không nhận ra thủ tục; DeepSeek-V4-Flash
+# 1-11 giây; Qwen3.6-27B trả rỗng. Giá gemma-4-31B-it 0,15/0,45 USD mỗi
+# triệu token, rẻ ngang Saola.
+LLM_MODEL = os.getenv("LLM_MODEL", "gemma-4-31B-it")
 # Người dân đang đứng chờ: quá hạn thì lùi về câu trả lời tĩnh, không treo.
 LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "12"))
 

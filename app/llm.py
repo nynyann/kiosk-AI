@@ -82,6 +82,30 @@ async def chat(messages: List[dict], *, max_tokens: int = 300, temperature: floa
         return None
 
 
+def _flat_text(s: str) -> str:
+    """Bỏ dấu, hạ chữ thường, gộp khoảng trắng: so «bảy mươi sáu tuổi» với
+    «Bảy Mươi Sáu Tuổi» mà mô hình hay viết hoa lại."""
+    import unicodedata
+    nfd = unicodedata.normalize("NFD", (s or "").lower())
+    t = "".join(c for c in nfd if unicodedata.category(c) != "Mn").replace("đ", "d")
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", " ", t)).strip()
+
+
+# Từ không mang nội dung, bỏ khi so bằng chứng với câu hỏi.
+_STOP = set("toi bac chau co khong phai la a dang hien nay nam bao nhieu gi thi ma va hay hoac cua o roi da se den tu".split())
+
+
+def _topic_words(q: dict) -> set:
+    """Từ nội dung của một câu hỏi: lấy từ câu hỏi, nhãn và cụm gợi ý của các
+    lựa chọn. Dùng để kiểm bằng chứng mô hình trích có nói về chuyện đó không."""
+    words = set(_flat_text(q.get("text", "")).split())
+    for o in q.get("options", []):
+        words |= set(_flat_text(o.get("label", "")).split())
+        for m in o.get("match") or []:
+            words |= set(_flat_text(m).split())
+    return {w for w in words if len(w) > 1 and w not in _STOP}
+
+
 def _json_block(text: str) -> Optional[dict]:
     """Lấy khối JSON đầu tiên trong câu trả lời, kể cả khi mô hình bọc ```json."""
     if not text:
@@ -193,20 +217,38 @@ async def prefill_from_utterance(proc: dict, utterance: str) -> Optional[dict]:
         f"{kb_context(proc)}\n\n"
         f"Người dân vừa nói: «{utterance}»\n\n"
         "Nhiệm vụ: với từng câu hỏi điều kiện ở trên, nếu câu người dân nói CHO BIẾT RÕ câu trả lời "
-        "thì ghi giá trị lựa chọn tương ứng; không rõ thì bỏ qua, KHÔNG suy đoán. "
+        "thì ghi giá trị lựa chọn tương ứng kèm đoạn TRÍCH NGUYÊN VĂN trong câu người dân làm bằng chứng; "
+        "không có đoạn nào nói rõ thì bỏ qua, KHÔNG suy đoán (ví dụ bác không nói gì về quốc tịch thì "
+        "không điền công dân). "
         "Rồi viết một câu ngắn, ấm áp, xác nhận cháu đã hiểu hoàn cảnh bác vừa kể (nhắc lại đúng những "
         "gì bác nói, không thêm), không hứa hẹn kết quả.\n"
-        "Trả lời DUY NHẤT một JSON: {\"answers\": {\"<id câu hỏi>\": \"<value>\"}, \"ack\": \"<câu xác nhận>\"}"
+        "Trả lời DUY NHẤT một JSON: {\"answers\": {\"<id câu hỏi>\": \"<value>\"}, "
+        "\"evidence\": {\"<id câu hỏi>\": \"<trích nguyên văn>\"}, \"ack\": \"<câu xác nhận>\"}"
     )
     text = await chat([{"role": "system", "content": STYLE}, {"role": "user", "content": prompt}],
-                      max_tokens=300, temperature=0.1)
+                      max_tokens=350, temperature=0.1)
     data = _json_block(text or "")
     if not data:
         return None
+    # Chốt an toàn: mỗi câu điền sẵn phải có bằng chứng là một đoạn CÓ THẬT
+    # trong câu bác nói, và hai câu không được dùng chung một bằng chứng. Đo
+    # 16/09: Saola tự điền «công dân = có», «BHXH = không» dù bác không nói;
+    # chốt này chặn đúng kiểu đó.
+    uf = _flat_text(utterance)
+    evidence = data.get("evidence") or {}
+    topic = {q["id"]: _topic_words(q) for q in qs}
+    used = set()
     answers = {}
     for k, v in (data.get("answers") or {}).items():
-        if k in valid and v in valid[k]:
-            answers[k] = v
+        ev = _flat_text(str(evidence.get(k) or ""))
+        if not (k in valid and v in valid[k] and ev and ev in uf and ev not in used):
+            continue
+        # Bằng chứng phải nói về đúng chuyện câu hỏi hỏi: «sống một mình» không
+        # phải bằng chứng cho «công dân Việt Nam» (Saola từng trả đúng thế).
+        if not (set(ev.split()) & topic[k]):
+            continue
+        answers[k] = v
+        used.add(ev)
     ack = str(data.get("ack") or "").strip()
     if not answers and not ack:
         return None
@@ -273,9 +315,12 @@ async def answer_from_kb(proc: dict, question: str, answers: Dict[str, str],
         f"NGỮ CẢNH PHIÊN NÀY:\n{citizen_context(proc, answers, utterance, history, stage)}\n\n"
         f"Bác hỏi: «{question}»\n\n"
         "Trả lời bác bằng lời tự nhiên, tối đa 3 câu, dựa ĐÚNG vào kho tri thức và ngữ cảnh ở trên; "
-        "nếu bác kể thêm hoàn cảnh thì xác nhận đã hiểu trước khi hướng dẫn. "
+        "nếu bác kể thêm hoàn cảnh (mắt kém, chân yếu, ở xa, con cháu giúp) thì xác nhận đã hiểu rồi "
+        "chỉ ra phần nào trong kho giúp được bác (ví dụ cách nộp qua bưu điện, trực tuyến, nhờ cán bộ "
+        "hướng dẫn điền). Kho có thông tin liên quan gần thì cứ dùng, không cần khớp từng chữ. "
         "Tuyệt đối không thêm giấy tờ, điều kiện, con số hay mức tiền không có trong kho. "
-        f"Nếu kho không có thông tin để trả lời, chỉ trả đúng chuỗi {NOT_IN_KB}."
+        f"Chỉ khi câu hỏi hoàn toàn không liên quan tới thủ tục này, hoặc kho không có gì gần với "
+        f"điều bác hỏi, mới trả đúng chuỗi {NOT_IN_KB}."
     )
     text = await chat([{"role": "system", "content": STYLE}, {"role": "user", "content": prompt}],
                       max_tokens=260, temperature=0.3)

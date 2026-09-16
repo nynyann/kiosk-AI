@@ -64,6 +64,26 @@ def _to_disk(text: str, voice: str, audio: bytes) -> None:
         print(f"[tts] không ghi được kho đĩa: {exc}")
 
 
+_known: set | None = None
+
+
+def _known_texts() -> set:
+    global _known
+    if _known is None:
+        from . import kb  # tránh import vòng
+        try:
+            _known = set(kb.all_speech_texts())
+        except Exception:  # noqa: BLE001
+            _known = set()
+    return _known
+
+
+def forget_known_texts() -> None:
+    """Gọi sau khi nạp lại kho tri thức."""
+    global _known
+    _known = None
+
+
 def cache_info() -> dict:
     on_disk = len(list(config.TTS_CACHE_DIR.glob("*.mp3"))) if config.TTS_CACHE_DIR.is_dir() else 0
     return {"entries": len(_cache),
@@ -150,7 +170,10 @@ async def synthesize(text: str, voice: str | None = None,
     except Exception as exc:  # noqa: BLE001
         print(f"[tts] hỏng ({type(exc).__name__}): {exc}")
         raise TtsError("Máy chưa đọc thành tiếng được.", "tts_failed") from exc
-    _to_disk(text, voice, audio)
+    # Chỉ ghi xuống đĩa những câu có trong kho (để đi theo repo). Câu do mô
+    # hình ngôn ngữ sinh ra mỗi lần mỗi khác, ghi đĩa chỉ rác thư mục.
+    if text in _known_texts():
+        _to_disk(text, voice, audio)
     _cache[k] = audio
     while len(_cache) > config.TTS_CACHE_SIZE:
         _cache.popitem(last=False)

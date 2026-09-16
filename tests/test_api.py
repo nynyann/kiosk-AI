@@ -16,6 +16,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 # Phải bật chế độ giả TRƯỚC khi import app, vì app đọc config lúc nạp module.
 os.environ["MOCK"] = "1"
+# Test không bao giờ gọi mô hình thật: ghi đè khoá thành rỗng TRƯỚC khi
+# config đọc .env (config chỉ điền biến chưa có).
+os.environ["FPT_API_KEY"] = ""
 
 from fastapi.testclient import TestClient  # noqa: E402
 
