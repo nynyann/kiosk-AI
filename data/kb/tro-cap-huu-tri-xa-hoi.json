@@ -291,6 +291,17 @@
     "faq": [
       {
         "q": [
+          "mẫu số 01 điền thế nào",
+          "kê khai thế nào",
+          "điền đơn thế nào",
+          "cách viết đơn",
+          "mẫu số 01 là gì",
+          "trong mẫu có những gì"
+        ],
+        "a": "Mẫu số 01 là văn bản đề nghị hưởng trợ cấp hưu trí xã hội. Bác điền họ tên, ngày sinh, số định danh, nơi ở, ghi rõ không nhận lương hưu hay trợ cấp bảo hiểm xã hội, chọn nhận tiền mặt hay qua tài khoản, rồi ký tên. Chỗ nào không rõ bác để trống, cán bộ tại nơi nộp sẽ hướng dẫn hoặc điền giúp rồi đọc lại cho bác nghe."
+      },
+      {
+        "q": [
           "hơn 75 tuổi có được nhận trợ cấp không",
           "có được nhận trợ cấp không",
           "có được hưởng không",
@@ -339,6 +350,24 @@
         ],
         "a": "Mức trợ cấp do Chính phủ quy định và có thể được điều chỉnh. Cháu không nêu con số để tránh sai, bác hỏi cán bộ tiếp nhận để biết mức hiện hành."
       }
+    ],
+    "forms": [
+      {
+        "name": "Mẫu số 01 (Văn bản đề nghị hưởng trợ cấp hưu trí xã hội, Nghị định 176/2025/NĐ-CP)",
+        "how": "Xin mẫu tại Trung tâm Phục vụ hành chính công cấp xã, hoặc nhờ cán bộ in. Bác điền bằng bút mực, viết chữ in hoa cho rõ, chỗ nào không biết thì để trống rồi hỏi cán bộ, không đoán. Mắt kém hoặc không biết chữ thì nói với cán bộ, cán bộ điền giúp rồi đọc lại cho bác nghe trước khi ký.",
+        "fields": [
+          "Kính gửi: Chủ tịch Uỷ ban nhân dân xã, phường nơi bác đang ở",
+          "Họ và tên của bác, viết đúng như trên căn cước",
+          "Ngày tháng năm sinh, giới tính",
+          "Số định danh cá nhân (12 số trên căn cước)",
+          "Nơi cư trú hiện nay (thôn, xã, tỉnh)",
+          "Tình trạng hưởng lương hưu hoặc trợ cấp bảo hiểm xã hội hằng tháng: ghi «không» nếu bác không nhận",
+          "Trường hợp từ 70 đến dưới 75 tuổi: ghi thuộc hộ nghèo hay hộ cận nghèo",
+          "Hình thức nhận trợ cấp: nhận tiền mặt tại xã hay chuyển vào tài khoản ngân hàng (ghi số tài khoản nếu chọn)",
+          "Cam đoan thông tin đúng sự thật, ký và ghi rõ họ tên, ghi ngày tháng"
+        ],
+        "note": "Các mục trên tóm tắt theo mẫu; mẫu in tại nơi nộp là bản chính thức, có mục nào khác thì bác làm theo mẫu in và hỏi cán bộ."
+      }
     ]
   },
   "source": {
@@ -346,5 +375,6 @@
     "url": "https://dichvucong.gov.vn/"
   },
   "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.1",
-  "verified_date": "2026-09-11"
+  "verified_date": "2026-09-11",
+  "forms_note": "Mục flow.forms tóm tắt các mục của mẫu ở mức người dân cần biết trước khi đến; Mian đối chiếu với mẫu in kèm Nghị định rồi ghi ngày kiểm chứng."
 }

@@ -40,6 +40,8 @@ class Source(BaseModel):
 class AnswerRequest(BaseModel):
     text: str
     session_id: Optional[str] = None
+    # Xưng hô bác chọn trên màn hình: bác, ông, bà, cô, chú, anh, chị.
+    pronoun: Optional[str] = None
 
 
 class AnswerResult(BaseModel):
@@ -58,6 +60,9 @@ class AnswerResult(BaseModel):
     speech: str = ""
     # true khi thủ tục do mô hình ngôn ngữ nhận ra (tra từ khoá không bắt được).
     via_llm: bool = False
+    # Các thủ tục có thể là điều bác cần, chắc nhất trước (tối đa 3). Giao diện
+    # đưa ra cho bác chọn khi câu nói ứng với nhiều thủ tục.
+    candidates: List["ProcedureSummary"] = []
     # Câu ngắn để máy hỏi lại «Cháu hiểu bác cần làm thủ tục X. Đúng không ạ?»
     # trước khi vào luồng từng bước. Giao diện 2.0 đọc câu này thay vì `speech`.
     confirm: str = ""
@@ -199,6 +204,7 @@ class PrefilledAnswer(BaseModel):
 class FlowStartRequest(BaseModel):
     procedure_id: str
     session_id: Optional[str] = None
+    pronoun: Optional[str] = None
     # Câu bác nói lúc mở đầu («tôi 76 tuổi, không có lương hưu…»). Máy đọc để
     # điền sẵn điều kiện và xác nhận đã hiểu, không bắt bác nói lại.
     utterance: Optional[str] = None
@@ -210,6 +216,7 @@ class FlowAnswerRequest(BaseModel):
     question_id: str
     value: str
     session_id: Optional[str] = None
+    pronoun: Optional[str] = None
 
 
 class FlowNextRequest(BaseModel):
@@ -218,6 +225,7 @@ class FlowNextRequest(BaseModel):
     answers: dict = {}
     stage: str
     session_id: Optional[str] = None
+    pronoun: Optional[str] = None
 
 
 class FlowAskResult(BaseModel):
@@ -236,3 +244,7 @@ class FlowAskResult(BaseModel):
     # true khi câu trả lời do mô hình ngôn ngữ viết từ kho tri thức (câu hỏi
     # diễn đạt khác FAQ). false là lấy nguyên văn từ kho.
     via_llm: bool = False
+
+
+AnswerResult.model_rebuild()
+FlowState.model_rebuild()

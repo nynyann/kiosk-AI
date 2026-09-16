@@ -128,6 +128,12 @@ STYLE = ("Bạn là kiosk hướng dẫn thủ tục hành chính đặt tại b
          "ngắn gọn, mỗi câu trả lời tối đa 3 câu, không dùng từ chuyên ngành khi có từ thường. "
          "Không bao giờ kết luận \"chắc chắn được hưởng\"; dùng \"có khả năng thuộc diện\" và nói "
          "cơ quan có thẩm quyền sẽ xem xét.")
+# Máy chủ vẫn sinh mọi câu với cặp «bác / cháu»; xưng hô bác chọn trên màn
+# hình được thay vào sau bằng flow.personalize(), cho cả câu tĩnh lẫn câu mô
+# hình. Nhờ vậy kho mp3 và cache đều theo một bản duy nhất.
+# Máy chủ vẫn sinh mọi câu với cặp «bác / cháu»; xưng hô bác chọn trên màn
+# hình được thay vào sau bằng flow.personalize(), cho cả câu tĩnh lẫn câu mô
+# hình. Nhờ vậy kho mp3 và cache đều theo một bản duy nhất.
 
 
 def kb_context(proc: dict) -> str:
@@ -152,6 +158,12 @@ def kb_context(proc: dict) -> str:
         lines.append("CHUẨN BỊ: " + prep["say"])
     for t in prep.get("tips") or []:
         lines.append("- " + t)
+    for f in fl.get("forms") or []:
+        lines.append(f"CÁCH KÊ KHAI {f.get('name')}: {f.get('how') or ''}")
+        for i, fld in enumerate(f.get("fields") or [], 1):
+            lines.append(f"  {i}. {fld}")
+        if f.get("note"):
+            lines.append("  Lưu ý: " + f["note"])
     sub = fl.get("submit") or {}
     lines.append("NƠI NỘP: " + "; ".join(sub.get("places") or [proc.get("where_to_submit") or ""]))
     if sub.get("methods"):
@@ -258,25 +270,39 @@ async def prefill_from_utterance(proc: dict, utterance: str) -> Optional[dict]:
 # ---------------------------------------------------------------------------
 # 2. Nhận ra thủ tục khi tra từ khoá không bắt được
 # ---------------------------------------------------------------------------
-async def pick_procedure(utterance: str, procedures: List[dict]) -> Optional[str]:
-    """Trả mã thủ tục hoặc None. Dùng khi kb.search dưới ngưỡng, để câu diễn
-    đạt lạ («tôi già rồi nhà nước có cho tiền không») vẫn vào được luồng."""
+async def pick_procedures(utterance: str, procedures: List[dict]) -> List[str]:
+    """Trả danh sách mã thủ tục có thể là điều bác cần, xếp theo độ chắc, tối
+    đa 3, rỗng nếu không cái nào. Dùng khi kb.search dưới ngưỡng, để câu diễn
+    đạt lạ («tôi già rồi nhà nước có cho tiền không») vẫn vào được luồng; và
+    để giao diện đưa ra vài thủ tục cho bác chọn khi câu nói ứng với nhiều
+    thủ tục («tôi muốn xin trợ cấp» có thể là hưu trí xã hội hoặc xã hội
+    hằng tháng)."""
     if not enabled() or not (utterance or "").strip():
-        return None
+        return []
     menu = "\n".join(f"- {p['id']}: {p.get('name')} ({p.get('short') or ''}). Người dân hay gọi: "
                      + "; ".join((p.get("aliases") or [])[:6]) for p in procedures)
     prompt = (
         f"Danh sách thủ tục kiosk hỗ trợ:\n{menu}\n\n"
         f"Người dân nói: «{utterance}»\n\n"
-        "Người dân đang cần thủ tục nào? Chỉ chọn khi khá chắc; không rõ hoặc không thuộc danh sách "
-        "thì trả \"none\". Trả lời DUY NHẤT một JSON: {\"procedure_id\": \"<id hoặc none>\"}"
+        "Người dân có thể đang cần thủ tục nào? Liệt kê tối đa 3 mã, chắc nhất trước; chỉ liệt kê "
+        "những cái thật sự có thể; không cái nào thì trả danh sách rỗng. "
+        "Trả lời DUY NHẤT một JSON: {\"procedure_ids\": [\"<id>\", ...]}"
     )
     text = await chat([{"role": "system", "content": STYLE}, {"role": "user", "content": prompt}],
-                      max_tokens=60, temperature=0.0)
+                      max_tokens=80, temperature=0.0)
     data = _json_block(text or "")
-    pid = (data or {}).get("procedure_id")
     ids = {p["id"] for p in procedures}
-    return pid if pid in ids else None
+    out = []
+    for pid in (data or {}).get("procedure_ids") or []:
+        if pid in ids and pid not in out:
+            out.append(pid)
+    return out[:3]
+
+
+async def pick_procedure(utterance: str, procedures: List[dict]) -> Optional[str]:
+    """Mã thủ tục chắc nhất, hoặc None. Giữ cho chỗ nào chỉ cần một."""
+    got = await pick_procedures(utterance, procedures)
+    return got[0] if got else None
 
 
 # ---------------------------------------------------------------------------
@@ -317,15 +343,28 @@ async def answer_from_kb(proc: dict, question: str, answers: Dict[str, str],
         "Trả lời bác bằng lời tự nhiên, tối đa 3 câu, dựa ĐÚNG vào kho tri thức và ngữ cảnh ở trên; "
         "nếu bác kể thêm hoàn cảnh (mắt kém, chân yếu, ở xa, con cháu giúp) thì xác nhận đã hiểu rồi "
         "chỉ ra phần nào trong kho giúp được bác (ví dụ cách nộp qua bưu điện, trực tuyến, nhờ cán bộ "
-        "hướng dẫn điền). Kho có thông tin liên quan gần thì cứ dùng, không cần khớp từng chữ. "
-        "Tuyệt đối không thêm giấy tờ, điều kiện, con số hay mức tiền không có trong kho. "
-        f"Chỉ khi câu hỏi hoàn toàn không liên quan tới thủ tục này, hoặc kho không có gì gần với "
-        f"điều bác hỏi, mới trả đúng chuỗi {NOT_IN_KB}."
+        "hướng dẫn điền, cách kê khai từng mục của mẫu). Kho có thông tin liên quan gần thì cứ dùng, "
+        "không cần khớp từng chữ. Tuyệt đối không thêm giấy tờ, điều kiện, con số hay mức tiền không "
+        "có trong kho.\n"
+        "Nếu câu hỏi không liên quan tới thủ tục này, hoặc kho không có gì gần với điều bác hỏi, hoặc "
+        "câu nghe không thành nghĩa (máy nghe nhầm), thì KHÔNG trả lời nội dung; thay vào đó viết 1 đến "
+        "2 câu tử tế: nói cháu là máy hướng dẫn thủ tục nên chỉ giúp được về thủ tục này, câu này bác "
+        "hỏi cán bộ tiếp nhận giúp cháu, hoặc mời bác nói lại rõ hơn nếu câu nghe không thành nghĩa. "
+        "Không được bịa thông tin trong câu này.\n"
+        "Trả lời DUY NHẤT một JSON: {\"in_kb\": true hoặc false, \"answer\": \"<câu trả lời>\"}"
     )
     text = await chat([{"role": "system", "content": STYLE}, {"role": "user", "content": prompt}],
-                      max_tokens=260, temperature=0.3)
+                      max_tokens=300, temperature=0.3)
     if text is None:
         return None
-    if NOT_IN_KB in text:
-        return NOT_IN_KB
-    return text.strip().strip('"')
+    data = _json_block(text)
+    if not data or not str(data.get("answer") or "").strip():
+        # Mô hình không theo định dạng: vẫn dùng chữ thô nếu có, coi là trong kho.
+        raw = text.strip().strip('"')
+        return NOT_IN_KB if NOT_IN_KB in raw else (raw or None)
+    ans = str(data["answer"]).strip()
+    if not data.get("in_kb", True):
+        # Câu ngoài kho nhưng đã có lời đáp tử tế: gắn mã ở đầu để máy chủ
+        # biết, và vẫn dùng lời đó thay câu cứng.
+        return NOT_IN_KB + "\n" + ans
+    return ans

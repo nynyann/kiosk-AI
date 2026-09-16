@@ -345,6 +345,16 @@
     "faq": [
       {
         "q": [
+          "tờ khai điền thế nào",
+          "kê khai thế nào",
+          "mẫu nào",
+          "trong tờ khai có những gì",
+          "điền đơn thế nào"
+        ],
+        "a": "Mỗi trường hợp (hưởng mới, điều chỉnh, thôi hưởng) có một mẫu tờ khai riêng, bác nói với cán bộ xã để được đưa đúng mẫu. Trong tờ khai bác điền họ tên, ngày sinh, số định danh, nơi ở, hoàn cảnh gia đình, tình trạng lương hưu hay trợ cấp đang nhận, nội dung đề nghị, cách nhận tiền, rồi ký tên. Chỗ nào không rõ bác để trống, cán bộ sẽ hướng dẫn hoặc điền giúp."
+      },
+      {
+        "q": [
           "khác trợ cấp hưu trí xã hội chỗ nào",
           "khác hưu trí xã hội",
           "trợ cấp hưu trí"
@@ -382,6 +392,22 @@
         ],
         "a": "Mức trợ cấp tuỳ từng nhóm đối tượng và do quy định hiện hành ấn định. Cháu không nêu con số để tránh sai, bác hỏi cán bộ tiếp nhận để biết mức áp dụng cho trường hợp của mình."
       }
+    ],
+    "forms": [
+      {
+        "name": "Tờ khai của đối tượng (theo mẫu tại Nghị định 20/2021/NĐ-CP, mỗi nhóm đối tượng một mẫu)",
+        "how": "Xin đúng mẫu tại Uỷ ban nhân dân xã: bác nói rõ mình xin mới, điều chỉnh hay thôi hưởng và thuộc nhóm nào, cán bộ đưa đúng mẫu. Điền bằng bút mực, chữ in hoa; chỗ nào không rõ để trống rồi hỏi cán bộ. Mắt kém hoặc không biết chữ thì nói với cán bộ, cán bộ điền giúp rồi đọc lại cho bác nghe trước khi ký.",
+        "fields": [
+          "Họ và tên, ngày tháng năm sinh, giới tính, viết đúng như trên căn cước",
+          "Số định danh cá nhân, nơi cư trú hiện nay",
+          "Hoàn cảnh gia đình: sống cùng ai, có người phụng dưỡng không, thuộc hộ nghèo hay cận nghèo",
+          "Tình trạng hưởng lương hưu, trợ cấp bảo hiểm xã hội hoặc trợ cấp khác",
+          "Nội dung đề nghị: hưởng mới, điều chỉnh (ghi rõ nội dung cần điều chỉnh) hay thôi hưởng",
+          "Hình thức nhận trợ cấp: tiền mặt hay tài khoản ngân hàng",
+          "Cam đoan, ký và ghi rõ họ tên, ghi ngày tháng"
+        ],
+        "note": "Các mục trên tóm tắt theo mẫu; mẫu in tại nơi nộp là bản chính thức, có mục nào khác thì bác làm theo mẫu in và hỏi cán bộ."
+      }
     ]
   },
   "source": {
@@ -389,5 +415,6 @@
     "url": "https://dichvucong.gov.vn/"
   },
   "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.2",
-  "verified_date": "2026-09-11"
+  "verified_date": "2026-09-11",
+  "forms_note": "Mục flow.forms tóm tắt các mục của mẫu ở mức người dân cần biết trước khi đến; Mian đối chiếu với mẫu in kèm Nghị định rồi ghi ngày kiểm chứng."
 }

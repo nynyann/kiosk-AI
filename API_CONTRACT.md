@@ -1,6 +1,6 @@
 # Giao kèo API — Kiosk hướng dẫn thủ tục hành chính
 
-Phiên bản 2.1 — chốt ngày 16/09/2026. **Chốt rồi không đổi tên trường nữa.**
+Phiên bản 2.2 — chốt ngày 17/09/2026. **Chốt rồi không đổi tên trường nữa.**
 
 Đổi so với 1.0, **chỉ thêm, không đổi và không bỏ trường nào**, nên giao diện
 viết theo 1.0 vẫn chạy nguyên:
@@ -19,6 +19,12 @@ viết theo 1.0 vẫn chạy nguyên:
   `via_llm`; `/flow/start` nhận thêm `utterance` và trả `ack`, `prefilled`;
   `/flow/ask` nhận thêm `answers`, `utterance`, `history`, `stage` và trả
   `via_llm`. Không có khoá thì mọi trường mới rỗng và máy chạy như 2.0.
+- 2.2: mọi đường dẫn nhận thêm `pronoun` (bác, ông, bà, cô, chú, anh, chị;
+  JSON hoặc form tuỳ đường dẫn), máy chủ thay xưng hô trong mọi chuỗi trả
+  về, kể cả `speech`. `/answer`, `/turn` trả thêm `candidates` (tối đa 3
+  thủ tục có thể là điều bác cần, chắc nhất trước) để giao diện đưa ra cho
+  bác chọn. Kho tri thức thêm mục `flow.forms` (cách kê khai từng mục của
+  mẫu), mô hình đọc được khi bác hỏi «mẫu này điền thế nào».
 Nếu buộc phải đổi, tăng số phiên bản và báo trong nhóm chat trước khi đẩy code.
 
 Địa chỉ máy chủ:

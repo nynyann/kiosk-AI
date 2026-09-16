@@ -113,14 +113,28 @@ def score(query: str, proc: dict) -> float:
     return round(min(total, 1.0), 3)
 
 
+def rank(query: str) -> List[Tuple[float, dict]]:
+    """Mọi thủ tục xếp theo điểm giảm dần."""
+    if not _PROCEDURES:
+        return []
+    q = normalize(query)
+    return sorted(((score(q, p), p) for p in _PROCEDURES), key=lambda x: x[0], reverse=True)
+
+
 def search(query: str) -> Tuple[dict | None, float]:
     """Trả (thủ tục khớp nhất, điểm). Trả (None, 0.0) nếu kho rỗng."""
-    if not _PROCEDURES:
+    ranked = rank(query)
+    if not ranked:
         return None, 0.0
-    q = normalize(query)
-    ranked = sorted(((score(q, p), p) for p in _PROCEDURES), key=lambda x: x[0], reverse=True)
     best_score, best = ranked[0]
     return best, best_score
+
+
+def candidates(query: str, floor: float = 0.3, limit: int = 3) -> List[dict]:
+    """Các thủ tục có thể là điều bác cần theo từ khoá: điểm từ `floor` trở
+    lên, tối đa `limit`, chắc nhất trước."""
+    return [{"id": p["id"], "name": p.get("name", p["id"]), "short": p.get("short")}
+            for s, p in rank(query) if s >= floor][:limit]
 
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 # Tổng hợp giải pháp Kiosk hướng dẫn thủ tục hành chính
 
-Cập nhật ngày 16/09/2026, theo nhánh `main` của repo
+Cập nhật ngày 17/09/2026, theo nhánh `main` của repo
 `nynyann/kiosk-backend`. Tài liệu bao gồm mọi thông tin kỹ thuật và mọi con
 số đã đo để cả nhóm đọc và điền vào bản đề xuất giải pháp. Con số nào là đo
 thật thì ghi "đo thật", con số nào chưa có thì ghi "chưa có", không ước lượng -> sẽ quyết định điền hoặc bỏ.
@@ -80,13 +80,13 @@ npm, không cơ sở dữ liệu.
 
 Kích thước mã nguồn (đếm ngày 16/09/2026): backend `app/` 2.752 dòng Python,
 giao diện `web/index.html` 981 dòng, công cụ đo `eval/` 875 dòng, kịch bản
-`scripts/` 3 file, test 4 file với 62 test. Tổng khoảng 5.400 dòng.
+`scripts/` 3 file, test 4 file với 64 test. Tổng khoảng 5.600 dòng.
 
 Thư viện chính (ghim phiên bản trong `requirements.txt`): fastapi 0.115.6,
 uvicorn 0.34.0, faster-whisper 1.1.1, ctranslate2 4.8.2, edge-tts 7.2.8,
 httpx 0.28.1 (gọi mô hình ngôn ngữ).
 
-Giao kèo API viết ở `API_CONTRACT.md`, phiên bản 2.1. Mọi phản hồi đều có
+Giao kèo API viết ở `API_CONTRACT.md`, phiên bản 2.2. Mọi phản hồi đều có
 trường `ok`; lỗi thì có `error` là câu tiếng Việt hiển thị thẳng cho người
 dân được.
 
@@ -301,7 +301,9 @@ hết tiền hay quá hạn giờ:
 | Bác mở đầu «tôi 76 tuổi, không có lương hưu, sống một mình» | điền sẵn tuổi, lương hưu vào bước 1; nói «Cháu hiểu rồi ạ, bác 76 tuổi, chưa có lương hưu và sống một mình»; chỉ hỏi phần còn thiếu | điền sẵn bằng luật (số tuổi, cụm phủ định rõ), nói «Cháu ghi nhận: …» | 1, 3, 5 |
 | Câu nói không khớp từ khoá («tôi già rồi nhà nước có cho đồng nào không») | mô hình chọn trong 6 thủ tục, máy hỏi lại mềm «Nếu cháu hiểu đúng thì…» | chuyển cán bộ, đưa danh sách bấm chọn | 4 |
 | Trả lời câu bước 1 bằng lời mà so cụm từ không ra | mô hình ánh xạ sang một lựa chọn có sẵn, không được bịa lựa chọn | mời bấm chọn | 4 |
-| Hỏi thêm ở bước 2, 3 diễn đạt khác FAQ, hoặc kể thêm hoàn cảnh | mô hình đọc toàn bộ kho tri thức của thủ tục + tuổi, lương hưu đã trả lời + các lượt hỏi trước, viết câu trả lời tối đa 3 câu | ý định chung (nộp đâu, bao lâu, phí, mang gì) hoặc mời hỏi cán bộ | 1, 3, 4, 6 |
+| Hỏi thêm ở bước 2, 3 diễn đạt khác FAQ, hoặc kể thêm hoàn cảnh | mô hình đọc toàn bộ kho tri thức của thủ tục (kể cả cách kê khai mẫu) + tuổi, lương hưu đã trả lời + các lượt hỏi trước, viết câu trả lời tối đa 3 câu | ý định chung (nộp đâu, bao lâu, phí, mang gì) hoặc mời hỏi cán bộ | 1, 3, 4, 6 |
+| Câu ngoài kho, câu máy nghe nhầm thành vô nghĩa, «cháu tên gì» | mô hình viết 1 đến 2 câu tử tế (là máy hướng dẫn nên chỉ giúp về thủ tục này; hỏi cán bộ giúp; mời nói lại), không bịa | câu cứng «Câu này cháu chưa có trong kho» | 6 |
+| Câu nói ứng với nhiều thủ tục («tôi muốn xin trợ cấp») | mô hình liệt kê tối đa 3 thủ tục, giao diện hỏi «cần hỗ trợ thủ tục nào trước» | từ khoá đủ điểm thì một thủ tục, không thì danh sách 6 | 5 |
 
 Nguyên tắc giữ nguyên: prompt chỉ chứa kho tri thức của đúng thủ tục đó;
 mô hình bị ép trả mã `KHONG_CO_TRONG_KHO` khi kho không có, máy chủ thay bằng
@@ -346,22 +348,50 @@ này chặn đúng lỗi Saola điền bừa. 16 test với mô hình giả ki�
 
 ---
 
+### Kho tri thức có hướng dẫn kê khai không (câu hỏi của nhóm ngày 17/09)
+
+Trước 17/09: không. Kho chỉ ghi «xin mẫu tại quầy, cán bộ hướng dẫn điền»,
+nên dù đã có mô hình, hỏi «mẫu số 2 là gì, điền thế nào» thì mô hình chỉ
+nói lại được đúng câu đó: mô hình bị ép chỉ dùng kho, kho không có thì nó
+không được bịa. Đó là lý do «đã gọi API mà vẫn không trả lời được».
+
+Từ 17/09: thêm mục `flow.forms` cho ba thủ tục có mẫu (Mẫu số 01 trợ cấp
+hưu trí xã hội, Mẫu số 2 bảo hiểm y tế, tờ khai trợ cấp xã hội hằng tháng):
+xin mẫu ở đâu, điền bằng gì, từng mục của mẫu viết theo cách người dân
+hiểu, mắt kém hay không biết chữ thì nhờ cán bộ điền rồi đọc lại. Mô hình
+đọc mục này khi trả lời. Các mục mẫu là bản tóm tắt nhóm viết theo Nghị
+định, **Mian phải đối chiếu với mẫu in** (trường `forms_note` trong từng
+file ghi rõ).
+
+---
+
 ## 8. Giao diện kiosk (frontend)
 
 `web/index.html`, một file, không build. Dạng hội thoại: máy nói một câu
 bên trái, người dân trả lời một câu bên phải, khung dưới cùng chỉ hiện đúng
 việc cần làm lúc đó.
 
+Bản 3 (17/09/2026) theo ý tưởng của nhóm: màn hình chia hai, bên trái là
+trợ lý AI (biểu tượng, ô thoại trên đầu hiện câu máy vừa nói kèm hướng dẫn
+cách trả lời, dưới là câu bác vừa nói và lịch sử), bên phải là việc bác cần
+làm lúc đó. Micro luôn hiện ở góc dưới phải. Nút nào cần bấm tiếp thì nhấp
+nháy ánh sáng (nút Bắt đầu, các ô xưng hô, các thủ tục gợi ý, các lựa chọn
+bước 1, micro khi tới lượt bác nói, nút sang bước tiếp).
+
 Trình tự màn hình:
 
-0. Màn «Chạm vào màn hình để bắt đầu» (mở khoá tiếng, xem mục 5). Hiện trạng
-   thái máy chủ đang khởi động hay đã sẵn sàng.
-1. Chào bằng chữ và bằng tiếng: "Xin chào bác! Cháu là máy hướng dẫn làm
-   thủ tục hành chính."
-2. "Bác cần làm gì ạ?" kèm hướng dẫn cách nói và nút micro to. Không liệt
-   kê thủ tục. Dòng nhỏ "Bác không nói được? Bấm đây để chọn bằng tay" mở
-   danh sách khi cần.
-3. Máy hỏi lại để xác nhận: "Cháu hiểu bác cần làm thủ tục X. Đúng không ạ?"
+0. Trang chủ: thanh menu (Trang chủ, Thủ tục, Hướng dẫn, Góp ý); góc dưới
+   trái là hòm thư và số điện thoại góp ý; giữa là nút Bắt đầu (cái chạm
+   này mở khoá tiếng, xem mục 5).
+0b. Chọn xưng hô: bác, ông, bà, cô, chú, anh, chị. Máy chủ thay xưng hô vào
+   mọi câu trả về (kể cả câu đọc); với anh, chị thì máy xưng em.
+1. Máy chào bằng chữ và bằng tiếng: "Xin chào ông! Cháu là máy hướng dẫn
+   làm thủ tục hành chính. Ông cần làm gì ạ?" kèm cách nói; micro nhấp nháy.
+2. Bác nói. Máy đưa ra thủ tục nó hiểu ở bên phải: một thủ tục thì hỏi
+   "đúng không ạ?", nhiều thủ tục thì hỏi "cần hỗ trợ thủ tục nào trước
+   ạ?". Danh sách đủ 6 thủ tục chỉ hiện khi máy không hiểu hoặc bác bấm
+   "không nói được".
+3. Bác bấm chọn thủ tục.
 4. Bước 1: hỏi từng câu, bắt đầu từ tuổi. Mỗi câu kèm dòng hướng dẫn cách
    trả lời ("Bác nói số tuổi, ví dụ tôi bảy mươi sáu tuổi, hoặc bấm chọn
    một ô bên dưới"). Trả lời xong mới hiện câu tiếp. Có nút "Trả lời bằng
@@ -464,11 +494,12 @@ có dùng được để quyết định mời nói lại, nhưng không mạnh;
 
 ### 9.5 Kiểm thử tự động
 
-62 test, chạy dưới 4 giây, không cần mô hình nhận dạng và không gọi mạng:
+64 test, chạy dưới 4 giây, không cần mô hình nhận dạng và không gọi mạng:
 12 test giao kèo API, 24 test luồng 3 bước (cả 6 file kho tri thức đủ
 trường, rẽ nhánh đúng sơ đồ, ánh xạ lời nói sang lựa chọn, hỏi thêm không
-bịa, câu chào của giao diện khớp với chuỗi máy chủ sinh sẵn), 16 test mô
-hình ngôn ngữ với mô hình giả (mục 7b), 10 test chuẩn hoá và tính WER.
+bịa, câu chào của giao diện khớp với chuỗi máy chủ sinh sẵn), 18 test mô
+hình ngôn ngữ và xưng hô với mô hình giả (mục 7b), 10 test chuẩn hoá và
+tính WER.
 
 ### 9.6 Con số chưa có
 
@@ -562,10 +593,11 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 23 commit từ 05/09 đến 16/09/2
 | cf16318 | Thêm TONG-HOP.md, tài liệu này |
 | 56f40dd | Màn chạm để bắt đầu (mở khoá tiếng), kho mp3 đi theo repo, thử lại khi Edge hỏng |
 | b67f9e4 | Cập nhật TONG-HOP.md theo lần sửa 15/09 |
-| b53df86, 044fd9a | Sunny: sửa tài liệu và tên người kiểm chứng kho tri thức |
+| b53df86, 044fd9a, 79c46b6, 8468a3b | Sunny: sửa tài liệu và tên người kiểm chứng kho tri thức |
 | d7b545c | Bỏ cấu hình riêng của máy cá nhân khỏi repo |
 | f269f66 | Nối mô hình ngôn ngữ FPT AI Marketplace theo phản hồi giám khảo: nhớ ngữ cảnh, hiểu hoàn cảnh, trả lời ngoài FAQ, lời tự nhiên; API 2.1; 61 test |
-| (16/09) | Đo 5 mô hình trên khoá thật, chốt gemma-4-31B-it; chốt bằng chứng khi điền sẵn; sửa FAQ khớp bừa; hỏi mô hình trước gợi ý chuyển; config tự đọc .env; 62 test |
+| 604dda5 | Đo 5 mô hình trên khoá thật, chốt gemma-4-31B-it; chốt bằng chứng khi điền sẵn; sửa FAQ khớp bừa; hỏi mô hình trước gợi ý chuyển; config tự đọc .env; 62 test |
+| (17/09) | Giao diện bản 3: trang chủ có menu và góp ý, chọn xưng hô, trợ lý AI bên trái, thủ tục gợi ý để chọn, mic luôn hiện và nhấp nháy; xưng hô theo lựa chọn; mô hình tự nói câu ngoài kho; kho thêm cách kê khai mẫu; API 2.2; 64 test |
 
 Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 
@@ -619,6 +651,23 @@ Lần cập nhật 16/09/2026 (đo trên khoá thật) thay đổi gì:
 - `app/config.py` tự đọc `.env` (trước đây README bảo chép `.env` nhưng
   không có gì đọc file đó). Test từ 61 lên 62.
 
+Lần cập nhật 17/09/2026 (theo phản hồi của Sunny và ý tưởng giao diện mới)
+thay đổi gì:
+
+- Lỗi đại từ: nút «Đúng rồi, hướng dẫn cháu nhé» là lời bác bấm mà lại
+  xưng cháu; sửa thành lời của bác, và thêm chọn xưng hô (bác, ông, bà, cô,
+  chú, anh, chị) áp cho mọi câu máy nói.
+- Có mô hình rồi mà câu ngoài kho và câu nghe nhầm («như nàng») vẫn ra
+  câu cứng: giờ mô hình tự viết 1 đến 2 câu tử tế trong cùng một lượt gọi
+  (trường `in_kb` trong JSON trả về), không bịa.
+- Hỏi «mẫu số 2 là gì, điền thế nào» không trả lời được vì kho không có:
+  thêm `flow.forms` cho ba thủ tục có mẫu, mô hình đọc được.
+- Câu nói ứng với nhiều thủ tục: `/turn` trả `candidates`, giao diện đưa
+  ra cho bác chọn thủ tục nào trước.
+- Giao diện bản 3 theo ý tưởng của nhóm: trang chủ có menu và góp ý; Bắt
+  đầu → chọn xưng hô → trợ lý AI bên trái với ô thoại trên đầu, việc cần
+  làm bên phải, mic luôn hiện, nút cần bấm thì nhấp nháy. API 2.2, 64 test.
+
 ---
 
 ## 13. Việc còn lại và ai làm
@@ -629,6 +678,8 @@ Lần cập nhật 16/09/2026 (đo trên khoá thật) thay đổi gì:
 | Chạy `eval.wer` trên tập tự thu, ghi WER và tỷ lệ bắt đúng cụm hành chính | Lia | `results/` | cao |
 | Bổ sung `HARD_FIXES` từ cụm nghe nhầm thật, chạy `eval.rescore`, ghi chuỗi số cải thiện | Lia | `app/normalize.py` | cao, là nội dung mục 4.3 |
 | Đọc lại 24 câu hỏi bước 1 và 20 kết luận, đối chiếu văn bản | Mian | `data/kb/*.json` mục `flow.check` | cao |
+| Đối chiếu ba mục kê khai mẫu (`flow.forms`) với mẫu in kèm Nghị định, sửa mục nào sai, ghi ngày kiểm chứng | Mian | `data/kb/*.json` mục `flow.forms`, `forms_note` | cao, nhóm tự viết theo Nghị định, chưa đối chiếu mẫu in |
+| Thay hòm thư và số điện thoại góp ý trên trang chủ bằng của địa phương đặt kiosk | Kns | `web/index.html`, khối `#contact` | vừa |
 | Thêm FAQ sau mỗi buổi thử với người thật | Mian | `flow.faq` | vừa |
 | Sau mỗi lần sửa kho tri thức: chạy `python scripts/build_tts_cache.py` rồi commit cả `data/tts/` | Lia | `scripts/build_tts_cache.py` | cao, quên là câu mới không có tiếng |
 | Đặt `FPT_API_KEY` vào Environment trên Render (máy nhà đã có trong `.env`) | Lia | Render, Environment | cao nhất, không có thì bản trên mạng chạy kho tĩnh |
@@ -658,6 +709,6 @@ Lần cập nhật 16/09/2026 (đo trên khoá thật) thay đổi gì:
 - Mục triển khai và chi phí: mục 10 và bảng 9.4 (RAM, tốc độ, gói máy chủ
   miễn phí đủ chạy).
 - Mục hạn chế và hướng phát triển: mục 11 và 13, đừng bỏ mục nào.
-- Mục kiểm thử: 9.5 (61 test tự động) và 9.6 (những gì chưa đo, nói thật).
+- Mục kiểm thử: 9.5 (64 test tự động) và 9.6 (những gì chưa đo, nói thật).
 - Mục trả lời phản hồi giám khảo: mục 7b, bảng 4 chỗ dùng mô hình ứng với 6
   điểm phản hồi, kèm giới hạn 5b.

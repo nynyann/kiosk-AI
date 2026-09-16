@@ -119,24 +119,49 @@ def test_mo_hinh_tra_rac_thi_lui_ve_luat(fake_llm):
 
 
 def test_nhan_ra_thu_tuc_khi_tu_khoa_khong_bat_duoc(fake_llm):
-    calls = fake_llm('{"procedure_id": "tro-cap-huu-tri-xa-hoi"}')
+    calls = fake_llm('{"procedure_ids": ["tro-cap-huu-tri-xa-hoi", "tro-cap-xa-hoi-hang-thang"]}')
     d = client.post("/answer", json={"text": "tôi già rồi nhà nước có cho đồng nào không"}).json()
     assert d["handoff"] is False and d["procedure_id"] == HUU_TRI and d["via_llm"] is True
     assert d["confirm"]
+    # Giao diện đưa cả hai thủ tục trợ cấp ra cho bác chọn, chắc nhất trước.
+    assert [c["id"] for c in d["candidates"]] == ["tro-cap-huu-tri-xa-hoi", "tro-cap-xa-hoi-hang-thang"]
     assert "Trợ cấp hưu trí xã hội" in calls[0][-1]["content"]   # danh sách thủ tục có trong prompt
 
 
 def test_mo_hinh_tra_none_thi_van_chuyen_can_bo(fake_llm):
-    fake_llm('{"procedure_id": "none"}')
+    fake_llm('{"procedure_ids": []}')
     d = client.post("/answer", json={"text": "hôm nay trời đẹp quá"}).json()
-    assert d["handoff"] is True and d["via_llm"] is False
+    assert d["handoff"] is True and d["via_llm"] is False and d["candidates"] == []
 
 
-def test_tu_khoa_bat_duoc_thi_khong_goi_mo_hinh(fake_llm):
-    calls = fake_llm('{"procedure_id": "cap-the-can-cuoc"}')
-    d = client.post("/answer", json={"text": "tôi muốn xin trợ cấp hưu trí xã hội"}).json()
-    assert d["procedure_id"] == HUU_TRI and d["via_llm"] is False
+def test_tu_khoa_bat_duoc_ro_mot_thu_tuc_thi_khong_goi_mo_hinh(fake_llm):
+    calls = fake_llm('{"procedure_ids": ["cap-the-can-cuoc"]}')
+    d = client.post("/answer", json={"text": "tôi muốn xin cấp thẻ căn cước"}).json()
+    assert d["procedure_id"] == "cap-the-can-cuoc" and d["via_llm"] is False
+    assert [c["id"] for c in d["candidates"]] == ["cap-the-can-cuoc"]
     assert calls == []
+
+
+def test_cau_ung_voi_nhieu_thu_tuc_thi_dua_ra_vai_ung_vien(fake_llm):
+    """«tôi muốn xin trợ cấp» ứng với cả hưu trí xã hội lẫn xã hội hằng tháng:
+    mô hình liệt kê cả hai, giao diện đưa ra cho bác chọn. Từ khoá một mình
+    không đủ điểm cho cái nào (0,29 và 0,22) nên không có mô hình thì đưa
+    danh sách đủ 6 thủ tục."""
+    calls = fake_llm('{"procedure_ids": ["tro-cap-xa-hoi-hang-thang", "tro-cap-huu-tri-xa-hoi"]}')
+    d = client.post("/answer", json={"text": "tôi muốn xin trợ cấp"}).json()
+    ids = [c["id"] for c in d["candidates"]]
+    assert ids == ["tro-cap-xa-hoi-hang-thang", "tro-cap-huu-tri-xa-hoi"]
+    assert d["procedure_id"] == ids[0] and d["via_llm"] is True and len(calls) == 1
+
+
+def test_xung_ho_theo_lua_chon():
+    st = client.post("/flow/start", json={"procedure_id": HUU_TRI, "pronoun": "ông"}).json()
+    assert "ông" in st["question"]["text"].lower() and "bác" not in st["question"]["text"].lower()
+    assert st["speech"].startswith("Trước tiên cháu hỏi ông")
+    st = client.post("/flow/start", json={"procedure_id": HUU_TRI, "pronoun": "chị"}).json()
+    assert st["speech"].startswith("Trước tiên em hỏi chị")
+    # «con cháu» là con cái, không phải xưng hô.
+    assert flow.personalize_text("Có con cháu giúp thì bác nhờ, cháu hướng dẫn.", "anh") == "Có con cháu giúp thì anh nhờ, em hướng dẫn."
 
 
 def test_hieu_cau_tra_loi_tu_do_o_buoc_1(fake_llm):

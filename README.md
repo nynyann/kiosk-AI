@@ -18,15 +18,23 @@ máy chủ FastAPI phục vụ luôn trang kiosk ở `/`, còn API nằm ở `/h
 
 ## Kiosk chạy như thế nào
 
-Theo sơ đồ luồng và tài liệu «trực quan» của nhóm. Giao diện là một cuộc
-trò chuyện: máy nói một câu, bác trả lời một câu, cứ thế từng bước. Bác
-đứng trước kiosk:
+Theo sơ đồ luồng và tài liệu «trực quan» của nhóm. Màn hình chia hai: bên
+trái là trợ lý AI với ô thoại trên đầu, bên phải là việc bác cần làm lúc
+đó; micro luôn hiện ở góc dưới phải; nút nào cần bấm tiếp thì nhấp nháy.
+Bác đứng trước kiosk:
 
-0. Máy chào: «Xin chào bác! … Bác cần làm gì ạ?» kèm hướng dẫn cách nói.
+0. Trang chủ: thanh menu (Trang chủ, Thủ tục, Hướng dẫn, Góp ý), góc dưới
+   trái là hòm thư và số điện thoại góp ý, giữa là nút **Bắt đầu** (cái
+   chạm này cũng là thứ trình duyệt cần để cho phép phát tiếng).
+0b. Chọn **xưng hô** (bác, ông, bà, cô, chú, anh, chị). Mọi câu máy nói
+   sau đó đổi theo, cả câu tĩnh trong kho lẫn câu mô hình sinh.
+0c. Máy chào: «Xin chào ông! … Ông cần làm gì ạ?» kèm hướng dẫn cách nói,
+   micro nhấp nháy.
 1. **Bác nói điều mình cần** bằng lời thường («tôi 76 tuổi, không có lương
-   hưu thì được hỗ trợ gì»). Máy nhận ra thủ tục, hỏi lại «Cháu hiểu bác cần
-   làm thủ tục X, đúng không ạ?». Màn hình chính **không** liệt kê thủ tục;
-   danh sách chỉ hiện khi máy không hiểu, hoặc bác bấm «không nói được».
+   hưu thì được hỗ trợ gì»). Máy đưa ra **thủ tục nó hiểu** để bác bấm
+   chọn: một thủ tục thì hỏi «đúng không ạ?», nhiều thủ tục thì hỏi «bác
+   cần hỗ trợ thủ tục nào trước ạ?». Danh sách đủ 6 thủ tục chỉ hiện khi
+   máy không hiểu hoặc bác bấm «không nói được».
 2. **Bước 1. Kiểm tra điều kiện** — kiosk hỏi từng câu một, bắt đầu từ tuổi
    (rồi công dân, lương hưu, trợ cấp BHXH, hộ nghèo…). Mỗi câu kèm hướng dẫn
    cách trả lời («bác nói số tuổi, ví dụ "tôi bảy mươi sáu tuổi", hoặc bấm
@@ -62,7 +70,8 @@ OpenAI) ở bốn chỗ, chỗ nào cũng có đường lùi về kho tĩnh:
 | Bác mở đầu «tôi 76 tuổi, không có lương hưu, sống một mình» | điền sẵn tuổi, lương hưu; nói «Cháu hiểu rồi ạ, bác 76 tuổi, chưa có lương hưu và sống một mình»; chỉ hỏi phần còn thiếu | điền sẵn bằng luật (số tuổi, cụm phủ định rõ), nói «Cháu ghi nhận: …» |
 | Câu nói không khớp từ khoá («tôi già rồi nhà nước có cho đồng nào không») | mô hình chọn thủ tục trong 6 thủ tục, máy hỏi lại «Nếu cháu hiểu đúng thì…» | chuyển cán bộ, đưa danh sách bấm chọn |
 | Trả lời câu bước 1 bằng lời mà so cụm từ không ra | mô hình ánh xạ sang một lựa chọn, không được tự bịa lựa chọn | mời bấm chọn |
-| Hỏi thêm ở bước 2, 3 diễn đạt khác FAQ, hoặc kể thêm hoàn cảnh | mô hình đọc toàn bộ kho tri thức của thủ tục + những gì bác đã trả lời rồi viết câu trả lời, tối đa 3 câu | ý định chung (nộp đâu, bao lâu, phí, mang gì) hoặc mời hỏi cán bộ |
+| Hỏi thêm ở bước 2, 3 diễn đạt khác FAQ, hoặc kể thêm hoàn cảnh | mô hình đọc toàn bộ kho tri thức của thủ tục (kể cả cách kê khai từng mục của mẫu) + những gì bác đã trả lời rồi viết câu trả lời, tối đa 3 câu | ý định chung (nộp đâu, bao lâu, phí, mang gì) hoặc mời hỏi cán bộ |
+| Câu ngoài kho, câu nghe không thành nghĩa («như nàng»), «cháu tên gì» | mô hình tự viết 1 đến 2 câu tử tế: cháu là máy hướng dẫn nên chỉ giúp về thủ tục này, hỏi cán bộ giúp, hoặc mời nói lại; không bịa | câu cứng «Câu này cháu chưa có trong kho…» |
 
 Nguyên tắc không đổi: prompt chỉ đưa kho tri thức của đúng thủ tục đó, mô
 hình bị ép trả mã `KHONG_CO_TRONG_KHO` khi kho không có, máy chủ thay bằng
@@ -253,7 +262,7 @@ chỉ 1,6 giây — nên hạn giờ lúc hâm nóng (45 giây) để rộng hơ
 
 ```bash
 pip install -r requirements-dev.txt   # một lần, chỉ có pytest
-python -m pytest tests/ -q            # 62 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
+python -m pytest tests/ -q            # 64 test: giao kèo API + luồng 3 bước + đọc tiếng + chuẩn hoá
 python -m app.normalize               # in bảng 10 câu trước/sau, ảnh cho mục 4.3
 ```
 

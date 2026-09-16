@@ -66,9 +66,20 @@ khởi động lại. Nếu file sai cú pháp JSON, máy chủ in cảnh báo r
     "places": ["nộp ở đâu"], "methods": ["trực tiếp", "bưu điện", "trực tuyến"],
     "bring": ["giấy tờ mang theo"], "agency": "cơ quan xử lý làm gì", "result": "bác nhận được gì"
   },
-  "faq": [ { "q": ["các cách hỏi", "…"], "a": "câu trả lời lấy từ văn bản" } ]
+  "faq": [ { "q": ["các cách hỏi", "…"], "a": "câu trả lời lấy từ văn bản" } ],
+  "forms": [
+    { "name": "Mẫu số 01 (…)", "how": "xin ở đâu, điền bằng gì, mắt kém thì nhờ ai",
+      "fields": ["từng mục của mẫu, viết theo cách người dân hiểu"],
+      "note": "mẫu in tại nơi nộp là bản chính thức" }
+  ]
 }
 ```
+
+`forms`: cách kê khai mẫu. Người dân hỏi «mẫu số 2 là gì, điền thế nào» rất
+nhiều; không có mục này thì mô hình chỉ biết «xin mẫu ở quầy». Ghi từng
+mục của mẫu ở mức bác cần biết trước khi đến, đối chiếu với mẫu in kèm
+Nghị định. Ba thủ tục có mẫu (hưu trí, xã hội hằng tháng, bảo hiểm y tế) đã
+có bản nháp, trường `forms_note` ghi ai cần kiểm chứng.
 
 Máy chạy thế này, mỗi lượt tính lại từ đầu:
 

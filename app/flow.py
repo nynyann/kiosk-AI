@@ -508,6 +508,57 @@ def answer_question(proc: dict, text: str) -> FlowAskResult:
 
 
 # ---------------------------------------------------------------------------
+# Xưng hô theo lựa chọn của người dân
+# ---------------------------------------------------------------------------
+# Cặp (người dân, máy). Kho tri thức và mọi câu máy sinh đều viết «bác/cháu»;
+# thay vào lúc trả về. Với anh/chị thì máy xưng «em».
+PRONOUNS = {
+    "bác": "cháu", "ông": "cháu", "bà": "cháu", "cô": "cháu", "chú": "cháu",
+    "anh": "em", "chị": "em",
+}
+
+
+def personalize_text(text: str, pronoun: str) -> str:
+    """Đổi «bác/cháu» trong một chuỗi sang cặp xưng hô đã chọn, giữ chữ hoa.
+    «con cháu» (con cái) không phải xưng hô, giữ nguyên."""
+    p = (pronoun or "bác").strip().lower()
+    if p not in PRONOUNS or p == "bác":
+        return text
+    me = PRONOUNS[p]
+
+    def swap(m):
+        w = m.group(0)
+        repl = {"bác": p, "cháu": me}[w.lower()]
+        return repl.capitalize() if w[0].isupper() else repl
+
+    out = re.sub(r"(?<![\w])(?<!con )(?<!Con )(cháu|Cháu)(?![\w])", swap, text or "")
+    return re.sub(r"(?<![\w])(bác|Bác)(?![\w])", swap, out)
+
+
+def personalize(obj, pronoun: str):
+    """Áp personalize_text lên mọi chuỗi trong một BaseModel / dict / list, tại
+    chỗ. Bỏ qua mã (id, value, stage...) vì chúng không chứa «bác»."""
+    p = (pronoun or "bác").strip().lower()
+    if p not in PRONOUNS or p == "bác":
+        return obj
+    from pydantic import BaseModel
+
+    def walk(x):
+        if isinstance(x, str):
+            return personalize_text(x, p)
+        if isinstance(x, list):
+            return [walk(i) for i in x]
+        if isinstance(x, dict):
+            return {k: walk(v) for k, v in x.items()}
+        if isinstance(x, BaseModel):
+            for name in x.model_fields:
+                setattr(x, name, walk(getattr(x, name)))
+            return x
+        return x
+    return walk(obj)
+
+
+# ---------------------------------------------------------------------------
 # Mọi câu máy có thể đọc — để sinh sẵn tiếng lúc khởi động
 # ---------------------------------------------------------------------------
 def all_speech_texts(proc: dict) -> List[str]:

@@ -29,8 +29,8 @@ from . import config, flow, kb, llm, tts
 from .asr import AsrError, is_ready, last_error, load_model, transcribe_bytes
 from .schemas import (AnswerRequest, AnswerResult, AsrResult, FlowAnswerRequest,
                       FlowAskResult, FlowNextRequest, FlowStartRequest, FlowState,
-                      HealthResult, PrefilledAnswer, ProceduresResult, TtsRequest,
-                      TurnResult)
+                      HealthResult, PrefilledAnswer, ProcedureSummary, ProceduresResult,
+                      TtsRequest, TurnResult)
 
 if config.MOCK:
     from .mock import mock_asr
@@ -188,18 +188,27 @@ def kb_reload():
     return {"ok": True, "procedures": n}
 
 
-async def _recognize(text: str, session_id: Optional[str]) -> AnswerResult:
+async def _recognize(text: str, session_id: Optional[str], pronoun: Optional[str] = None) -> AnswerResult:
     """Nhận ra thủ tục từ câu nói: tra từ khoá trước, dưới ngưỡng thì hỏi mô
     hình ngôn ngữ (nếu bật). Câu diễn đạt lạ («tôi già rồi nhà nước có cho
-    tiền không») vẫn vào được luồng thay vì bị đẩy sang cán bộ."""
+    tiền không») vẫn vào được luồng thay vì bị đẩy sang cán bộ.
+
+    Trả kèm `candidates`: vài thủ tục có thể là điều bác cần, để giao diện
+    đưa ra cho bác chọn («tôi muốn xin trợ cấp» có hai thủ tục trợ cấp)."""
     ans = kb.build_answer(text, session_id)
-    if ans.handoff and llm.enabled():
-        pid = await llm.pick_procedure(text, kb.procedures())
-        proc = kb.get(pid) if pid else None
-        if proc:
-            ans = kb.answer_for(proc, max(ans.match_score, config.KB_MATCH_THRESHOLD))
-            ans.via_llm = True
-    return ans
+    cands = kb.candidates(text)
+    if llm.enabled() and (ans.handoff or len(cands) != 1):
+        picked = await llm.pick_procedures(text, kb.procedures())
+        if picked:
+            summ = {p["id"]: p for p in kb.summaries()}
+            cands = [summ[i] for i in picked if i in summ]
+            if ans.handoff:
+                ans = kb.answer_for(kb.get(picked[0]), max(ans.match_score, config.KB_MATCH_THRESHOLD))
+                ans.via_llm = True
+    if ans.procedure_id and all(c["id"] != ans.procedure_id for c in cands):
+        cands.insert(0, {"id": ans.procedure_id, "name": ans.procedure_name, "short": None})
+    ans.candidates = [ProcedureSummary(**c) for c in cands[:3]]
+    return flow.personalize(ans, pronoun)
 
 
 # ---------------------------------------------------------------------------
@@ -232,7 +241,7 @@ async def answer_endpoint(req: AnswerRequest):
     # thật luôn, để giao diện demo thấy đúng thủ tục ứng với câu đã "nghe".
     if not req.text.strip():
         return kb.retry_answer()
-    result = await _recognize(req.text, req.session_id)
+    result = await _recognize(req.text, req.session_id, req.pronoun)
     _log_turn({"session": req.session_id, "query": req.text,
                "procedure": result.procedure_id, "score": result.match_score,
                "handoff": result.handoff})
@@ -243,14 +252,15 @@ async def answer_endpoint(req: AnswerRequest):
 async def turn_endpoint(
     audio: UploadFile = File(...),
     session_id: Optional[str] = Form(None),
+    pronoun: Optional[str] = Form(None),
 ):
     """Một lượt trọn vẹn: âm thanh vào, hướng dẫn ra. Giao diện dùng đường này."""
     t0 = time.time()
 
     if config.MOCK:
         a = mock_asr()
-        ans = kb.retry_answer() if a.no_speech else await _recognize(a.text, session_id)
-        return TurnResult(asr=a, answer=ans,
+        ans = kb.retry_answer() if a.no_speech else await _recognize(a.text, session_id, pronoun)
+        return TurnResult(asr=a, answer=flow.personalize(ans, pronoun),
                           total_latency_seconds=round(time.time() - t0, 2))
 
     data = await audio.read()
@@ -269,9 +279,9 @@ async def turn_endpoint(
     # mời bác nói lại, KHÔNG chuyển cán bộ vội. Chuyển cán bộ chỉ dành cho
     # trường hợp nghe rõ nhưng không có thủ tục nào khớp.
     if a.no_speech or a.confidence < config.ASR_CONFIDENCE_FLOOR:
-        ans = kb.retry_answer()
+        ans = flow.personalize(kb.retry_answer(), pronoun)
     else:
-        ans = await _recognize(a.text, session_id)
+        ans = await _recognize(a.text, session_id, pronoun)
 
     _log_turn({"session": session_id, "raw": a.text_raw, "norm": a.text,
                "asr_conf": a.confidence, "procedure": ans.procedure_id,
@@ -360,7 +370,7 @@ async def flow_start(req: FlowStartRequest):
         st.speech = flow.for_speech(st.ack) + " " + st.speech
     _log_turn({"session": req.session_id, "flow": "start", "procedure": proc["id"],
                "utterance": req.utterance, "prefilled": answers, "llm_ack": bool(ack)})
-    return st
+    return flow.personalize(st, req.pronoun)
 
 
 @app.post("/flow/answer", response_model=FlowState)
@@ -377,7 +387,7 @@ def flow_answer(req: FlowAnswerRequest):
     _log_turn({"session": req.session_id, "flow": "answer", "procedure": proc["id"],
                "question": req.question_id, "value": req.value, "stage": st.stage,
                "verdict": st.verdict})
-    return st
+    return flow.personalize(st, req.pronoun)
 
 
 @app.post("/flow/answer-voice", response_model=FlowState)
@@ -387,6 +397,7 @@ async def flow_answer_voice(
     question_id: str = Form(...),
     answers: str = Form("{}"),
     session_id: Optional[str] = Form(None),
+    pronoun: Optional[str] = Form(None),
 ):
     """Bác trả lời câu hỏi bước 1 bằng lời. Nghe → ánh xạ sang lựa chọn →
     như /flow/answer. Không ánh xạ được thì trả lại câu hỏi cũ với
@@ -429,7 +440,7 @@ async def flow_answer_voice(
     _log_turn({"session": session_id, "flow": "answer-voice", "procedure": proc["id"],
                "question": question_id, "raw": a.text_raw, "norm": a.text,
                "asr_conf": a.confidence, "value": value, "stage": st.stage})
-    return st
+    return flow.personalize(st, pronoun)
 
 
 @app.post("/flow/next", response_model=FlowState)
@@ -451,7 +462,7 @@ def flow_next(req: FlowNextRequest):
         return _err(BAD_REQUEST_TEXT, "bad_request", 400)
     _log_turn({"session": req.session_id, "flow": "next", "procedure": proc["id"],
                "from": req.stage, "stage": st.stage})
-    return st
+    return flow.personalize(st, req.pronoun)
 
 
 @app.post("/flow/ask", response_model=FlowAskResult)
@@ -466,6 +477,7 @@ async def flow_ask(
     utterance: Optional[str] = Form(None),
     history: str = Form("[]"),
     stage: Optional[str] = Form(None),
+    pronoun: Optional[str] = Form(None),
 ):
     """Hỏi thêm trong bước 2 / bước 3. Gửi `audio` (nói) hoặc `text` (gõ).
 
@@ -506,18 +518,22 @@ async def flow_ask(
         # phải muốn chuyển sang làm căn cước. Mô hình đọc cả kho mà bảo không
         # có thì mới tới gợi ý chuyển (nếu có) hoặc câu mời gặp cán bộ.
         out = await llm.answer_from_kb(proc, text, prev, utterance or "", hist, stage or "")
-        if out and out != llm.NOT_IN_KB:
+        if out and not out.startswith(llm.NOT_IN_KB):
             res.answer, res.speech, res.matched, res.via_llm = out, flow.for_speech(out), True, True
             res.match_score = max(res.match_score, 0.5)
             res.switch_to, res.switch_name = None, None
-        elif out == llm.NOT_IN_KB and not res.switch_to and res.matched and res.match_score < 0.8:
-            # FAQ khớp lờ mờ theo vài từ cũng không đáng tin nữa.
-            res.matched, res.match_score = False, 0.0
-            res.answer, res.speech = flow.ASK_FALLBACK_TEXT, flow.for_speech(flow.ASK_FALLBACK_TEXT)
+        elif out and out.startswith(llm.NOT_IN_KB) and not res.switch_to and not (res.matched and res.match_score >= 0.8):
+            # Ngoài kho. Mô hình có kèm lời đáp tử tế («cháu là máy hướng
+            # dẫn, câu này bác hỏi cán bộ giúp cháu») thì dùng lời đó thay câu
+            # cứng; FAQ khớp lờ mờ theo vài từ cũng không đáng tin nữa.
+            polite = out[len(llm.NOT_IN_KB):].strip()
+            res.matched, res.match_score, res.via_llm = False, 0.0, bool(polite)
+            res.answer = polite or flow.ASK_FALLBACK_TEXT
+            res.speech = flow.for_speech(res.answer)
     _log_turn({"session": session_id, "flow": "ask", "procedure": proc["id"],
                "query": res.question, "matched": res.matched, "score": res.match_score,
                "switch_to": res.switch_to, "via_llm": res.via_llm})
-    return res
+    return flow.personalize(res, pronoun)
 
 
 # ---------------------------------------------------------------------------
