@@ -131,6 +131,7 @@ def test_nhan_ra_thu_tuc_khi_tu_khoa_khong_bat_duoc(fake_llm):
 def test_mo_hinh_tra_none_thi_van_chuyen_can_bo(fake_llm):
     fake_llm('{"procedure_ids": []}')
     d = client.post("/answer", json={"text": "hôm nay trời đẹp quá"}).json()
+    # Mô hình trả JSON rỗng cho cả câu lái về thủ tục → không dùng, về câu tĩnh.
     assert d["handoff"] is True and d["via_llm"] is False and d["candidates"] == []
 
 
@@ -236,6 +237,22 @@ def test_cau_ngoai_kho_thi_mo_hinh_tu_noi_loi_tu_te(fake_llm):
 
 
 # --- 3. Kho tri thức phẳng cho prompt -----------------------------------------
+
+def test_cau_ngoai_le_o_man_chon_thu_tuc_thi_mo_hinh_lai_ve_thu_tuc(fake_llm):
+    """Ảnh 17/09: bác nói «đúng rồi hướng dẫn tôi từng bước» ở màn «bác cần
+    làm gì» → câu cứng «cháu chưa được học». Có mô hình thì đáp lại và hỏi
+    lại bác cần thủ tục gì; vẫn handoff (hiện 6 nút chọn)."""
+    def reply(messages):
+        if "procedure_ids" in messages[-1]["content"]:
+            return '{"procedure_ids": []}'
+        return "Dạ vâng ạ. Bác cho cháu biết bác cần làm thủ tục gì, ví dụ «tôi muốn làm căn cước» ạ."
+    fake_llm(reply)
+    d = client.post("/answer", json={"text": "đúng rồi hướng dẫn tôi từng bước"}).json()
+    assert d["handoff"] is True and d["via_llm"] is True
+    assert "thủ tục gì" in d["answer"] and d["speech"]
+    assert d["candidates"] == []
+
+
 def test_kb_context_du_moi_phan():
     t = llm.kb_context(kb.get(HUU_TRI))
     for phan in ["THỦ TỤC:", "ĐIỀU KIỆN", "KẾT LUẬN", "HỒ SƠ:", "NƠI NỘP:", "THỜI HẠN:", "CÂU HỎI THƯỜNG GẶP", "NGUỒN:"]:

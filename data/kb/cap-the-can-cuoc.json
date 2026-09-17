@@ -56,7 +56,7 @@
     "Lịch hẹn, nếu đã đăng ký thời gian và địa điểm trước"
   ],
   "where_to_submit": "Cơ quan quản lý căn cước có thẩm quyền. Bác có thể đăng ký thời gian, địa điểm làm thủ tục qua hệ thống dịch vụ công hoặc ứng dụng định danh điện tử.",
-  "fee": "Cấp thẻ lần đầu: miễn phí hoàn toàn. Cấp đổi thẻ căn cước công dân sang thẻ căn cước: 30.000 đồng một thẻ. Cấp đổi thẻ căn cước (đủ 14, 25, 40, 60 tuổi; thay đổi thông tin nhân thân; sai sót do cơ quan quản lý; sắp xếp đơn vị hành chính): 50.000 đồng một thẻ. Cấp lại thẻ căn cước (mất, hỏng, trở lại quốc tịch Việt Nam): 70.000 đồng một thẻ.",
+  "fee": "Cấp thẻ lần đầu: miễn phí hoàn toàn. Cấp đổi thẻ căn cước công dân sang thẻ căn cước: 30.000 đồng một thẻ. Cấp đổi thẻ căn cước (đủ 25, 40, 60 tuổi; thay đổi thông tin nhân thân; sai sót do cơ quan quản lý; sắp xếp đơn vị hành chính): 50.000 đồng một thẻ. Cấp lại thẻ căn cước (mất, hỏng, trở lại quốc tịch Việt Nam): 70.000 đồng một thẻ.",
   "processing_time": "07 ngày làm việc.",
   "validity": "Thẻ căn cước phải đổi khi bác đủ 25, 40 và 60 tuổi.",
   "common_questions": [
@@ -331,7 +331,7 @@
           "có mất phí không",
           "có mất tiền không"
         ],
-        "a": "Cấp thẻ lần đầu miễn phí hoàn toàn. Cấp đổi thẻ căn cước công dân sang thẻ căn cước 30.000 đồng một thẻ. Cấp đổi thẻ căn cước khi đủ tuổi 14, 25, 40, 60, thay đổi thông tin nhân thân, sai sót do cơ quan quản lý hoặc sắp xếp đơn vị hành chính 50.000 đồng một thẻ. Cấp lại thẻ khi bị mất, hỏng hoặc trở lại quốc tịch Việt Nam 70.000 đồng một thẻ."
+        "a": "Cấp thẻ lần đầu miễn phí hoàn toàn. Cấp đổi thẻ căn cước công dân sang thẻ căn cước 30.000 đồng một thẻ. Cấp đổi thẻ căn cước khi đủ tuổi 25, 40, 60, thay đổi thông tin nhân thân, sai sót do cơ quan quản lý hoặc sắp xếp đơn vị hành chính 50.000 đồng một thẻ. Cấp lại thẻ khi bị mất, hỏng hoặc trở lại quốc tịch Việt Nam 70.000 đồng một thẻ."
       },
       {
         "q": [

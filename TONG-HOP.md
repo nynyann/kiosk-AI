@@ -523,7 +523,7 @@ có dùng được để quyết định mời nói lại, nhưng không mạnh;
 
 ### 9.5 Kiểm thử tự động
 
-69 test, chạy dưới 10 giây, không cần mô hình nhận dạng và không gọi mạng:
+70 test, chạy dưới 10 giây, không cần mô hình nhận dạng và không gọi mạng:
 12 test giao kèo API, 26 test luồng 3 bước (cả 6 file kho tri thức đủ
 trường, rẽ nhánh đúng kho bản 17/09 kể cả ba nhánh căn cước, ánh xạ lời nói
 sang lựa chọn, hỏi thêm không bịa, câu chào của giao diện khớp với chuỗi
@@ -632,7 +632,8 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 29 commit từ 07/09 đến 17/09/2
 | 8487c31 | Lắp kho tri thức bản 17/09 của Mian (Excel 6 sheet) vào 6 file JSON: mã thủ tục, lệ phí, mức trợ cấp, nhánh điều chỉnh và thôi hưởng, căn cước gộp lần đầu, đổi, mất; bước 3 có nút chọn cách nộp; API 2.3; sinh lại kho mp3; 66 test |
 | a3d3276 | Bổ sung mã thủ tục hộ tịch 2.000635 và căn cước 2.000200 |
 | dbd391b | Sửa kho theo rà soát của Lia: bỏ mọi mục kê khai mẫu; trợ cấp hằng tháng không thuộc nhóm thì chỉ kết luận và chỉ ra một cửa; BHYT bỏ lựa chọn «chưa biết chọn gì»; hộ tịch bỏ hai câu hỏi và lưu ý không có trong kho, hồ sơ không đòi căn cước; chứng thực không hỏi loại giấy, không đẩy sang thủ tục khác; căn cước đổi theo tuổi 25, 40, 60; 67 test |
-| (17/09, lần 5) | Máy im ở bước 2: kết luận «đủ điều kiện» từng áp dụng ngay khi chọn mục đích nên bỏ qua câu hỏi riêng của nhánh, và câu bước 2 theo tổ hợp lựa chọn không có sẵn tiếng; nay hỏi hết câu của nhánh rồi mới kết luận, liệt kê tiếng sẵn cho mọi đường trả lời (50 câu kết thúc), tiền «70.000 đồng» đọc thành «bảy mươi nghìn», giao diện thử lại /tts một lần; 69 test |
+| 73c1c1d | Máy im ở bước 2: kết luận «đủ điều kiện» từng áp dụng ngay khi chọn mục đích nên bỏ qua câu hỏi riêng của nhánh, và câu bước 2 theo tổ hợp lựa chọn không có sẵn tiếng; nay hỏi hết câu của nhánh rồi mới kết luận, liệt kê tiếng sẵn cho mọi đường trả lời (50 câu kết thúc), tiền «70.000 đồng» đọc thành «bảy mươi nghìn», giao diện thử lại /tts một lần; 69 test |
+| (17/09, lần 6) | Câu không ứng với thủ tục nào ở màn «bác cần làm gì» («đúng rồi hướng dẫn tôi từng bước», «cháu tên gì»): mô hình đáp lại rồi lái về hỏi bác cần thủ tục gì, chỉ được nhắc 6 thủ tục, thay câu cứng «cháu chưa được học»; mốc đổi thẻ căn cước 25, 40, 60 (14 là mốc cấp lần đầu); 70 test |
 
 Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 

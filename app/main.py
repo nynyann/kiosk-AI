@@ -25,6 +25,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
 
+from .normalize import for_speech
 from . import config, flow, kb, llm, tts
 from .asr import AsrError, is_ready, last_error, load_model, transcribe_bytes
 from .schemas import (AnswerRequest, AnswerResult, AsrResult, FlowAnswerRequest,
@@ -205,6 +206,12 @@ async def _recognize(text: str, session_id: Optional[str], pronoun: Optional[str
             if ans.handoff:
                 ans = kb.answer_for(kb.get(picked[0]), max(ans.match_score, config.KB_MATCH_THRESHOLD))
                 ans.via_llm = True
+    if ans.handoff and not cands and llm.enabled():
+        # Không ứng với thủ tục nào: mô hình đáp lại rồi lái về «bác cần làm
+        # thủ tục gì», thay vì câu cứng «cháu chưa được học».
+        reply = await llm.steer_reply(text, kb.procedures())
+        if reply:
+            ans.answer, ans.speech, ans.via_llm = reply, for_speech(reply), True
     if ans.procedure_id and all(c["id"] != ans.procedure_id for c in cands):
         cands.insert(0, {"id": ans.procedure_id, "name": ans.procedure_name, "short": None})
     ans.candidates = [ProcedureSummary(**c) for c in cands[:3]]

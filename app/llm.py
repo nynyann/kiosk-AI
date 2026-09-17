@@ -307,6 +307,31 @@ async def pick_procedures(utterance: str, procedures: List[dict]) -> List[str]:
     return out[:3]
 
 
+async def steer_reply(utterance: str, procedures: List[dict]) -> Optional[str]:
+    """Bác nói câu không ứng với thủ tục nào («đúng rồi hướng dẫn tôi từng
+    bước», «cháu tên gì», «trời mưa quá»): mô hình đáp lại tử tế rồi lái về
+    câu hỏi «bác cần làm thủ tục gì», chỉ được nhắc tên 6 thủ tục kiosk có.
+    Trả None khi tắt hoặc hỏng, để dùng câu tĩnh."""
+    if not enabled() or not (utterance or "").strip():
+        return None
+    menu = "; ".join(p.get("short") or p.get("name") or "" for p in procedures)
+    prompt = (
+        f"Kiosk chỉ hướng dẫn 6 thủ tục: {menu}. "
+        f"Người dân nói: «{utterance}». "
+        "Câu này không rõ bác cần thủ tục nào. Hãy đáp lại 1 đến 2 câu: nếu bác đang nói chuyện "
+        "hoặc hỏi ngoài lề thì đáp ngắn cho phải phép, rồi hỏi lại bác cần làm thủ tục gì và "
+        "gợi ý cách nói (ví dụ «tôi muốn làm căn cước», «tôi xin trợ cấp người già»). Nếu câu "
+        "nghe không thành nghĩa thì mời bác nói lại chậm hơn. Không nói về thủ tục nào ngoài 6 "
+        "thủ tục trên, không bịa quy định. Chỉ trả lời câu nói, không giải thích."
+    )
+    text = await chat([{"role": "system", "content": STYLE}, {"role": "user", "content": prompt}],
+                      max_tokens=120, temperature=0.3)
+    text = (text or "").strip().strip('"«»')
+    if text.startswith("{") or not (10 < len(text) < 400):
+        return None
+    return text
+
+
 async def pick_procedure(utterance: str, procedures: List[dict]) -> Optional[str]:
     """Mã thủ tục chắc nhất, hoặc None. Giữ cho chỗ nào chỉ cần một."""
     got = await pick_procedures(utterance, procedures)
