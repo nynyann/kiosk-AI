@@ -206,10 +206,13 @@ def evaluate(proc: dict, answers: Dict[str, str], first: bool = False) -> FlowSt
     if outcome and outcome.get("verdict") != "eligible":
         return _stop_state(proc, answers, outcome)
 
+    # Kết luận «đủ điều kiện» chỉ áp dụng khi đã hỏi hết các câu còn phải hỏi:
+    # kho căn cước kết luận theo mục đích (lần đầu / đổi / mất) nhưng vẫn còn
+    # câu hỏi riêng của từng nhánh phía sau.
+    nxt = _next_question(proc, answers)
+    if nxt is not None:
+        return _question_state(proc, answers, *nxt, first=first)
     if outcome is None:
-        nxt = _next_question(proc, answers)
-        if nxt is not None:
-            return _question_state(proc, answers, *nxt, first=first)
         outcome = _check(proc).get("eligible") or {}
 
     return _prepare_state(proc, answers, outcome)
@@ -571,19 +574,25 @@ def all_speech_texts(proc: dict) -> List[str]:
 
     Câu hỏi được sinh cả hai kiểu (có lời dẫn / không) vì câu đầu tiên có lời
     dẫn còn các câu sau thì không. Kết luận, bước 2 mặc định, bước 3, kết thúc
-    và FAQ đều có. Bước 2 theo từng tổ hợp lựa chọn thì không liệt kê hết —
-    bác nào rơi vào đó chịu chậm 1–2 giây một lần, cache giữ cho lần sau.
+    và FAQ đều có; bước 2, 3 liệt kê theo mọi đường trả lời có thể xảy ra.
     """
     texts: List[str] = []
     qs = _questions(proc)
     for i, q in enumerate(qs):
         texts.append(_question_state(proc, {} if i == 0 else {"_": "x"}, q, 1, 1).speech)
-    for o in _check(proc).get("outcomes") or []:
-        if o.get("verdict") != "eligible":
-            texts.append(_stop_state(proc, {}, o).speech)
-        else:
-            texts.append(_prepare_state(proc, {}, o).speech)
-    texts.append(_prepare_state(proc, {}, _check(proc).get("eligible") or {}).speech)
+    # Đi hết mọi nhánh trả lời có thể xảy ra: kết luận, bước 2 và bước 3 đều
+    # đổi theo lựa chọn (ghi chú riêng, hồ sơ riêng), nên liệt kê theo đường
+    # đi thật chứ không theo từng kết luận rời. Mỗi thủ tục vài chục đường.
+    stack: List[Dict[str, str]] = [{}]
+    while stack:
+        answers = stack.pop()
+        st = evaluate(proc, answers)
+        if st.stage == "check" and st.question is not None:
+            stack += [{**answers, st.question.id: o.value} for o in st.question.options]
+            continue
+        texts.append(st.speech)
+        if st.stage == "prepare":
+            texts.append(submit_state(proc, answers).speech)
     texts.append(submit_state(proc, {}).speech)
     for c in (_flow(proc).get("submit") or {}).get("choices") or []:
         if c.get("say"):

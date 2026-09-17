@@ -281,6 +281,34 @@ def test_moi_cau_may_doc_deu_duoc_liet_ke_de_sinh_san():
     assert not any("(" in t for t in texts)
 
 
+def test_ket_luan_du_dieu_kien_van_hoi_het_cau_cua_nhanh():
+    """Lỗi 17/09: căn cước kết luận theo mục đích nên bỏ qua câu hỏi riêng của
+    nhánh (mất thẻ mà không hỏi tài khoản định danh) và máy im vì câu bước 2
+    không có sẵn tiếng."""
+    st = _answer("cap-the-can-cuoc", {}, "purpose", "lost")
+    assert st["stage"] == "check" and st["question"]["id"] == "eid"
+    st = _answer("cap-the-can-cuoc", {"purpose": "lost"}, "eid", "no")
+    assert st["stage"] == "prepare" and any("xác minh" in n for n in st["notes"])
+    assert "bảy mươi nghìn đồng" in st["speech"]
+
+
+def test_moi_duong_tra_loi_deu_co_cau_doc_san():
+    """Đi hết mọi nhánh của 6 thủ tục: câu máy nói ở kết luận, bước 2, bước 3
+    đều phải nằm trong danh sách sinh tiếng sẵn, không thì kiosk im."""
+    known = set(kb.all_speech_texts())
+    for proc in kb.procedures():
+        stack = [{}]
+        while stack:
+            answers = stack.pop()
+            st = flow.evaluate(proc, answers)
+            if st.stage == "check":
+                stack += [{**answers, st.question.id: o.value} for o in st.question.options]
+                continue
+            assert st.speech in known, (proc["id"], answers)
+            if st.stage == "prepare":
+                assert flow.submit_state(proc, answers).speech in known, (proc["id"], answers)
+
+
 if __name__ == "__main__":
     try:
         sys.stdout.reconfigure(encoding="utf-8")

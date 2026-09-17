@@ -73,6 +73,11 @@ def test_chu_so_thanh_chu_de_doc():
     # Số dính chữ phải tách ra, không thì giọng đọc nuốt mất số: "QH15" từng
     # thành "QHmười lăm". Lộ ra khi đọc nguồn văn bản ở bước 3 của luồng.
     assert digits_to_words("Luật số 41/2024/QH15") == "Luật số bốn mươi mốt/hai nghìn hai mươi bốn/QH mười lăm"
+    # Tiền viết kiểu Việt "70.000" từng đọc thành "bảy mươi. không" (lộ ra ở
+    # bước 2 của căn cước, 17/09). Mã thủ tục "1.014027" không bị gộp nhầm.
+    assert digits_to_words("70.000 đồng") == "bảy mươi nghìn đồng"
+    assert digits_to_words("tối đa 200.000 đồng/bản") == "tối đa hai trăm nghìn đồng/bản"
+    assert "nghìn" not in digits_to_words("1.014027").split(".")[0]
 
 
 def test_khong_pha_cau_da_dung():

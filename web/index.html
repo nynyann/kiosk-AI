@@ -367,9 +367,14 @@ async function speak(text){
     try{
       let blob = prefetched.get(text);
       if (!blob){
-        const res = await fetch(BASE + "/tts", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ text }) });
-        if (!res.ok) throw new Error("tts " + res.status);
-        blob = await res.blob();
+        // Dịch vụ giọng đọc hỏng theo đợt: thử lại một lần trước khi rơi về
+        // giọng trình duyệt (thường không có tiếng Việt, tức là máy im).
+        for (let lan = 0; ; lan++){
+          const res = await fetch(BASE + "/tts", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ text }) });
+          if (res.ok){ blob = await res.blob(); break; }
+          if (lan >= 1 || ticket !== speechTicket) throw new Error("tts " + res.status);
+          await new Promise(r => setTimeout(r, 1500));
+        }
       }
       if (ticket !== speechTicket) return;
       const audio = new Audio(URL.createObjectURL(blob));

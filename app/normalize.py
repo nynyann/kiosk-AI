@@ -183,6 +183,9 @@ def digits_to_words(text: str) -> str:
     # "QHmười lăm" và giọng đọc nuốt mất số.
     text = re.sub(r"(?<=[^\W\d_])(?=\d)", " ", text)
     text = re.sub(r"(?<=\d)(?=[^\W\d_])", " ", text)
+    # Số tiền viết kiểu Việt "70.000", "200.000": gộp dấu chấm nghìn trước, không
+    # thì đọc thành "bảy mươi. không". Mã thủ tục "1.014027" không khớp mẫu này.
+    text = re.sub(r"(?<!\d)\d{1,3}(?:\.\d{3})+(?!\d)", lambda m: m.group().replace(".", ""), text)
     return re.sub(r"\d+", lambda m: num_to_vi(int(m.group())), text)
 
 
