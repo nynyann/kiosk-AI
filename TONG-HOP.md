@@ -218,9 +218,9 @@ viết; máy chỉ đọc lại đúng những gì có trong file, không sinh t
 | `tro-cap-huu-tri-xa-hoi` | 1.014027 | Trợ cấp hưu trí xã hội (xin mới, điều chỉnh, thôi hưởng); mức 500.000 đồng một tháng | không | 10 ngày làm việc |
 | `tro-cap-xa-hoi-hang-thang` | 1.001776 | Trợ cấp xã hội hằng tháng (xin mới theo 5 nhóm đối tượng, điều chỉnh, thôi hưởng) | không | 10 ngày làm việc |
 | `cap-the-bao-hiem-y-te` | 1.014137 | Cấp thẻ BHYT (cấp mới giấy hoặc điện tử, sửa thông tin, hỏi quyền lợi) | không | 05 ngày làm việc |
-| `cap-ban-sao-trich-luc-ho-tich` | (chưa ghi) | Cấp bản sao giấy khai sinh, trích lục hộ tịch | 8.000 đồng một bản | trong ngày, sau 15 giờ thì hôm sau |
+| `cap-ban-sao-trich-luc-ho-tich` | 2.000635 | Cấp bản sao giấy khai sinh, trích lục hộ tịch | 8.000 đồng một bản | trong ngày, sau 15 giờ thì hôm sau |
 | `chung-thuc-ban-sao` | 2.000815 | Chứng thực bản sao từ bản chính | 2.000 đồng một trang cho 2 trang đầu, từ trang 3 là 1.000 đồng, tối đa 200.000 đồng một bản | trong ngày, phức tạp thêm tối đa 02 ngày làm việc |
-| `cap-the-can-cuoc` | (chưa ghi) | Cấp thẻ căn cước: lần đầu, đổi hoặc cập nhật, mất thẻ | lần đầu miễn phí; đổi CCCD sang căn cước 30.000; cấp đổi 50.000; cấp lại 70.000 đồng một thẻ | 07 ngày làm việc |
+| `cap-the-can-cuoc` | 2.000200 | Cấp thẻ căn cước: lần đầu, đổi hoặc cập nhật, mất thẻ | lần đầu miễn phí; đổi CCCD sang căn cước 30.000; cấp đổi 50.000; cấp lại 70.000 đồng một thẻ | 07 ngày làm việc |
 
 Mỗi file có hai phần:
 
@@ -626,7 +626,7 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 29 commit từ 07/09 đến 17/09/2
 | dcc4308 | Đo 5 mô hình trên khoá thật, chốt gemma-4-31B-it; chốt bằng chứng khi điền sẵn; sửa FAQ khớp bừa; hỏi mô hình trước gợi ý chuyển; config tự đọc .env; 62 test |
 | 7af3aa2 | Giao diện bản 3: trang chủ có menu và góp ý, chọn xưng hô, trợ lý AI bên trái, thủ tục gợi ý để chọn, mic luôn hiện và nhấp nháy; xưng hô theo lựa chọn; mô hình tự nói câu ngoài kho; kho thêm cách kê khai mẫu; API 2.2; 64 test |
 | b80e0a5 | Xưng hô trung tính «bác», bỏ bước chọn; chốt cứng con số trong câu trả lời phải có trong kho; prompt gọn hơn 40%; 66 test |
-| (17/09, lần 3) | Lắp kho tri thức bản 17/09 của Mian (Excel 6 sheet) vào 6 file JSON: mã thủ tục, lệ phí, mức trợ cấp, nhánh điều chỉnh và thôi hưởng, căn cước gộp lần đầu, đổi, mất; bước 3 có nút chọn cách nộp; API 2.3; sinh lại kho mp3; 66 test |
+| 8487c31 | Lắp kho tri thức bản 17/09 của Mian (Excel 6 sheet) vào 6 file JSON: mã thủ tục, lệ phí, mức trợ cấp, nhánh điều chỉnh và thôi hưởng, căn cước gộp lần đầu, đổi, mất; bước 3 có nút chọn cách nộp; API 2.3; sinh lại kho mp3; 66 test |
 
 Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 
@@ -726,7 +726,6 @@ Lần cập nhật 17/09/2026 (lần 3, kho tri thức mới của Mian) thay đ
 | Chạy `eval.wer` trên tập tự thu, ghi WER và tỷ lệ bắt đúng cụm hành chính | Lia | `results/` | cao |
 | Bổ sung `HARD_FIXES` từ cụm nghe nhầm thật, chạy `eval.rescore`, ghi chuỗi số cải thiện | Lia | `app/normalize.py` | cao, là nội dung mục 4.3 |
 | Đọc lại 30 câu hỏi bước 1 và 31 kết luận trong JSON, đối chiếu với sheet Excel bản 17/09 xem chuyển có sót ý nào | Mian | `data/kb/*.json` mục `flow.check`, `data/kb-source/` | cao |
-| Bổ sung mã thủ tục cho hộ tịch và căn cước (sheet chưa ghi) | Mian | `data/kb/*.json` trường `code` | vừa |
 | Đối chiếu ba mục kê khai mẫu (`flow.forms`) với mẫu in kèm Nghị định, sửa mục nào sai, ghi ngày kiểm chứng | Mian | `data/kb/*.json` mục `flow.forms`, `forms_note` | cao, nhóm tự viết theo Nghị định, chưa đối chiếu mẫu in |
 | Thay hòm thư và số điện thoại góp ý trên trang chủ bằng của địa phương đặt kiosk | Kns | `web/index.html`, khối `#contact` | vừa |
 | Thêm FAQ sau mỗi buổi thử với người thật | Mian | `flow.faq` | vừa |
