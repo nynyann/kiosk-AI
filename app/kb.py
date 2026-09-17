@@ -13,6 +13,7 @@ Kim thêm so khớp ngữ nghĩa (sentence-transformers) thì chỉ cần sửa 
 from __future__ import annotations
 
 import json
+import re
 import unicodedata
 from pathlib import Path
 from typing import Dict, List, Tuple
@@ -204,7 +205,8 @@ def _spoken_for(proc: dict, steps, lead: str) -> str:
     )
     if proc.get("where_to_submit"):
         spoken += f" Bác nộp tại {proc['where_to_submit']}"
-    return spoken
+    # Bỏ phần trong ngoặc: hữu ích trên màn hình, đọc lên thì dài và rối.
+    return re.sub(r"\s*\([^)]*\)", "", spoken)
 
 
 def confirm_text(proc: dict) -> str:

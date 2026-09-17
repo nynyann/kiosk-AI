@@ -25,7 +25,7 @@ from typing import Dict, List, Optional, Tuple
 
 from . import config
 from .normalize import for_speech, normalize
-from .schemas import (FlowAskResult, FlowOption, FlowQuestion, FlowState,
+from .schemas import (FlowAskResult, FlowOption, FlowQuestion, FlowState, SubmitChoice,
                       Source)
 
 # ---------------------------------------------------------------------------
@@ -285,6 +285,11 @@ def submit_state(proc: dict, answers: Dict[str, str]) -> FlowState:
     st.title = STEP_TITLES[3]
     info = _submit_info(proc)
     st.places, st.methods, st.bring = info["places"], info["methods"], info["bring"]
+    sub_cfg = _flow(proc).get("submit") or {}
+    st.submit_choices = [
+        SubmitChoice(label=c["label"], say=c["say"], speech=_spoken(c["say"]))
+        for c in sub_cfg.get("choices") or [] if c.get("label") and c.get("say")
+    ]
     st.agency, st.processing_time = info["agency"], info["processing_time"]
     st.result, st.fee = info["result"], info["fee"]
     st.notes = _option_notes(proc, answers)
@@ -580,6 +585,9 @@ def all_speech_texts(proc: dict) -> List[str]:
             texts.append(_prepare_state(proc, {}, o).speech)
     texts.append(_prepare_state(proc, {}, _check(proc).get("eligible") or {}).speech)
     texts.append(submit_state(proc, {}).speech)
+    for c in (_flow(proc).get("submit") or {}).get("choices") or []:
+        if c.get("say"):
+            texts.append(_spoken(c["say"]))
     texts.append(done_state(proc, {}).speech)
     for item in _flow(proc).get("faq") or []:
         if item.get("a"):

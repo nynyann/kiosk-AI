@@ -1,6 +1,6 @@
 # Giao kèo API — Kiosk hướng dẫn thủ tục hành chính
 
-Phiên bản 2.2 — chốt ngày 17/09/2026. **Chốt rồi không đổi tên trường nữa.**
+Phiên bản 2.3 — chốt ngày 17/09/2026. **Chốt rồi không đổi tên trường nữa.**
 
 Đổi so với 1.0, **chỉ thêm, không đổi và không bỏ trường nào**, nên giao diện
 viết theo 1.0 vẫn chạy nguyên:
@@ -25,6 +25,10 @@ viết theo 1.0 vẫn chạy nguyên:
   thủ tục có thể là điều bác cần, chắc nhất trước) để giao diện đưa ra cho
   bác chọn. Kho tri thức thêm mục `flow.forms` (cách kê khai từng mục của
   mẫu), mô hình đọc được khi bác hỏi «mẫu này điền thế nào».
+- 2.3: `/flow/*` ở `stage: "submit"` trả thêm `submit_choices` (các cách
+  nộp theo kho tri thức mới: trực tiếp, trực tuyến, bưu chính; mỗi cách có
+  `label`, `say` và `speech`). Giao diện vẽ thành nút nhấp nháy, bấm thì máy
+  nói hướng dẫn riêng cho cách đó. Không có thì mảng rỗng.
 Nếu buộc phải đổi, tăng số phiên bản và báo trong nhóm chat trước khi đẩy code.
 
 Địa chỉ máy chủ:
@@ -321,6 +325,7 @@ Mọi đường dẫn `/flow/*` trả về cùng một kiểu **FlowState**:
   "suggest_procedure_id": null, "suggest_procedure_name": null,
   "note": null, "documents": [], "notes": [], "tips": [],
   "places": [], "methods": [], "bring": [],
+  "submit_choices": [ { "label": "Nộp trực tiếp", "say": "…", "speech": "…" } ],
   "agency": null, "processing_time": null, "result": null, "fee": null,
   "source": { "title": "…", "url": "…" },
   "asr": null, "matched": null, "message": null
@@ -334,7 +339,7 @@ Giao diện chỉ cần nhìn `stage` để biết vẽ màn hình nào:
 | `check`   | 1 | `intro` (chỉ câu đầu), `question.text`, `question.hint` (cách trả lời), nút cho từng `question.options` | bấm chọn → `/flow/answer`, hoặc nói → `/flow/answer-voice` |
 | `stop`    | 1 | `title` + `reason`. `verdict` là `ineligible` (chưa đủ điều kiện), `consult` (cần cán bộ xác định) hoặc `redirect` (đây là thủ tục khác, có thể kèm `suggest_procedure_id`) | Làm lại, xem thủ tục gợi ý, hoặc kết thúc |
 | `prepare` | 2 | `note` (kết quả bước 1), `prompt`, `documents` (danh sách giấy tờ **theo đúng trường hợp của bác**), `notes` (lưu ý theo lựa chọn), `tips` | hỏi thêm → `/flow/ask`; tiếp tục → `/flow/next` với `stage: "prepare"` |
-| `submit`  | 3 | `prompt`, `places`, `methods`, `bring`, `agency`, `processing_time`, `result`, `fee`, `source` | hỏi thêm → `/flow/ask`; kết thúc → `/flow/next` với `stage: "submit"` |
+| `submit`  | 3 | `prompt`, `submit_choices` (nút chọn cách nộp, bấm thì đọc `speech`), `places`, `methods`, `bring`, `agency`, `processing_time`, `result`, `fee`, `source` | hỏi thêm → `/flow/ask`; kết thúc → `/flow/next` với `stage: "submit"` |
 | `done`    | — | `prompt` | về màn hình chính |
 
 `speech` luôn là câu để đọc thành tiếng cho trạng thái đó (đưa vào `/tts`).

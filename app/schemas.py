@@ -180,6 +180,9 @@ class FlowState(BaseModel):
     tips: List[str] = []
     places: List[str] = []
     methods: List[str] = []
+    # Bước 3: «Bác muốn nộp bằng cách nào?» Mỗi cách một nút, bấm thì máy nói
+    # `say` của cách đó (giao diện tự hiện và đọc, không gọi máy chủ).
+    submit_choices: List["SubmitChoice"] = []
     bring: List[str] = []
     agency: Optional[str] = None
     processing_time: Optional[str] = None
@@ -192,6 +195,12 @@ class FlowState(BaseModel):
     # là trạng thái cũ (câu hỏi cũ) để bác bấm chọn.
     matched: Optional[bool] = None
     message: Optional[str] = None
+
+
+class SubmitChoice(BaseModel):
+    label: str
+    say: str
+    speech: str = ""
 
 
 class PrefilledAnswer(BaseModel):

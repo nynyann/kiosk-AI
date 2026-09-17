@@ -64,11 +64,11 @@ def test_danh_sach_thu_tuc():
     assert all(p["id"] and p["name"] for p in d["procedures"])
 
 
-# --- Bước 1: hỏi đúng thứ tự trong sơ đồ (tuổi → công dân → lương hưu → BHXH → hộ nghèo)
+# --- Bước 1: hỏi đúng thứ tự trong kho (mục đích → tuổi → công dân → lương hưu → BHXH → hộ nghèo)
 def test_bat_dau_hoi_cau_dau_tien_kem_loi_dan():
     st = client.post("/flow/start", json={"procedure_id": HUU_TRI}).json()
     assert st["ok"] and st["stage"] == "check" and st["step"] == 1
-    assert st["question"]["id"] == "age"
+    assert st["question"]["id"] == "purpose"
     assert "cháu hỏi bác" in st["speech"].lower()
     assert st["answers"] == {}
 
@@ -76,7 +76,7 @@ def test_bat_dau_hoi_cau_dau_tien_kem_loi_dan():
 def test_dap_ung_dieu_kien_thi_sang_buoc_2():
     st = client.post("/flow/start", json={"procedure_id": HUU_TRI}).json()
     order = []
-    for qid, v in [("age", "ge75"), ("citizen", "yes"), ("pension", "no"), ("bhxh", "no")]:
+    for qid, v in [("purpose", "new"), ("age", "ge75"), ("citizen", "yes"), ("pension", "no"), ("bhxh", "no")]:
         assert st["question"]["id"] == qid
         order.append(qid)
         st = _answer(HUU_TRI, st["answers"], qid, v)
@@ -84,22 +84,22 @@ def test_dap_ung_dieu_kien_thi_sang_buoc_2():
     assert st["stage"] == "prepare" and st["step"] == 2 and st["verdict"] == "eligible"
     assert st["documents"] and st["note"]
     assert "có khả năng" in st["note"]           # không kết luận "chắc chắn được hưởng"
-    assert st["answers"] == {"age": "ge75", "citizen": "yes", "pension": "no", "bhxh": "no"}
+    assert st["answers"] == {"purpose": "new", "age": "ge75", "citizen": "yes", "pension": "no", "bhxh": "no"}
 
 
 def test_70_den_75_thi_hoi_them_ho_ngheo():
     st = client.post("/flow/start", json={"procedure_id": HUU_TRI}).json()
-    for qid, v in [("age", "70_74"), ("citizen", "yes"), ("pension", "no"), ("bhxh", "no")]:
+    for qid, v in [("purpose", "new"), ("age", "70_74"), ("citizen", "yes"), ("pension", "no"), ("bhxh", "no")]:
         st = _answer(HUU_TRI, st["answers"], qid, v)
     assert st["stage"] == "check" and st["question"]["id"] == "poor"
-    assert st["question"]["index"] == 5 and st["question"]["total"] == 5
+    assert st["question"]["index"] == 6 and st["question"]["total"] == 6
     st = _answer(HUU_TRI, st["answers"], "poor", "no")
     assert st["stage"] == "stop" and st["verdict"] == "ineligible"
     assert "hộ nghèo" in st["reason"]
 
 
 def test_khong_dap_ung_thi_dung_ngay_va_giai_thich():
-    st = _answer(HUU_TRI, {}, "age", "lt70")
+    st = _answer(HUU_TRI, {"purpose": "new"}, "age", "lt70")
     assert st["stage"] == "stop" and st["verdict"] == "ineligible"
     assert st["title"] == "Chưa đủ điều kiện"
     assert st["reason"] and st["speech"]
@@ -107,7 +107,7 @@ def test_khong_dap_ung_thi_dung_ngay_va_giai_thich():
 
 
 def test_khong_ro_thi_moi_gap_can_bo_chu_khong_ket_luan():
-    answers = {"age": "70_74", "citizen": "yes", "pension": "no", "bhxh": "no"}
+    answers = {"purpose": "new", "age": "70_74", "citizen": "yes", "pension": "no", "bhxh": "no"}
     st = _answer(HUU_TRI, answers, "poor", "unsure")
     assert st["stage"] == "stop" and st["verdict"] == "consult"
 
@@ -119,16 +119,22 @@ def test_thu_tuc_khac_thi_goi_y_chuyen():
     assert st["suggest_procedure_name"]
 
 
-def test_can_cuoc_da_co_the_thi_khong_huong_dan_nham_cap_moi():
-    st = _answer("cap-the-can-cuoc", {"have": "yes"}, "why", "lost")
-    assert st["stage"] == "stop" and st["verdict"] == "redirect"
-    assert "cấp lại" in st["reason"]
+def test_can_cuoc_mat_the_thi_huong_dan_cap_lai_kem_le_phi():
+    """Kho mới gộp 6A/6B/6C vào một thủ tục: mất thẻ vẫn đi tiếp bước 2, 3,
+    kèm lệ phí cấp lại 70.000 đồng chứ không đẩy sang thủ tục khác."""
+    st = _answer("cap-the-can-cuoc", {"purpose": "lost"}, "eid", "no")
+    assert st["stage"] == "prepare" and st["verdict"] == "eligible"
+    assert "cấp lại" in st["note"] and "70.000" in st["note"]
+    st = _answer("cap-the-can-cuoc", {"purpose": "first"}, "in_db", "yes")
+    assert st["stage"] == "prepare" and "miễn phí" in st["note"]
+    st = _answer("cap-the-can-cuoc", {"purpose": "change"}, "reason", "age")
+    assert st["stage"] == "prepare" and "50.000" in st["note"]
 
 
 def test_dieu_chinh_tro_cap_thi_ho_so_khac_voi_xin_moi():
-    moi = _answer("tro-cap-xa-hoi-hang-thang", {"purpose": "new", "receiving": "no", "pension": "no"}, "age", "ge80")
+    moi = _answer("tro-cap-xa-hoi-hang-thang", {"purpose": "new"}, "group", "elderly")
     assert moi["stage"] == "prepare"
-    dc = _answer("tro-cap-xa-hoi-hang-thang", {}, "purpose", "adjust")
+    dc = _answer("tro-cap-xa-hoi-hang-thang", {"purpose": "adjust"}, "change_kind", "info")
     assert dc["stage"] == "prepare"
     assert dc["documents"] != moi["documents"]
     assert any("điều chỉnh" in d.lower() for d in dc["documents"])
@@ -178,9 +184,10 @@ def test_anh_xa_loi_noi_sang_lua_chon():
     assert flow.match_option(q, "không tôi không có lương hưu") == "no"
     assert flow.match_option(q, "có đang nhận") == "yes"
     assert flow.match_option(q, "dạ chưa") == "no"
-    q = flow.find_question(kb.get("cap-the-can-cuoc"), "have")
-    assert flow.match_option(q, "chưa có") == "no"
-    assert flow.match_option(q, "có rồi") == "yes"
+    q = flow.find_question(kb.get("cap-the-can-cuoc"), "purpose")
+    assert flow.match_option(q, "tôi chưa có thẻ") == "first"
+    assert flow.match_option(q, "tôi làm mất thẻ rồi") == "lost"
+    assert flow.match_option(q, "thẻ hết hạn muốn đổi") == "change"
 
 
 def test_answer_voice_khong_hieu_thi_giu_nguyen_cau_hoi():
@@ -190,13 +197,13 @@ def test_answer_voice_khong_hieu_thi_giu_nguyen_cau_hoi():
         r = client.post("/flow/answer-voice",
                         files={"audio": ("a.webm", b"x", "audio/webm")},
                         data={"procedure_id": HUU_TRI, "question_id": "citizen",
-                              "answers": '{"age": "ge75"}'})
+                              "answers": '{"purpose": "new", "age": "ge75"}'})
         d = r.json()
         assert r.status_code == 200 and d["ok"]
         assert "asr" in d and d["matched"] in (True, False)
         if not d["matched"]:
             assert d["stage"] == "check" and d["question"]["id"] == "citizen"
-            assert d["message"] and d["answers"] == {"age": "ge75"}
+            assert d["message"] and d["answers"] == {"purpose": "new", "age": "ge75"}
 
 
 # --- Hỏi thêm ở bước 2 / 3 ---------------------------------------------------
@@ -208,7 +215,7 @@ def test_hoi_them_tra_loi_tu_faq_cua_thu_tuc():
 
 def test_hoi_them_y_dinh_chung_noi_nop_thoi_gian():
     d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "nộp ở đâu"}).json()
-    assert d["matched"] and "Trung tâm" in d["answer"]
+    assert d["matched"] and "Uỷ ban nhân dân cấp xã" in d["answer"]
     d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "bao lâu thì xong"}).json()
     assert d["matched"] and "10 ngày" in d["answer"]
 
@@ -235,9 +242,10 @@ def test_hoi_them_ve_thu_tuc_khac_kem_y_dinh_chung_van_goi_y_chuyen():
 def test_cau_hoi_buoc_1_co_huong_dan_cach_tra_loi():
     st = client.post("/flow/start", json={"procedure_id": HUU_TRI}).json()
     assert "bấm chọn" in st["question"]["hint"]
-    assert "ví dụ" in st["question"]["hint"]          # câu hỏi tuổi: gợi ý nói số
     assert "trả lời bằng lời" in st["speech"].lower()  # câu đầu dặn cách trả lời
-    st = _answer(HUU_TRI, {}, "age", "ge75")
+    st = _answer(HUU_TRI, {}, "purpose", "new")
+    assert "ví dụ" in st["question"]["hint"]          # câu hỏi tuổi: gợi ý nói số
+    st = _answer(HUU_TRI, {"purpose": "new"}, "age", "ge75")
     assert "«có» hoặc «không»" in st["question"]["hint"]
 
 

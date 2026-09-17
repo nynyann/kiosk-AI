@@ -63,12 +63,12 @@ def test_khong_co_khoa_thi_tat_va_khong_nem_loi():
 
 def test_khong_co_khoa_van_dien_san_bang_luat():
     st = client.post("/flow/start", json={"procedure_id": HUU_TRI,
-                                          "utterance": "tôi bảy mươi sáu tuổi, không có lương hưu"}).json()
-    assert st["answers"] == {"age": "ge75", "pension": "no"}
+                                          "utterance": "tôi muốn đăng ký trợ cấp, tôi bảy mươi sáu tuổi, không có lương hưu"}).json()
+    assert st["answers"] == {"purpose": "new", "age": "ge75", "pension": "no"}
     assert st["question"]["id"] == "citizen"          # chỉ hỏi phần còn thiếu
     assert st["intro"]                                  # vẫn có lời dẫn bước 1
     assert st["ack"].startswith("Cháu ghi nhận")
-    assert [x["question_id"] for x in st["prefilled"]] == ["age", "pension"]
+    assert [x["question_id"] for x in st["prefilled"]] == ["purpose", "age", "pension"]
 
 
 def test_dien_san_bang_luat_khong_dung_co_khong_chung_chung():
@@ -79,16 +79,16 @@ def test_dien_san_bang_luat_khong_dung_co_khong_chung_chung():
 
 # --- 2. Có mô hình ------------------------------------------------------------
 def test_dien_san_va_xac_nhan_da_hieu_bang_mo_hinh(fake_llm):
-    fake_llm('{"answers": {"age": "ge75", "pension": "no", "citizen": "yes"}, '
-             '"evidence": {"age": "76 tuổi", "pension": "chưa có lương hưu", "citizen": "người Việt"}, '
+    fake_llm('{"answers": {"purpose": "new", "age": "ge75", "pension": "no", "citizen": "yes"}, '
+             '"evidence": {"purpose": "đăng ký trợ cấp", "age": "76 tuổi", "pension": "chưa có lương hưu", "citizen": "người Việt"}, '
              '"ack": "Cháu hiểu rồi ạ, bác 76 tuổi, chưa có lương hưu và đang sống một mình."}')
     st = client.post("/flow/start", json={"procedure_id": HUU_TRI,
-                                          "utterance": "tôi 76 tuổi sống một mình chưa có lương hưu, người Việt"}).json()
-    assert st["answers"] == {"age": "ge75", "pension": "no", "citizen": "yes"}
+                                          "utterance": "tôi muốn đăng ký trợ cấp, tôi 76 tuổi sống một mình chưa có lương hưu, người Việt"}).json()
+    assert st["answers"] == {"purpose": "new", "age": "ge75", "pension": "no", "citizen": "yes"}
     assert st["question"]["id"] == "bhxh"
     assert st["ack"].startswith("Cháu hiểu rồi ạ")
     assert st["speech"].startswith("Cháu hiểu rồi ạ")   # đọc câu xác nhận trước câu hỏi
-    assert len(st["prefilled"]) == 3
+    assert len(st["prefilled"]) == 4
 
 
 def test_mo_hinh_dien_ma_khong_co_bang_chung_thi_bo(fake_llm):
@@ -172,9 +172,9 @@ def test_hieu_cau_tra_loi_tu_do_o_buoc_1(fake_llm):
     from itertools import cycle
     mock._ASR_SAMPLES = cycle([("dạ cháu nó bảo tôi quốc tịch mình đấy", "…", 0.9, False)])
     r = client.post("/flow/answer-voice", files={"audio": ("a.webm", b"x", "audio/webm")},
-                    data={"procedure_id": HUU_TRI, "question_id": "citizen", "answers": '{"age": "ge75"}'})
+                    data={"procedure_id": HUU_TRI, "question_id": "citizen", "answers": '{"purpose": "new", "age": "ge75"}'})
     d = r.json()
-    assert d["matched"] is True and d["answers"] == {"age": "ge75", "citizen": "yes"}
+    assert d["matched"] is True and d["answers"] == {"purpose": "new", "age": "ge75", "citizen": "yes"}
     assert d["question"]["id"] == "pension"
 
 
@@ -218,11 +218,11 @@ def test_thu_tuc_khac_thi_hoi_mo_hinh_truoc_ngoai_kho_moi_goi_y_chuyen(fake_llm)
 
 
 def test_cau_tra_loi_co_so_khong_co_trong_kho_thi_bo(fake_llm):
-    """Lớp chặn cứng: mô hình nói «30 ngày» trong khi kho ghi 10 ngày → bỏ,
+    """Lớp chặn cứng: mô hình nói «45 ngày» trong khi kho ghi 10 ngày → bỏ,
     về câu mời gặp cán bộ. Nói «10 ngày» thì được."""
-    fake_llm('{"in_kb": true, "answer": "Khoảng 30 ngày làm việc là có kết quả bác ạ."}')
+    fake_llm('{"in_kb": true, "answer": "Khoảng 45 ngày làm việc là có kết quả bác ạ."}')
     d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "mấy hôm thì xong"}).json()
-    assert d["via_llm"] is False and "30" not in d["answer"]
+    assert d["via_llm"] is False and "45" not in d["answer"]
     fake_llm('{"in_kb": true, "answer": "Trong 10 ngày làm việc là có kết quả bác ạ."}')
     d = client.post("/flow/ask", data={"procedure_id": HUU_TRI, "text": "mấy hôm thì xong"}).json()
     assert d["via_llm"] is True and "10" in d["answer"]

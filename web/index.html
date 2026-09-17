@@ -140,7 +140,7 @@
     border-radius:var(--r-md); padding:16px 18px; min-height:70px;
     font-weight:700; font-size:var(--fs-body); line-height:1.3; text-align:center;
   }
-  .opt-btn:active{ background:var(--indigo); color:#fff; }
+  .opt-btn:active, .opt-btn.chosen{ background:var(--indigo); color:#fff; }
   .opt-btn .sub{ display:block; font-weight:500; font-size:var(--fs-label); color:var(--ink-soft); margin-top:4px; }
   .pron-btn{ font-size: clamp(1.3rem, 3vw, 1.8rem); min-height:84px; }
   .row{ display:flex; flex-wrap:wrap; gap:12px; justify-content:center; width:100%; margin-top:14px; }
@@ -730,13 +730,24 @@ function renderPrepare(st){
 function renderSubmit(st){
   const meta = [["Cơ quan xử lý", st.agency], ["Thời hạn", st.processing_time], ["Kết quả", st.result], ["Phí", st.fee]].filter(([,v]) => v).map(([k,v]) => `<div class="meta"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`).join("");
   aiSay(`<span class="stephead">Bước 3 · Nộp hồ sơ</span><p>${esc(st.prompt)}</p>`, { hint: "Nơi nộp, giấy tờ mang theo và thời hạn ở bên phải. Còn thắc mắc thì bấm micro hỏi thêm.", speech: st.speech });
-  setPanel(`<div class="card"><h3>Nộp ở đâu</h3>${bullets(st.places)}<h3 style="margin-top:10px">Cách nộp</h3>${bullets(st.methods)}</div>
+  const choices = st.submit_choices || [];
+  setPanel(`${choices.length ? `<div class="card"><h3>${esc(pronoun.charAt(0).toUpperCase() + pronoun.slice(1))} định nộp theo cách nào? Bấm để nghe hướng dẫn</h3>
+      <div class="options">${choices.map((c, i) => `<button class="opt-btn glow" data-c="${i}">${esc(c.label)}</button>`).join("")}</div></div>` : ""}
+    <div class="card"><h3>Nộp ở đâu</h3>${bullets(st.places)}<h3 style="margin-top:10px">Cách nộp</h3>${bullets(st.methods)}</div>
     <div class="card"><h3>Khi đi mang theo</h3>${checklist(st.bring)}</div>
     ${(st.notes || []).length ? `<div class="card"><h3>Lưu ý theo trường hợp của ${esc(pronoun)}</h3>${checklist(st.notes, "notes", true)}</div>` : ""}
     <div class="card"><h3>Quá trình xử lý và thời hạn</h3>${meta}${st.source && st.source.title ? `<a class="source" href="${esc(st.source.url || "#")}" target="_blank" rel="noopener">Nguồn: ${esc(st.source.title)}</a>` : ""}</div>
     <div class="row">${btn("replayBtn", "outline", "🔊 Nghe lại")}${btn("otherBtn", "outline", "Làm thủ tục khác")}${btn("nextBtn", "green glow", "Đã rõ, kết thúc", ICON_CHECK)}</div>`);
   $("replayBtn").addEventListener("click", () => speak(lastSpeech)); $("nextBtn").addEventListener("click", nextStage);
   $("otherBtn").addEventListener("click", () => greet("Bác cần làm thêm gì nữa ạ?"));
+  // Cách nộp theo kho tri thức (trực tiếp / trực tuyến / bưu chính): bấm là
+  // máy nói hướng dẫn riêng cho cách đó, nút đã bấm hết nhấp nháy.
+  panel.querySelectorAll("[data-c]").forEach(b => b.addEventListener("click", () => {
+    const c = choices[Number(b.dataset.c)]; if (!c) return;
+    stopSpeaking(); userSaid(c.label);
+    panel.querySelectorAll("[data-c]").forEach(x => x.classList.remove("glow")); b.classList.add("chosen");
+    aiSay(`<span class="stephead">${esc(c.label)}</span><p class="qtext">${esc(c.say)}</p>`, { hint: "Xong thì bấm «Đã rõ, kết thúc», hoặc bấm micro hỏi thêm.", speech: c.speech || c.say });
+  }));
   setMic("ask", "Còn thắc mắc, bấm micro hỏi thêm", "Ví dụ: «Mất bao lâu thì có kết quả?»");
 }
 async function nextStage(){

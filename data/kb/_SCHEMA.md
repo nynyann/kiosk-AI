@@ -64,6 +64,7 @@ khởi động lại. Nếu file sai cú pháp JSON, máy chủ in cảnh báo r
   "submit": {
     "say": "Câu kiosk nói ở bước 3",
     "places": ["nộp ở đâu"], "methods": ["trực tiếp", "bưu điện", "trực tuyến"],
+    "choices": [ { "label": "Nộp trực tiếp", "say": "Câu máy nói khi bác chọn cách này" } ],
     "bring": ["giấy tờ mang theo"], "agency": "cơ quan xử lý làm gì", "result": "bác nhận được gì"
   },
   "faq": [ { "q": ["các cách hỏi", "…"], "a": "câu trả lời lấy từ văn bản" } ],

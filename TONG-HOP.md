@@ -206,27 +206,38 @@ Số đo (đo thật ở trình duyệt):
 
 ## 6. Kho tri thức 6 thủ tục
 
-Mỗi thủ tục một file JSON trong `data/kb/`, do Mian đối chiếu văn bản gốc,
+Mỗi thủ tục một file JSON trong `data/kb/`, chuyển từ kho tri thức bản
+17/09/2026 của Mian (file Excel `data/kb-source/Kho moi tri thuc 6 thu tuc.xlsx`,
+mỗi sheet một thủ tục, ghi mã thủ tục trên Cổng Dịch vụ công, đối tượng, cơ
+quan, cách thức, thời hạn, lệ phí, và kịch bản hỏi đáp từng bước). Mỗi file
 ghi `verified_by` và `verified_date`. Nguyên tắc: không có nguồn thì không
 viết; máy chỉ đọc lại đúng những gì có trong file, không sinh thêm.
 
-| Mã | Thủ tục | Căn cứ chính | Thời hạn |
-|---|---|---|---|
-| `tro-cap-huu-tri-xa-hoi` | Trợ cấp hưu trí xã hội | Điều 21 Luật BHXH 41/2024/QH15; NĐ 176/2025 | 10 ngày làm việc |
-| `tro-cap-xa-hoi-hang-thang` | Trợ cấp xã hội hằng tháng | NĐ 20/2021 và sửa đổi | 10 ngày làm việc |
-| `cap-the-bao-hiem-y-te` | Cấp thẻ bảo hiểm y tế | NĐ 188/2025 | 5 ngày làm việc |
-| `cap-ban-sao-trich-luc-ho-tich` | Cấp bản sao trích lục hộ tịch | Luật Hộ tịch 60/2014/QH13 | trong ngày, sau 15 giờ thì hôm sau |
-| `chung-thuc-ban-sao` | Chứng thực bản sao từ bản chính | NĐ 23/2015 | trong ngày, sau 15 giờ thì hôm sau |
-| `cap-the-can-cuoc` | Cấp thẻ căn cước từ đủ 14 tuổi | Luật Căn cước 26/2023/QH15 | 7 ngày làm việc |
+| Mã trong repo | Mã thủ tục | Thủ tục | Lệ phí | Thời hạn |
+|---|---|---|---|---|
+| `tro-cap-huu-tri-xa-hoi` | 1.014027 | Trợ cấp hưu trí xã hội (xin mới, điều chỉnh, thôi hưởng); mức 500.000 đồng một tháng | không | 10 ngày làm việc |
+| `tro-cap-xa-hoi-hang-thang` | 1.001776 | Trợ cấp xã hội hằng tháng (xin mới theo 5 nhóm đối tượng, điều chỉnh, thôi hưởng) | không | 10 ngày làm việc |
+| `cap-the-bao-hiem-y-te` | 1.014137 | Cấp thẻ BHYT (cấp mới giấy hoặc điện tử, sửa thông tin, hỏi quyền lợi) | không | 05 ngày làm việc |
+| `cap-ban-sao-trich-luc-ho-tich` | (chưa ghi) | Cấp bản sao giấy khai sinh, trích lục hộ tịch | 8.000 đồng một bản | trong ngày, sau 15 giờ thì hôm sau |
+| `chung-thuc-ban-sao` | 2.000815 | Chứng thực bản sao từ bản chính | 2.000 đồng một trang cho 2 trang đầu, từ trang 3 là 1.000 đồng, tối đa 200.000 đồng một bản | trong ngày, phức tạp thêm tối đa 02 ngày làm việc |
+| `cap-the-can-cuoc` | (chưa ghi) | Cấp thẻ căn cước: lần đầu, đổi hoặc cập nhật, mất thẻ | lần đầu miễn phí; đổi CCCD sang căn cước 30.000; cấp đổi 50.000; cấp lại 70.000 đồng một thẻ | 07 ngày làm việc |
 
 Mỗi file có hai phần:
 
 - Phần tra cứu: tên, các cách người dân gọi (`aliases`), từ khoá, hồ sơ,
   nơi nộp, phí, thời hạn, nguồn.
-- Phần luồng (`flow`), lắp ngày 14/09: câu hỏi kiểm tra điều kiện bước 1
-  (tổng 24 câu cho 6 thủ tục), quy tắc kết luận (20 quy tắc), lời dẫn bước 2
-  và bước 3, câu hỏi thường gặp (30 mục FAQ). Cách viết ghi ở
-  `data/kb/_SCHEMA.md`.
+- Phần luồng (`flow`): câu hỏi bước 1, câu đầu luôn là «bác muốn làm gì»
+  (xin mới, điều chỉnh, thôi hưởng; làm thẻ lần đầu, đổi, mất…) rồi mới tới
+  điều kiện; tổng 30 câu hỏi và 31 quy tắc kết luận cho 6 thủ tục; lời dẫn
+  bước 2 và bước 3; 16 nút chọn cách nộp ở bước 3 (trực tiếp, trực tuyến,
+  bưu chính, mỗi nút một câu máy nói); 46 mục FAQ; 4 mục cách kê khai mẫu.
+  Cách viết ghi ở `data/kb/_SCHEMA.md`.
+
+Kho bản 17/09 khác bản 11/09 ở chỗ: có mã thủ tục và lệ phí cụ thể; hưu trí
+và trợ cấp hằng tháng có thêm nhánh điều chỉnh và thôi hưởng; BHYT thêm
+nhánh sửa thông tin và hỏi quyền lợi; căn cước gộp ba trường hợp lần đầu,
+đổi, mất vào một thủ tục với lệ phí riêng (trước đây đổi hoặc mất thì máy
+chỉ báo «đây là thủ tục khác»); chứng thực hỏi thêm đã có bản photo chưa.
 
 Thủ tục thứ 7 "xác nhận cư trú" viết lúc đầu để chạy thử, chưa kiểm chứng,
 đã chuyển sang `data/kb-draft/`, không nạp vào kiosk.
@@ -511,10 +522,10 @@ có dùng được để quyết định mời nói lại, nhưng không mạnh;
 
 66 test, chạy dưới 4 giây, không cần mô hình nhận dạng và không gọi mạng:
 12 test giao kèo API, 24 test luồng 3 bước (cả 6 file kho tri thức đủ
-trường, rẽ nhánh đúng sơ đồ, ánh xạ lời nói sang lựa chọn, hỏi thêm không
-bịa, câu chào của giao diện khớp với chuỗi máy chủ sinh sẵn), 18 test mô
-hình ngôn ngữ và xưng hô với mô hình giả (mục 7b), 10 test chuẩn hoá và
-tính WER.
+trường, rẽ nhánh đúng kho bản 17/09 kể cả ba nhánh căn cước, ánh xạ lời nói
+sang lựa chọn, hỏi thêm không bịa, câu chào của giao diện khớp với chuỗi
+máy chủ sinh sẵn), 18 test mô hình ngôn ngữ và xưng hô với mô hình giả
+(mục 7b), 10 test chuẩn hoá và tính WER.
 
 ### 9.6 Con số chưa có
 
@@ -585,12 +596,13 @@ ctranslate2 4.5.0 không nạp được trên Linux vì cờ executable stack (g
 
 ## 12. Lịch sử phát triển trên git
 
-Repo `nynyann/kiosk-backend`, nhánh `main`, 23 commit từ 05/09 đến 16/09/2026.
+Repo `nynyann/kiosk-backend`, nhánh `main`, 29 commit từ 07/09 đến 17/09/2026
+(mã commit ghi theo lịch sử hiện tại trên GitHub).
 
 | Commit | Nội dung |
 |---|---|
 | f034503 | Khởi tạo backend: FastAPI, PhoWhisper, kho tri thức 1 thủ tục, chuẩn hoá, giao kèo API 1.0 |
-| a619798 | Dọn README |
+| a619798 | Sunny: dọn README |
 | d489140 | Sửa hai lỗi chuẩn hoá tìm được khi đo WER thật |
 | 6e568ee | Bộ công cụ đo trên dữ liệu công khai (VIVOS, FLEURS, VietMed, ViMD, Common Voice) |
 | ac422c1 | Ép lỗi kiểm tra dữ liệu về đúng định dạng giao kèo |
@@ -605,15 +617,16 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 23 commit từ 05/09 đến 16/09/2
 | a308283 | Lắp 6 thủ tục của Mian vào kho tri thức |
 | e95a025 | Luồng 3 bước theo sơ đồ: kiểm tra điều kiện, chuẩn bị hồ sơ, nộp hồ sơ; API 2.0 |
 | df008fd | Giao diện thành hội thoại từng bước: chào, hỏi bác cần gì, rồi mới hỏi từng điều kiện |
-| cf16318 | Thêm TONG-HOP.md, tài liệu này |
-| 56f40dd | Màn chạm để bắt đầu (mở khoá tiếng), kho mp3 đi theo repo, thử lại khi Edge hỏng |
-| b67f9e4 | Cập nhật TONG-HOP.md theo lần sửa 15/09 |
-| b53df86, 044fd9a, 79c46b6, 8468a3b | Sunny: sửa tài liệu và tên người kiểm chứng kho tri thức |
-| d7b545c | Bỏ cấu hình riêng của máy cá nhân khỏi repo |
-| f269f66 | Nối mô hình ngôn ngữ FPT AI Marketplace theo phản hồi giám khảo: nhớ ngữ cảnh, hiểu hoàn cảnh, trả lời ngoài FAQ, lời tự nhiên; API 2.1; 61 test |
-| 604dda5 | Đo 5 mô hình trên khoá thật, chốt gemma-4-31B-it; chốt bằng chứng khi điền sẵn; sửa FAQ khớp bừa; hỏi mô hình trước gợi ý chuyển; config tự đọc .env; 62 test |
-| 0f6e9ef | Giao diện bản 3: trang chủ có menu và góp ý, chọn xưng hô, trợ lý AI bên trái, thủ tục gợi ý để chọn, mic luôn hiện và nhấp nháy; xưng hô theo lựa chọn; mô hình tự nói câu ngoài kho; kho thêm cách kê khai mẫu; API 2.2; 64 test |
-| (17/09) | Xưng hô trung tính «bác», bỏ bước chọn; chốt cứng con số trong câu trả lời phải có trong kho; prompt gọn hơn 40%; 66 test |
+| 2799258 | Thêm TONG-HOP.md, tài liệu này |
+| 19f4da3 | Màn chạm để bắt đầu (mở khoá tiếng), kho mp3 đi theo repo, thử lại khi Edge hỏng |
+| 8c70cd7 | Cập nhật TONG-HOP.md theo lần sửa 15/09 |
+| 0661e70, 5d7465f, 107a089, fe9d9f5 | Sunny: sửa tài liệu và tên người kiểm chứng kho tri thức |
+| ab9c228 | Bỏ cấu hình riêng của máy cá nhân khỏi repo |
+| aeab1bf | Nối mô hình ngôn ngữ FPT AI Marketplace theo phản hồi giám khảo: nhớ ngữ cảnh, hiểu hoàn cảnh, trả lời ngoài FAQ, lời tự nhiên; API 2.1; 61 test |
+| dcc4308 | Đo 5 mô hình trên khoá thật, chốt gemma-4-31B-it; chốt bằng chứng khi điền sẵn; sửa FAQ khớp bừa; hỏi mô hình trước gợi ý chuyển; config tự đọc .env; 62 test |
+| 7af3aa2 | Giao diện bản 3: trang chủ có menu và góp ý, chọn xưng hô, trợ lý AI bên trái, thủ tục gợi ý để chọn, mic luôn hiện và nhấp nháy; xưng hô theo lựa chọn; mô hình tự nói câu ngoài kho; kho thêm cách kê khai mẫu; API 2.2; 64 test |
+| b80e0a5 | Xưng hô trung tính «bác», bỏ bước chọn; chốt cứng con số trong câu trả lời phải có trong kho; prompt gọn hơn 40%; 66 test |
+| (17/09, lần 3) | Lắp kho tri thức bản 17/09 của Mian (Excel 6 sheet) vào 6 file JSON: mã thủ tục, lệ phí, mức trợ cấp, nhánh điều chỉnh và thôi hưởng, căn cước gộp lần đầu, đổi, mất; bước 3 có nút chọn cách nộp; API 2.3; sinh lại kho mp3; 66 test |
 
 Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 
@@ -684,6 +697,25 @@ thay đổi gì:
   đầu → chọn xưng hô → trợ lý AI bên trái với ô thoại trên đầu, việc cần
   làm bên phải, mic luôn hiện, nút cần bấm thì nhấp nháy. API 2.2, 64 test.
 
+Lần cập nhật 17/09/2026 (lần 3, kho tri thức mới của Mian) thay đổi gì:
+
+- Mian gửi kho tri thức bản mới dạng Excel 6 sheet, mỗi sheet là kịch bản
+  hỏi đáp từng bước của một thủ tục kèm mã thủ tục, đối tượng, cơ quan,
+  thời hạn, lệ phí. Chuyển tay toàn bộ vào 6 file `data/kb/*.json`, giữ
+  nguyên khung `flow` nên `app/flow.py` không phải sửa logic.
+- Nội dung đổi nhiều nhất: câu hỏi đầu tiên của mọi thủ tục là «bác muốn
+  làm gì» (xin mới, điều chỉnh, thôi hưởng; làm thẻ lần đầu, đổi, mất…),
+  điều kiện chỉ hỏi ở nhánh xin mới. Căn cước không còn đẩy sang «thủ tục
+  khác» khi đổi hoặc mất thẻ mà hướng dẫn luôn kèm lệ phí 30.000, 50.000,
+  70.000 đồng. Hưu trí có mức 500.000 đồng một tháng và điều kiện lương hưu
+  thấp hơn mức chuẩn. Chứng thực có biểu phí theo trang. Từ 24 câu hỏi, 20
+  kết luận, 30 FAQ lên 30 câu hỏi, 31 kết luận, 46 FAQ.
+- Bước 3 thêm nút chọn cách nộp (trực tiếp, trực tuyến, bưu chính) theo
+  kịch bản trong sheet; bấm nút nào máy nói hướng dẫn của cách đó. Trường
+  `submit_choices`, API 2.3.
+- Kho mp3 sinh lại theo câu mới. Test sửa theo thứ tự câu hỏi mới, vẫn 66.
+- Excel gốc để ở `data/kb-source/` để lần sau Mian sửa sheet thì đối chiếu.
+
 ---
 
 ## 13. Việc còn lại và ai làm
@@ -693,7 +725,8 @@ thay đổi gì:
 | Thu tập kiểm thử nội bộ: 30 câu, người cao tuổi, từ vựng hành chính, có ồn, ghi đủ nhãn tuổi, giới, vùng, ồn | cả nhóm | `data/eval/README.md` có mẫu và cách ghi | cao nhất, quyết định mục 4 của bài |
 | Chạy `eval.wer` trên tập tự thu, ghi WER và tỷ lệ bắt đúng cụm hành chính | Lia | `results/` | cao |
 | Bổ sung `HARD_FIXES` từ cụm nghe nhầm thật, chạy `eval.rescore`, ghi chuỗi số cải thiện | Lia | `app/normalize.py` | cao, là nội dung mục 4.3 |
-| Đọc lại 24 câu hỏi bước 1 và 20 kết luận, đối chiếu văn bản | Mian | `data/kb/*.json` mục `flow.check` | cao |
+| Đọc lại 30 câu hỏi bước 1 và 31 kết luận trong JSON, đối chiếu với sheet Excel bản 17/09 xem chuyển có sót ý nào | Mian | `data/kb/*.json` mục `flow.check`, `data/kb-source/` | cao |
+| Bổ sung mã thủ tục cho hộ tịch và căn cước (sheet chưa ghi) | Mian | `data/kb/*.json` trường `code` | vừa |
 | Đối chiếu ba mục kê khai mẫu (`flow.forms`) với mẫu in kèm Nghị định, sửa mục nào sai, ghi ngày kiểm chứng | Mian | `data/kb/*.json` mục `flow.forms`, `forms_note` | cao, nhóm tự viết theo Nghị định, chưa đối chiếu mẫu in |
 | Thay hòm thư và số điện thoại góp ý trên trang chủ bằng của địa phương đặt kiosk | Kns | `web/index.html`, khối `#contact` | vừa |
 | Thêm FAQ sau mỗi buổi thử với người thật | Mian | `flow.faq` | vừa |

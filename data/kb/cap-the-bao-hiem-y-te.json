@@ -1,7 +1,8 @@
 {
   "id": "cap-the-bao-hiem-y-te",
+  "code": "1.014137",
   "name": "Cấp thẻ bảo hiểm y tế",
-  "short": "Cấp thẻ mới hoặc điều chỉnh thông tin trên thẻ",
+  "short": "Cấp thẻ mới, đổi thông tin trên thẻ, hoặc đổi thông tin về quyền lợi",
   "aliases": [
     "cấp thẻ bảo hiểm y tế",
     "làm thẻ bảo hiểm y tế",
@@ -10,7 +11,8 @@
     "thẻ bảo hiểm",
     "đổi thông tin trên thẻ bảo hiểm",
     "thẻ bảo hiểm y tế điện tử",
-    "mất thẻ bảo hiểm y tế"
+    "mất thẻ bảo hiểm y tế",
+    "thẻ đi khám bệnh"
   ],
   "keywords": [
     "bảo hiểm y tế",
@@ -23,34 +25,34 @@
   "steps": [
     {
       "title": "Xác định nhu cầu",
-      "detail": "Bác xem mình cần cấp thẻ mới hay chỉ sửa thông tin trên thẻ đang có. Bác cũng chọn nhận thẻ điện tử hay thẻ giấy."
+      "detail": "Bác xem mình chưa có thẻ và muốn cấp thẻ, đã có thẻ muốn thay đổi thông tin, hay muốn thay đổi thông tin về quyền lợi bảo hiểm y tế."
     },
     {
       "title": "Chuẩn bị hồ sơ",
-      "detail": "Bác điền Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 2. Nếu có thay đổi thông tin cá nhân hay quyền lợi thì mang thêm giấy tờ chứng minh việc thay đổi đó."
+      "detail": "Bác kê khai Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 02 ban hành kèm Nghị định 188/2025/NĐ-CP. Có thay đổi thông tin thì chuẩn bị thêm giấy tờ chứng minh nếu thuộc trường hợp phải cung cấp."
     },
     {
       "title": "Nộp hồ sơ",
-      "detail": "Bác nộp trực tiếp tại bộ phận một cửa của cơ quan Bảo hiểm xã hội, hoặc gửi qua bưu điện. Nếu có con cháu giúp thì nộp trực tuyến trên Cổng dịch vụ công hoặc ứng dụng của Bảo hiểm xã hội cũng được."
+      "detail": "Bác nộp trực tiếp tại cơ quan bảo hiểm xã hội, nộp trực tuyến, hoặc gửi qua dịch vụ bưu chính công ích."
     },
     {
       "title": "Nhận kết quả",
-      "detail": "Trong 5 ngày làm việc kể từ khi nhận đủ hồ sơ, cơ quan Bảo hiểm xã hội cấp thẻ cho bác. Bác nhận thẻ điện tử hoặc thẻ giấy theo lựa chọn lúc kê khai."
+      "detail": "Trong 05 ngày làm việc kể từ khi nhận đủ hồ sơ, cơ quan bảo hiểm xã hội cấp thẻ điện tử hoặc thẻ giấy theo lựa chọn của bác."
     }
   ],
   "documents": [
-    "Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 2 (ban hành kèm Nghị định 188/2025/NĐ-CP)",
-    "Giấy tờ chứng minh việc thay đổi thông tin hoặc quyền lợi (chỉ khi bác có thay đổi)"
+    "Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 02 (ban hành kèm Nghị định 188/2025/NĐ-CP)",
+    "Giấy tờ chứng minh thông tin thay đổi (bản scan, bản chụp hoặc giấy tờ liên quan), chỉ khi thuộc trường hợp phải cung cấp"
   ],
-  "where_to_submit": "Bộ phận một cửa của cơ quan Bảo hiểm xã hội, hoặc qua bưu điện, hoặc trực tuyến trên Cổng Dịch vụ công Quốc gia và ứng dụng của Bảo hiểm xã hội.",
-  "fee": "Bác hỏi cán bộ để biết có mất phí không.",
-  "processing_time": "5 ngày làm việc kể từ ngày nhận đủ hồ sơ.",
+  "where_to_submit": "Cơ quan bảo hiểm xã hội cấp tỉnh hoặc bộ phận tiếp nhận được giao. Nộp trực tiếp, trực tuyến hoặc qua dịch vụ bưu chính công ích.",
+  "fee": "Không thu lệ phí.",
+  "processing_time": "05 ngày làm việc kể từ ngày nhận đủ hồ sơ.",
   "validity": "Thẻ có thời hạn sử dụng, bác hỏi cán bộ để biết hạn cụ thể của mình.",
   "common_questions": [
     "Tôi mất thẻ bảo hiểm y tế thì làm lại thế nào",
     "Thẻ điện tử với thẻ giấy khác nhau chỗ nào",
     "Tôi đổi chỗ ở thì có phải làm lại thẻ không",
-    "Người già có được cấp thẻ bảo hiểm miễn phí không"
+    "Sau khi nộp hồ sơ bao lâu có kết quả"
   ],
   "flow": {
     "check": {
@@ -58,193 +60,130 @@
       "questions": [
         {
           "id": "need",
-          "text": "Bác muốn cấp thẻ mới hay điều chỉnh thông tin trên thẻ đang có ạ?",
+          "text": "Bác muốn làm gì với thẻ bảo hiểm y tế ạ?",
           "options": [
-            {
-              "value": "new",
-              "label": "Cấp thẻ mới",
-              "match": [
-                "cấp mới",
-                "thẻ mới",
-                "làm mới",
-                "chưa có thẻ",
-                "mất thẻ"
-              ]
-            },
-            {
-              "value": "adjust",
-              "label": "Điều chỉnh thông tin trên thẻ",
-              "match": [
-                "điều chỉnh",
-                "sửa",
-                "đổi thông tin",
-                "thay đổi",
-                "sai thông tin"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "changed",
-          "text": "Bác có thay đổi thông tin cá nhân hoặc quyền lợi bảo hiểm y tế không ạ? Ví dụ họ tên, ngày sinh, nơi ở, mức hưởng.",
-          "options": [
-            {
-              "value": "yes",
-              "label": "Có thay đổi",
-              "note": "Bác có thay đổi thông tin hoặc quyền lợi: cần chuẩn bị giấy tờ chứng minh việc thay đổi để cán bộ đối chiếu."
-            },
-            {
-              "value": "no",
-              "label": "Không thay đổi"
-            }
-          ]
-        },
-        {
-          "id": "proof",
-          "text": "Bác có giấy tờ nào chứng minh việc thay đổi thông tin hoặc quyền lợi đó không ạ?",
-          "ask_if": {
-            "changed": [
-              "yes"
-            ]
-          },
-          "options": [
-            {
-              "value": "yes",
-              "label": "Có giấy tờ"
-            },
-            {
-              "value": "no",
-              "label": "Chưa có",
-              "note": "Bác chưa có giấy tờ chứng minh thay đổi: bác hỏi cán bộ Bảo hiểm xã hội xem cần giấy tờ nào và chuẩn bị trước khi nộp."
-            }
+            { "value": "new", "label": "Tôi chưa có thẻ, muốn cấp thẻ", "match": ["cấp mới", "thẻ mới", "làm mới", "chưa có thẻ", "mất thẻ", "cấp thẻ", "làm thẻ"] },
+            { "value": "info", "label": "Đã có thẻ, muốn thay đổi thông tin trên thẻ", "match": ["sai thông tin", "đổi thông tin", "sửa thông tin", "thay đổi thông tin", "sai tên", "sai ngày sinh", "đổi chỗ ở"] },
+            { "value": "benefit", "label": "Muốn thay đổi thông tin về quyền lợi bảo hiểm y tế", "match": ["quyền lợi", "mức hưởng", "đối tượng khác", "nhóm đối tượng"] }
           ]
         },
         {
           "id": "format",
-          "text": "Bác muốn nhận thẻ bảo hiểm y tế điện tử hay thẻ giấy ạ?",
+          "text": "Bác muốn nhận thẻ bảo hiểm y tế như thế nào ạ?",
+          "ask_if": { "need": ["new"] },
           "options": [
-            {
-              "value": "e",
-              "label": "Thẻ điện tử",
-              "match": [
-                "điện tử",
-                "trên điện thoại",
-                "app"
-              ],
-              "note": "Bác chọn thẻ điện tử: thẻ dùng trên ứng dụng của Bảo hiểm xã hội, bác ghi rõ lựa chọn này trong tờ khai."
-            },
-            {
-              "value": "paper",
-              "label": "Thẻ giấy",
-              "match": [
-                "giấy",
-                "bản giấy",
-                "thẻ cứng"
-              ],
-              "note": "Bác chọn thẻ giấy: bác ghi rõ lựa chọn này trong tờ khai để được cấp bản giấy."
-            },
-            {
-              "value": "unsure",
-              "label": "Tôi chưa biết chọn gì",
-              "match": [
-                "không biết",
-                "chưa biết",
-                "không rõ",
-                "tuỳ"
-              ],
-              "note": "Bác chưa chọn dạng thẻ: thẻ điện tử tiện dùng trên điện thoại, thẻ giấy tiện cho người không dùng điện thoại. Bác có thể hỏi cán bộ khi nộp."
-            }
+            { "value": "e", "label": "Thẻ điện tử (trên ứng dụng VssID, email hoặc tài khoản định danh)", "match": ["điện tử", "trên điện thoại", "app", "vssid"], "note": "Bác chọn thẻ điện tử: bác sẽ nhận thẻ theo phương thức cơ quan bảo hiểm xã hội cung cấp, như trên VssID, email hoặc thông qua tài khoản định danh điện tử phù hợp." },
+            { "value": "paper", "label": "Thẻ giấy", "match": ["giấy", "bản giấy", "thẻ cứng"], "note": "Bác đăng ký nhận thẻ bảo hiểm y tế bản giấy, ghi rõ lựa chọn này trong tờ khai." },
+            { "value": "unsure", "label": "Tôi chưa biết chọn gì", "match": ["không biết", "chưa biết", "không rõ", "tuỳ"], "note": "Bác chưa chọn dạng thẻ: thẻ điện tử tiện dùng trên điện thoại, thẻ giấy tiện cho người không dùng điện thoại. Bác có thể hỏi cán bộ khi nộp." }
+          ]
+        },
+        {
+          "id": "info_kind",
+          "text": "Thông tin nào trên hồ sơ bảo hiểm y tế của bác cần thay đổi ạ?",
+          "ask_if": { "need": ["info"] },
+          "options": [
+            { "value": "personal", "label": "Thông tin cá nhân (họ tên, ngày sinh, nơi ở)", "match": ["họ tên", "tên", "ngày sinh", "nơi ở", "địa chỉ", "giới tính"], "note": "Thay đổi thông tin cá nhân: bác kê khai thông tin điều chỉnh và chuẩn bị giấy tờ chứng minh thông tin thay đổi nếu thuộc trường hợp phải cung cấp giấy tờ." },
+            { "value": "identity", "label": "Thông tin định danh (số căn cước, số định danh)", "match": ["định danh", "căn cước", "số cccd", "chứng minh"], "note": "Thay đổi thông tin định danh: bác kê khai thông tin điều chỉnh. Nếu cơ quan bảo hiểm xã hội yêu cầu tài liệu chứng minh, bác chuẩn bị giấy tờ liên quan đến thông tin định danh." },
+            { "value": "other", "label": "Thông tin khác", "match": ["khác"], "note": "Thay đổi thông tin khác: bác kê khai nội dung cần điều chỉnh. Hồ sơ cụ thể phụ thuộc vào loại thông tin cần thay đổi, cán bộ sẽ hướng dẫn." }
+          ]
+        },
+        {
+          "id": "benefit_reason",
+          "text": "Quyền lợi bảo hiểm y tế của bác thay đổi vì lý do nào ạ?",
+          "ask_if": { "need": ["benefit"] },
+          "options": [
+            { "value": "group", "label": "Tôi thuộc nhóm đối tượng khác so với trước đây", "match": ["nhóm khác", "đối tượng khác", "người có công", "hộ nghèo", "người cao tuổi"], "note": "Việc xác định quyền lợi bảo hiểm y tế phụ thuộc vào nhóm đối tượng tham gia và hồ sơ chứng minh. Bác cần chuẩn bị giấy tờ chứng minh việc thay đổi đối tượng nếu có." },
+            { "value": "info", "label": "Tôi có thay đổi thông tin liên quan đến quyền lợi", "match": ["thông tin", "mức hưởng"], "note": "Bác cần kê khai thông tin điều chỉnh và cung cấp giấy tờ liên quan nếu pháp luật yêu cầu đối với trường hợp của bác." }
           ]
         }
       ],
-      "outcomes": [],
+      "outcomes": [
+        {
+          "when": { "need": ["info"] },
+          "verdict": "eligible",
+          "note": "Bác đang thực hiện yêu cầu điều chỉnh thông tin bảo hiểm y tế. Hồ sơ chính là Tờ khai theo Mẫu số 02; trường hợp thay đổi cần giấy tờ chứng minh thì chuẩn bị thêm bản scan, bản chụp hoặc giấy tờ liên quan.",
+          "documents": [
+            "Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 02 (ban hành kèm Nghị định 188/2025/NĐ-CP)",
+            "Bản scan, bản chụp hoặc giấy tờ chứng minh thông tin thay đổi, chỉ khi thuộc trường hợp phải cung cấp"
+          ]
+        },
+        {
+          "when": { "need": ["benefit"] },
+          "verdict": "eligible",
+          "note": "Bác đang yêu cầu điều chỉnh thông tin liên quan đến quyền lợi bảo hiểm y tế. Hồ sơ chính là Tờ khai theo Mẫu số 02; có tài liệu chứng minh thay đổi thì chuẩn bị thêm giấy tờ liên quan đến nội dung thay đổi.",
+          "documents": [
+            "Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 02 (ban hành kèm Nghị định 188/2025/NĐ-CP)",
+            "Giấy tờ chứng minh việc thay đổi đối tượng hoặc quyền lợi, nếu có"
+          ]
+        }
+      ],
       "eligible": {
-        "note": "Cháu đã xác định được nhu cầu của bác. Bác chuẩn bị hồ sơ theo hướng dẫn sau."
+        "note": "Bác đang thực hiện thủ tục cấp thẻ bảo hiểm y tế. Bác cần kê khai thông tin tham gia bảo hiểm y tế và lựa chọn hình thức nhận thẻ."
       }
     },
     "prepare": {
-      "say": "Bác cần kê khai Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 2. Nếu bác có thay đổi thông tin cá nhân hoặc quyền lợi, bác cần chuẩn bị giấy tờ liên quan để đối chiếu.",
+      "say": "Bác cần chuẩn bị Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 02 ban hành kèm Nghị định 188/2025/NĐ-CP. Có thay đổi thông tin thì chuẩn bị thêm giấy tờ chứng minh nếu thuộc trường hợp phải cung cấp.",
       "tips": [
-        "Mẫu số 2 ban hành kèm Nghị định 188/2025/NĐ-CP.",
-        "Nếu cơ quan, tổ chức đang quản lý bác (ví dụ đơn vị lập danh sách) thì họ dùng danh sách theo Mẫu số 3, bác không phải tự làm.",
-        "Nếu thay đổi thông tin thân nhân hoặc quyền lợi thì chuẩn bị bản chụp các giấy tờ liên quan, nếu có."
+        "Không thu lệ phí.",
+        "Mẫu số 02 xin tại cơ quan bảo hiểm xã hội hoặc kê khai trực tuyến; mắt kém hay không biết chữ thì nhờ cán bộ điền giúp rồi đọc lại cho bác nghe trước khi ký."
       ]
     },
     "submit": {
-      "say": "Bác có thể chọn cách nộp trực tiếp hoặc trực tuyến. Nếu bác chưa quen thao tác trực tuyến, cháu có thể hướng dẫn từng bước.",
+      "say": "Bác có thể nộp hồ sơ theo một trong ba cách: nộp trực tiếp, nộp trực tuyến, hoặc gửi qua bưu chính. Bác bấm vào cách bác muốn để cháu hướng dẫn cụ thể.",
       "places": [
-        "Bộ phận một cửa của cơ quan Bảo hiểm xã hội được giao nhiệm vụ tiếp nhận"
+        "Cơ quan bảo hiểm xã hội cấp tỉnh hoặc bộ phận tiếp nhận được giao"
       ],
       "methods": [
-        "Nộp trực tiếp tại bộ phận một cửa của cơ quan Bảo hiểm xã hội",
-        "Nộp trực tuyến trên Cổng Dịch vụ công Quốc gia",
-        "Thực hiện qua ứng dụng của cơ quan Bảo hiểm xã hội",
+        "Nộp trực tiếp tại cơ quan bảo hiểm xã hội",
+        "Nộp trực tuyến trên Cổng Dịch vụ công Quốc gia hoặc ứng dụng của bảo hiểm xã hội",
         "Gửi qua dịch vụ bưu chính công ích"
       ],
-      "bring": [
-        "Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 2",
-        "Giấy tờ chứng minh việc thay đổi thông tin hoặc quyền lợi, nếu bác có thay đổi"
+      "choices": [
+        { "label": "Nộp trực tiếp", "say": "Bác mang Tờ khai theo Mẫu số 02 và giấy tờ chứng minh nếu có đến bộ phận tiếp nhận của cơ quan bảo hiểm xã hội để nộp." },
+        { "label": "Nộp trực tuyến", "say": "Kiosk hiện chỉ hướng dẫn. Bác có thể kê khai và gửi hồ sơ trên Cổng Dịch vụ công Quốc gia hoặc ứng dụng của bảo hiểm xã hội, có con cháu giúp thao tác thì thuận tiện hơn." },
+        { "label": "Gửi qua bưu chính", "say": "Bác có thể gửi Tờ khai theo Mẫu số 02 và giấy tờ kèm theo qua dịch vụ bưu chính công ích đến cơ quan bảo hiểm xã hội." }
       ],
-      "agency": "Cơ quan Bảo hiểm xã hội tiếp nhận và xử lý hồ sơ.",
-      "result": "Bác nhận thẻ bảo hiểm y tế điện tử hoặc thẻ giấy theo lựa chọn đã kê khai."
+      "bring": [
+        "Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế theo Mẫu số 02",
+        "Giấy tờ chứng minh thông tin thay đổi, chỉ khi bác có thay đổi"
+      ],
+      "agency": "Cơ quan bảo hiểm xã hội kiểm tra hồ sơ và thông tin liên quan của bác.",
+      "result": "Bác nhận thẻ bảo hiểm y tế điện tử hoặc thẻ giấy theo hình thức đã đăng ký; trường hợp điều chỉnh thì nhận kết quả điều chỉnh thông tin hoặc quyền lợi đã được cơ quan có thẩm quyền xác nhận."
     },
     "faq": [
       {
-        "q": [
-          "mẫu số 2 điền thế nào",
-          "mẫu số 2 là gì",
-          "kê khai thế nào",
-          "điền tờ khai thế nào",
-          "trong tờ khai có những gì",
-          "số hai là gì"
-        ],
-        "a": "Mẫu số 2 là tờ khai tham gia hoặc điều chỉnh thông tin bảo hiểm y tế. Bác điền họ tên, ngày sinh, số định danh, nơi ở, nơi khám chữa bệnh ban đầu, ghi rõ cấp mới hay điều chỉnh thông tin gì, chọn thẻ điện tử hay thẻ giấy, rồi ký tên. Chỗ nào không rõ bác để trống, cán bộ Bảo hiểm xã hội sẽ hướng dẫn hoặc điền giúp rồi đọc lại cho bác nghe."
+        "q": ["sau khi nộp hồ sơ bao lâu sẽ có kết quả", "bao lâu có thẻ", "mấy ngày có thẻ"],
+        "a": "Hồ sơ được xử lý trong thời hạn 05 ngày làm việc kể từ khi cơ quan bảo hiểm xã hội nhận đủ hồ sơ."
       },
       {
-        "q": [
-          "thẻ điện tử với thẻ giấy khác nhau chỗ nào",
-          "thẻ điện tử là gì",
-          "khác nhau thế nào"
-        ],
-        "a": "Thẻ điện tử hiện trên ứng dụng của Bảo hiểm xã hội, dùng điện thoại khi đi khám. Thẻ giấy là bản in cầm tay. Giá trị sử dụng như nhau, bác chọn dạng nào tiện cho mình và ghi trong tờ khai."
+        "q": ["sau khi nộp hồ sơ tiếp theo làm gì", "nộp xong thì sao"],
+        "a": "Cơ quan bảo hiểm xã hội sẽ kiểm tra hồ sơ của bác trong 05 ngày làm việc. Sau khi giải quyết, bác nhận thẻ hoặc kết quả điều chỉnh theo hình thức đã đăng ký: thẻ điện tử trên VssID, email hoặc tài khoản định danh; thẻ giấy thì nhận bản giấy."
       },
       {
-        "q": [
-          "mất thẻ thì làm lại thế nào",
-          "mất thẻ bảo hiểm",
-          "làm lại thẻ"
-        ],
-        "a": "Bác kê khai Tờ khai theo Mẫu số 2 và nộp tại cơ quan Bảo hiểm xã hội hoặc trực tuyến, nêu rõ là cấp lại do mất. Nếu bác dùng thẻ điện tử thì không lo mất thẻ."
+        "q": ["mẫu số 2 điền thế nào", "mẫu số 02 điền thế nào", "mẫu số 2 là gì", "kê khai thế nào", "điền tờ khai thế nào", "trong tờ khai có những gì", "số hai là gì"],
+        "a": "Mẫu số 02 là tờ khai tham gia hoặc điều chỉnh thông tin bảo hiểm y tế. Bác điền họ tên, ngày sinh, số định danh, nơi ở, nơi khám chữa bệnh ban đầu, ghi rõ cấp mới hay điều chỉnh thông tin gì, chọn thẻ điện tử hay thẻ giấy, rồi ký tên. Chỗ nào không rõ bác để trống, cán bộ bảo hiểm xã hội sẽ hướng dẫn hoặc điền giúp rồi đọc lại cho bác nghe."
       },
       {
-        "q": [
-          "đổi chỗ ở có phải làm lại thẻ không",
-          "chuyển chỗ ở",
-          "đổi nơi ở"
-        ],
-        "a": "Đổi nơi cư trú là thay đổi thông tin cá nhân. Bác kê khai Mẫu số 2 để điều chỉnh và mang giấy tờ chứng minh việc thay đổi để cán bộ đối chiếu."
+        "q": ["thẻ điện tử với thẻ giấy khác nhau chỗ nào", "thẻ điện tử là gì", "khác nhau thế nào"],
+        "a": "Thẻ điện tử nhận trên ứng dụng VssID, email hoặc tài khoản định danh điện tử, dùng điện thoại khi đi khám. Thẻ giấy là bản in cầm tay. Giá trị sử dụng như nhau, bác chọn dạng nào tiện cho mình và ghi trong tờ khai."
       },
       {
-        "q": [
-          "người già có được miễn phí không",
-          "miễn phí",
-          "có mất tiền không"
-        ],
-        "a": "Mức đóng và quyền lợi tuỳ nhóm đối tượng, cháu không kết luận thay cơ quan Bảo hiểm xã hội. Bác hỏi cán bộ tiếp nhận để biết trường hợp của mình có được hỗ trợ mức đóng không."
+        "q": ["mất thẻ thì làm lại thế nào", "mất thẻ bảo hiểm", "làm lại thẻ"],
+        "a": "Bác kê khai Tờ khai theo Mẫu số 02 và nộp tại cơ quan bảo hiểm xã hội hoặc trực tuyến. Nếu bác dùng thẻ điện tử thì không lo mất thẻ."
       },
       {
-        "q": [
-          "mẫu số 2 lấy ở đâu",
-          "lấy mẫu ở đâu",
-          "xin mẫu ở đâu"
-        ],
-        "a": "Mẫu số 2 ban hành kèm Nghị định 188/2025/NĐ-CP. Bác xin mẫu tại bộ phận một cửa của cơ quan Bảo hiểm xã hội, hoặc kê khai trực tuyến trên Cổng Dịch vụ công."
+        "q": ["đổi chỗ ở có phải làm lại thẻ không", "chuyển chỗ ở", "đổi nơi ở"],
+        "a": "Đổi nơi cư trú là thay đổi thông tin cá nhân. Bác kê khai Mẫu số 02 để điều chỉnh và chuẩn bị giấy tờ chứng minh việc thay đổi nếu thuộc trường hợp phải cung cấp."
+      },
+      {
+        "q": ["có mất phí không", "lệ phí bao nhiêu", "tốn tiền không"],
+        "a": "Thủ tục cấp thẻ bảo hiểm y tế không thu lệ phí."
       }
     ],
     "forms": [
       {
-        "name": "Mẫu số 2 (Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế, Nghị định 188/2025/NĐ-CP)",
-        "how": "Xin mẫu tại bộ phận một cửa của cơ quan Bảo hiểm xã hội, hoặc kê khai trực tuyến trên Cổng Dịch vụ công Quốc gia (con cháu giúp được). Điền bằng bút mực, chữ in hoa; chỗ nào không rõ để trống rồi hỏi cán bộ. Mắt kém hoặc không biết chữ thì nói với cán bộ, cán bộ điền giúp rồi đọc lại cho bác nghe trước khi ký.",
+        "name": "Mẫu số 02 (Tờ khai tham gia, điều chỉnh thông tin bảo hiểm y tế, Nghị định 188/2025/NĐ-CP)",
+        "how": "Xin mẫu tại bộ phận tiếp nhận của cơ quan bảo hiểm xã hội, hoặc kê khai trực tuyến trên Cổng Dịch vụ công Quốc gia (con cháu giúp được). Điền bằng bút mực, chữ in hoa; chỗ nào không rõ để trống rồi hỏi cán bộ. Mắt kém hoặc không biết chữ thì nói với cán bộ, cán bộ điền giúp rồi đọc lại cho bác nghe trước khi ký.",
         "fields": [
           "Họ và tên, ngày tháng năm sinh, giới tính, viết đúng như trên căn cước",
           "Số định danh cá nhân (12 số trên căn cước)",
@@ -260,10 +199,10 @@
     ]
   },
   "source": {
-    "title": "Luật Bảo hiểm y tế và các văn bản hướng dẫn hiện hành; Nghị định 188/2025/NĐ-CP; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
+    "title": "Luật Bảo hiểm y tế và Nghị định 188/2025/NĐ-CP ngày 01/07/2025; thủ tục 1.014137 công bố trên Cổng Dịch vụ công Quốc gia",
     "url": "https://dichvucong.gov.vn/"
   },
-  "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.3",
-  "verified_date": "2026-09-11",
+  "verified_by": "Mian — kho tri thức bản 17/09/2026 (file «Kho mới tri thức 6 thủ tục.xlsx», sheet THỦ TỤC 3)",
+  "verified_date": "2026-09-17",
   "forms_note": "Mục flow.forms tóm tắt các mục của mẫu ở mức người dân cần biết trước khi đến; Mian đối chiếu với mẫu in kèm Nghị định rồi ghi ngày kiểm chứng."
 }

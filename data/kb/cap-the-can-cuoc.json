@@ -1,7 +1,8 @@
 {
   "id": "cap-the-can-cuoc",
   "name": "Cấp thẻ căn cước cho người từ đủ 14 tuổi trở lên",
-  "short": "Làm thẻ căn cước lần đầu",
+  "full_name": "Cấp thẻ căn cước cho người từ đủ 14 tuổi trở lên (cấp lần đầu, cấp đổi, cấp lại)",
+  "short": "Làm, đổi hoặc làm lại thẻ căn cước",
   "aliases": [
     "cấp thẻ căn cước",
     "làm căn cước",
@@ -11,7 +12,14 @@
     "xin cấp căn cước",
     "đăng ký làm căn cước",
     "chưa có căn cước",
-    "làm chứng minh thư"
+    "làm chứng minh thư",
+    "đổi căn cước",
+    "đổi thẻ căn cước",
+    "cấp đổi căn cước",
+    "mất căn cước",
+    "làm lại căn cước",
+    "cấp lại căn cước",
+    "căn cước hết hạn"
   ],
   "keywords": [
     "căn cước",
@@ -24,139 +32,188 @@
   "steps": [
     {
       "title": "Xác định nhu cầu",
-      "detail": "Bác xem mình làm căn cước lần đầu, hay đã có thẻ mà muốn đổi hoặc bị mất. Đổi thẻ và cấp lại thẻ là thủ tục khác, bác nói rõ với cán bộ để được hướng dẫn đúng."
+      "detail": "Bác xem mình làm căn cước lần đầu, đã có thẻ mà muốn đổi hoặc cập nhật, hay bị mất thẻ muốn làm lại. Ba trường hợp có mức lệ phí khác nhau, còn cách làm thì giống nhau."
     },
     {
       "title": "Đăng ký lịch",
-      "detail": "Bác có thể đến thẳng cơ quan công an làm căn cước. Có con cháu giúp thì đăng ký trước thời gian và địa điểm trên Cổng dịch vụ công hoặc ứng dụng định danh quốc gia VNeID, đến sẽ không phải chờ lâu."
+      "detail": "Bác có thể đăng ký thời gian và địa điểm làm thủ tục qua hệ thống dịch vụ công hoặc ứng dụng định danh điện tử, có con cháu giúp thì đăng ký trước để đến không phải chờ lâu. Không đăng ký được thì bác đến thẳng cơ quan quản lý căn cước."
     },
     {
-      "title": "Đến làm thẻ",
-      "detail": "Bác đến cơ quan công an theo lịch, cung cấp họ tên, số định danh cá nhân và nơi ở. Cán bộ chụp ảnh, lấy vân tay và cho bác kiểm tra lại thông tin trước khi xác nhận."
+      "title": "Đến thu nhận thông tin",
+      "detail": "Bác đến đúng địa điểm và thời gian đã đăng ký. Cán bộ kiểm tra và thu nhận thông tin, chụp ảnh, lấy vân tay. Trước khi hoàn tất, bác kiểm tra lại họ tên, ngày sinh, nơi cư trú; sai thì báo ngay cho cán bộ."
     },
     {
-      "title": "Nhận thẻ",
-      "detail": "Trong 7 ngày làm việc bác nhận được thẻ. Nhận trực tiếp hay gửi về nhà tuỳ theo cách bác đã đăng ký."
+      "title": "Nhận giấy hẹn và kết quả",
+      "detail": "Sau khi hoàn tất, bác nhận thông tin hoặc giấy hẹn trả kết quả. Thời hạn giải quyết là 07 ngày làm việc."
     }
   ],
   "documents": [
-    "Họ, chữ đệm và tên khai sinh",
-    "Số định danh cá nhân (12 số, có trên giấy khai sinh mới hoặc thông báo của công an)",
-    "Thông tin nơi bác đang ở",
-    "Lịch hẹn nếu đã đăng ký trực tuyến"
+    "Thông tin cá nhân: họ, chữ đệm và tên khai sinh; ngày tháng năm sinh; nơi cư trú",
+    "Giấy tờ tuỳ thân hoặc thông tin liên quan, nếu bác chưa có hoặc không rõ đã có thông tin trong Cơ sở dữ liệu quốc gia về dân cư",
+    "Thẻ cũ và thông tin về nội dung thay đổi, nếu bác đổi hoặc cập nhật thẻ",
+    "Thông tin hoặc tài khoản định danh điện tử để xác minh, nếu bác bị mất thẻ",
+    "Lịch hẹn, nếu đã đăng ký thời gian và địa điểm trước"
   ],
-  "where_to_submit": "Cơ quan quản lý căn cước của công an nơi bác ở. Đăng ký lịch trước trên Cổng Dịch vụ công Quốc gia, Cổng Dịch vụ công Bộ Công an hoặc ứng dụng VNeID.",
-  "fee": "Bác hỏi cán bộ để biết có mất phí không.",
-  "processing_time": "7 ngày làm việc.",
-  "validity": "Thẻ có thời hạn theo độ tuổi, bác hỏi cán bộ để biết hạn cụ thể của mình.",
+  "where_to_submit": "Cơ quan quản lý căn cước có thẩm quyền. Bác có thể đăng ký thời gian, địa điểm làm thủ tục qua hệ thống dịch vụ công hoặc ứng dụng định danh điện tử.",
+  "fee": "Cấp thẻ lần đầu: miễn phí hoàn toàn. Cấp đổi thẻ căn cước công dân sang thẻ căn cước: 30.000 đồng một thẻ. Cấp đổi thẻ căn cước (đủ 14, 25, 40, 60 tuổi; thay đổi thông tin nhân thân; sai sót do cơ quan quản lý; sắp xếp đơn vị hành chính): 50.000 đồng một thẻ. Cấp lại thẻ căn cước (mất, hỏng, trở lại quốc tịch Việt Nam): 70.000 đồng một thẻ.",
+  "processing_time": "07 ngày làm việc.",
+  "validity": "Thẻ phải đổi khi bác đủ 14, 25, 40 và 60 tuổi.",
   "common_questions": [
     "Tôi mất căn cước thì làm lại thế nào",
     "Thẻ căn cước hết hạn thì đổi ở đâu",
-    "Người già có phải làm căn cước không",
-    "Số định danh cá nhân là số nào"
+    "Làm căn cước mất bao nhiêu tiền",
+    "Đổi thẻ căn cước công dân sang thẻ căn cước có mất tiền không"
   ],
   "flow": {
     "check": {
-      "intro": "Cháu hỏi bác vài câu để xác định bác cần cấp thẻ lần đầu hay thuộc trường hợp khác ạ.",
+      "intro": "Cháu hỏi bác vài câu để biết bác làm thẻ lần đầu, đổi thẻ hay làm lại thẻ bị mất ạ.",
       "questions": [
         {
-          "id": "have",
-          "text": "Bác hiện đã có thẻ căn cước chưa ạ?",
+          "id": "purpose",
+          "text": "Bác đang muốn làm thẻ căn cước vì lý do nào ạ?",
+          "hint": "Bác chọn hoặc nói: làm lần đầu, đổi thẻ, hay mất thẻ.",
           "options": [
-            { "value": "no", "label": "Chưa có thẻ", "match": ["chưa", "chưa có", "chưa làm", "lần đầu"] },
-            { "value": "yes", "label": "Đã có thẻ rồi", "match": ["có rồi", "đã có", "làm rồi", "có"] }
+            { "value": "first", "label": "Tôi làm thẻ căn cước lần đầu", "match": ["lần đầu", "chưa có", "chưa làm", "mới làm", "lần đầu tiên"], "note": "Bác đang thực hiện thủ tục cấp thẻ căn cước lần đầu cho người từ đủ 14 tuổi trở lên. Bác cần đăng ký thời gian và địa điểm thực hiện thủ tục, sau đó đến cơ quan có thẩm quyền để thu nhận thông tin căn cước. Cấp lần đầu không thu lệ phí." },
+            { "value": "change", "label": "Tôi đã có thẻ và muốn đổi, cập nhật thẻ", "match": ["đổi", "cập nhật", "hết hạn", "sai", "thay đổi", "đổi sang", "căn cước công dân sang"], "note": "Bác đang thực hiện thủ tục cấp đổi thẻ căn cước." },
+            { "value": "lost", "label": "Tôi bị mất thẻ và muốn làm lại", "match": ["mất", "làm lại", "cấp lại", "rơi", "thất lạc", "hỏng"], "note": "Bác đang có nhu cầu cấp lại thẻ căn cước do bị mất. Bác cần thực hiện thủ tục cấp lại theo hướng dẫn của cơ quan quản lý căn cước." }
           ]
         },
         {
-          "id": "why",
-          "text": "Bác đã có thẻ, vậy bác muốn đổi thẻ hay bị mất thẻ ạ?",
-          "ask_if": { "have": ["yes"] },
+          "id": "in_db",
+          "text": "Bác đã có thông tin đăng ký trong Cơ sở dữ liệu quốc gia về dân cư chưa ạ?",
+          "hint": "Nếu bác đã có số định danh cá nhân 12 số trên giấy khai sinh hoặc thông báo của công an thì là đã có. Không rõ bác cứ nói không rõ.",
+          "ask_if": { "purpose": ["first"] },
           "options": [
-            { "value": "change", "label": "Muốn đổi thẻ (hết hạn, hỏng, đổi thông tin)", "match": ["đổi", "hết hạn", "hỏng", "cũ"] },
-            { "value": "lost", "label": "Bị mất thẻ", "match": ["mất", "rơi", "thất lạc"] }
+            { "value": "yes", "label": "Đã có", "match": ["có rồi", "đã có", "có số định danh", "có"] },
+            { "value": "unsure", "label": "Chưa có hoặc không rõ", "match": ["chưa", "chưa có", "không rõ", "không biết", "không chắc"], "note": "Bác có thể mang giấy tờ tuỳ thân hoặc thông tin liên quan đến cơ quan có thẩm quyền để được kiểm tra." }
           ]
         },
         {
-          "id": "info",
-          "text": "Thông tin họ tên, ngày tháng năm sinh, nơi cư trú của bác có thay đổi so với trước không ạ?",
-          "ask_if": { "have": ["no"] },
+          "id": "reason",
+          "text": "Lý do bác muốn đổi thẻ là gì ạ?",
+          "hint": "Bác chọn hoặc nói: thông tin trên thẻ thay đổi, thông tin cá nhân cần cập nhật, hay đổi theo độ tuổi.",
+          "ask_if": { "purpose": ["change"] },
           "options": [
-            { "value": "no", "label": "Không thay đổi" },
-            { "value": "yes", "label": "Có thay đổi", "note": "Thông tin của bác có thay đổi: cán bộ sẽ hướng dẫn bác thu thập, cập nhật thông tin trong Cơ sở dữ liệu quốc gia về dân cư trước khi làm thẻ." },
-            { "value": "unsure", "label": "Tôi không chắc", "match": ["không chắc", "không rõ", "không biết"], "note": "Bác chưa chắc thông tin có đúng không: khi đến làm thẻ, cán bộ sẽ kiểm tra trong Cơ sở dữ liệu dân cư và cho bác đối chiếu." }
+            { "value": "info", "label": "Thông tin trên thẻ thay đổi", "match": ["thông tin trên thẻ", "đổi tên", "đổi địa chỉ", "sáp nhập", "đơn vị hành chính", "sai"], "note": "Bác cần cung cấp thông tin về nội dung thay đổi để cơ quan quản lý căn cước kiểm tra và cập nhật." },
+            { "value": "update", "label": "Thông tin cá nhân cần cập nhật", "match": ["cập nhật", "bổ sung", "thông tin cá nhân"], "note": "Bác cần cung cấp thông tin về nội dung thay đổi để cơ quan quản lý căn cước kiểm tra và cập nhật." },
+            { "value": "age", "label": "Đổi thẻ theo quy định về độ tuổi", "match": ["độ tuổi", "hết hạn", "đủ tuổi", "60 tuổi", "sáu mươi", "tuổi"], "note": "Thẻ căn cước phải đổi khi bác đủ 14, 25, 40 và 60 tuổi. Lệ phí cấp đổi là 50.000 đồng một thẻ." }
+          ]
+        },
+        {
+          "id": "eid",
+          "text": "Bác còn thông tin hoặc tài khoản định danh điện tử để xác định danh tính không ạ?",
+          "hint": "Tài khoản định danh điện tử là tài khoản trên ứng dụng VNeID. Có hay không bác nói cháu đều hướng dẫn được.",
+          "ask_if": { "purpose": ["lost"] },
+          "options": [
+            { "value": "yes", "label": "Có", "match": ["có", "còn", "có vneid", "có tài khoản"], "note": "Bác chuẩn bị thông tin định danh để hỗ trợ quá trình xác minh." },
+            { "value": "no", "label": "Không", "match": ["không", "không có", "không còn", "không nhớ"], "note": "Bác vẫn cần đến cơ quan có thẩm quyền để được kiểm tra và xác minh thông tin." }
           ]
         }
       ],
       "outcomes": [
         {
-          "when": { "why": ["change"] },
-          "verdict": "redirect",
-          "reason": "Đổi thẻ đang có là thủ tục cấp đổi thẻ căn cước, khác với cấp thẻ lần đầu. Kho hướng dẫn hiện chưa có thủ tục cấp đổi, bác đến cơ quan quản lý căn cước của công an để được hướng dẫn đúng quy trình, tránh chuẩn bị nhầm."
+          "when": { "purpose": ["first"] },
+          "verdict": "eligible",
+          "note": "Bác đủ điều kiện làm thủ tục cấp thẻ căn cước lần đầu. Cấp lần đầu miễn phí hoàn toàn, không thu lệ phí.",
+          "documents": [
+            "Thông tin cá nhân theo hướng dẫn của cơ quan quản lý căn cước: họ tên, ngày tháng năm sinh, nơi cư trú",
+            "Giấy tờ tuỳ thân hoặc thông tin liên quan để cán bộ kiểm tra, nếu bác chưa rõ đã có thông tin trong Cơ sở dữ liệu quốc gia về dân cư",
+            "Lịch hẹn, nếu bác đã đăng ký thời gian và địa điểm trước"
+          ]
         },
         {
-          "when": { "why": ["lost"] },
-          "verdict": "redirect",
-          "reason": "Làm lại thẻ bị mất là thủ tục cấp lại thẻ căn cước, khác với cấp thẻ lần đầu. Kho hướng dẫn hiện chưa có thủ tục cấp lại, bác đến cơ quan quản lý căn cước của công an để được hướng dẫn đúng quy trình, tránh chuẩn bị nhầm."
+          "when": { "purpose": ["change"] },
+          "verdict": "eligible",
+          "note": "Bác đủ điều kiện làm thủ tục cấp đổi thẻ căn cước. Lệ phí: đổi thẻ căn cước công dân sang thẻ căn cước 30.000 đồng một thẻ; đổi thẻ căn cước do đủ tuổi, thay đổi thông tin, sai sót hoặc sắp xếp đơn vị hành chính 50.000 đồng một thẻ.",
+          "documents": [
+            "Thẻ căn cước hoặc căn cước công dân đang dùng",
+            "Thông tin về nội dung thay đổi để cơ quan quản lý căn cước kiểm tra và cập nhật",
+            "Lịch hẹn, nếu bác đã đăng ký thời gian và địa điểm trước"
+          ]
+        },
+        {
+          "when": { "purpose": ["lost"] },
+          "verdict": "eligible",
+          "note": "Bác đủ điều kiện làm thủ tục cấp lại thẻ căn cước do bị mất. Lệ phí cấp lại là 70.000 đồng một thẻ.",
+          "documents": [
+            "Thông tin hoặc tài khoản định danh điện tử để hỗ trợ xác minh, nếu bác còn",
+            "Thông tin cá nhân: họ tên, ngày tháng năm sinh, nơi cư trú",
+            "Lịch hẹn, nếu bác đã đăng ký thời gian và địa điểm trước"
+          ]
         }
       ],
       "eligible": {
-        "note": "Bác thuộc trường hợp cấp thẻ căn cước lần đầu. Cháu hướng dẫn bác các bước tiếp theo."
+        "note": "Bác đủ điều kiện làm thủ tục cấp thẻ căn cước."
       }
     },
     "prepare": {
-      "say": "Bác chuẩn bị ba thông tin: họ, chữ đệm và tên khai sinh; số định danh cá nhân; và nơi cư trú. Bác có thể đăng ký trước thời gian và địa điểm làm căn cước trên Cổng Dịch vụ công Quốc gia, Cổng Dịch vụ công Bộ Công an hoặc ứng dụng định danh quốc gia. Nếu bác chưa quen, cháu có thể hướng dẫn từng bước.",
+      "say": "Bác cần chuẩn bị thông tin cá nhân theo hướng dẫn của cơ quan quản lý căn cước. Bác nên kiểm tra trước họ tên, ngày tháng năm sinh, nơi cư trú và các thông tin cá nhân để hạn chế sai sót khi thu nhận dữ liệu.",
       "tips": [
-        "Đăng ký trực tuyến: đăng nhập, chọn thủ tục cấp thẻ căn cước, kiểm tra thông tin lấy từ Cơ sở dữ liệu dân cư, chọn thời gian và địa điểm, nhận xác nhận lịch.",
-        "Không đăng ký trước cũng được: bác đến thẳng cơ quan quản lý căn cước, nhưng có thể phải chờ lâu hơn."
+        "Lệ phí: cấp lần đầu miễn phí; đổi thẻ căn cước công dân sang thẻ căn cước 30.000 đồng một thẻ; cấp đổi thẻ căn cước 50.000 đồng một thẻ; cấp lại thẻ bị mất, hỏng 70.000 đồng một thẻ.",
+        "Bác có thể đăng ký thời gian, địa điểm làm thủ tục qua hệ thống dịch vụ công hoặc ứng dụng định danh điện tử, có con cháu giúp thì đăng ký trước cho đỡ chờ.",
+        "Bị mất thẻ mà còn tài khoản định danh điện tử thì chuẩn bị thông tin định danh để xác minh nhanh hơn; không còn thì bác vẫn đến cơ quan có thẩm quyền để được kiểm tra."
       ]
     },
     "submit": {
-      "say": "Bác đến cơ quan quản lý căn cước của công an theo lịch đã đăng ký hoặc đến trực tiếp. Cán bộ kiểm tra thông tin, lập hồ sơ, chụp ảnh, thu vân tay và cho bác kiểm tra lại thông tin trước khi xác nhận.",
+      "say": "Bác đến đúng địa điểm và thời gian đã đăng ký để thực hiện thủ tục. Cán bộ sẽ kiểm tra và thu nhận thông tin cần thiết để cấp thẻ căn cước cho bác. Trước khi hoàn tất hồ sơ, bác hãy kiểm tra lại các thông tin cá nhân; nếu có thông tin sai, bác thông báo ngay cho cán bộ tiếp nhận để được điều chỉnh.",
       "places": [
-        "Cơ quan quản lý căn cước của công an nơi bác cư trú"
+        "Cơ quan quản lý căn cước có thẩm quyền của công an nơi bác ở"
       ],
       "methods": [
-        "Đến trực tiếp cơ quan quản lý căn cước",
-        "Đăng ký lịch trước qua Cổng Dịch vụ công Quốc gia",
-        "Đăng ký lịch trước qua Cổng Dịch vụ công Bộ Công an",
-        "Đăng ký lịch trước qua ứng dụng định danh quốc gia VNeID"
+        "Đăng ký thời gian, địa điểm qua hệ thống dịch vụ công hoặc ứng dụng định danh điện tử rồi đến làm theo lịch",
+        "Đến trực tiếp cơ quan quản lý căn cước để được thu nhận thông tin"
+      ],
+      "choices": [
+        { "label": "Đăng ký lịch trước", "say": "Bác hoặc con cháu đăng ký thời gian, địa điểm làm thủ tục trên hệ thống dịch vụ công hoặc ứng dụng định danh điện tử. Đến ngày hẹn, bác đến đúng nơi đã đăng ký, cán bộ kiểm tra và thu nhận thông tin, chụp ảnh, lấy vân tay." },
+        { "label": "Đến trực tiếp", "say": "Bác đến cơ quan quản lý căn cước của công an nơi bác ở. Cán bộ kiểm tra thông tin, thu nhận dữ liệu, chụp ảnh, lấy vân tay. Bác kiểm tra lại họ tên, ngày sinh, nơi cư trú trước khi hoàn tất." }
       ],
       "bring": [
-        "Họ, chữ đệm và tên khai sinh",
-        "Số định danh cá nhân",
-        "Thông tin nơi cư trú",
-        "Lịch hẹn, nếu bác đã đăng ký trực tuyến"
+        "Thông tin cá nhân: họ tên, ngày tháng năm sinh, nơi cư trú",
+        "Thẻ cũ và thông tin nội dung thay đổi nếu đổi thẻ; thông tin định danh điện tử nếu mất thẻ",
+        "Tiền lệ phí nếu đổi hoặc cấp lại thẻ: 30.000, 50.000 hoặc 70.000 đồng một thẻ tuỳ trường hợp"
       ],
-      "agency": "Cơ quan quản lý căn cước kiểm tra thông tin trong Cơ sở dữ liệu quốc gia về dân cư, lập hồ sơ, thu nhận thông tin nhận dạng và sinh trắc học, cho bác kiểm tra và xác nhận. Thông tin chưa có hoặc chưa đúng thì cán bộ hướng dẫn cập nhật trước.",
-      "result": "Bác nhận thẻ căn cước theo phương thức đã đăng ký và được cơ quan quản lý căn cước hướng dẫn."
+      "agency": "Cơ quan quản lý căn cước kiểm tra thông tin và thực hiện thu nhận dữ liệu cần thiết: ảnh, vân tay, thông tin nhân thân. Bác kiểm tra lại thông tin trước khi hoàn tất.",
+      "result": "Sau khi hoàn tất, bác nhận thông tin hoặc giấy hẹn trả kết quả theo quy định. Thời hạn giải quyết được công bố là 07 ngày làm việc."
     },
     "faq": [
       {
-        "q": ["số định danh cá nhân là số nào", "số định danh", "mã định danh"],
-        "a": "Số định danh cá nhân là dãy 12 số của riêng bác, có trên giấy khai sinh mới, thông báo số định danh của công an, hoặc trên căn cước công dân gắn chip nếu đã từng có. Chưa biết số này thì cán bộ tra giúp bác."
+        "q": ["sau khi nộp bao lâu có thẻ", "bao lâu thì xong", "mấy ngày có thẻ", "thời hạn giải quyết"],
+        "a": "Thời hạn giải quyết được công bố là 07 ngày làm việc. Sau khi hoàn tất, bác nhận thông tin hoặc giấy hẹn trả kết quả theo quy định."
       },
       {
-        "q": ["mất căn cước thì làm lại thế nào", "mất căn cước", "làm lại căn cước"],
-        "a": "Mất thẻ thì làm thủ tục cấp lại thẻ căn cước, khác với cấp lần đầu. Bác đến cơ quan quản lý căn cước của công an để được hướng dẫn đúng thủ tục."
+        "q": ["làm căn cước mất bao nhiêu tiền", "lệ phí bao nhiêu", "phí bao nhiêu", "có mất phí không", "có mất tiền không"],
+        "a": "Cấp thẻ lần đầu miễn phí hoàn toàn. Cấp đổi thẻ căn cước công dân sang thẻ căn cước 30.000 đồng một thẻ. Cấp đổi thẻ căn cước khi đủ tuổi 14, 25, 40, 60, thay đổi thông tin nhân thân, sai sót do cơ quan quản lý hoặc sắp xếp đơn vị hành chính 50.000 đồng một thẻ. Cấp lại thẻ khi bị mất, hỏng hoặc trở lại quốc tịch Việt Nam 70.000 đồng một thẻ."
       },
       {
-        "q": ["hết hạn thì đổi ở đâu", "thẻ hết hạn", "đổi thẻ"],
-        "a": "Thẻ hết hạn thì làm thủ tục cấp đổi tại cơ quan quản lý căn cước của công an, hoặc đăng ký trước trên Cổng Dịch vụ công. Đây là thủ tục khác với cấp lần đầu."
+        "q": ["mất căn cước thì làm lại thế nào", "mất thẻ", "làm lại thẻ"],
+        "a": "Bác làm thủ tục cấp lại thẻ căn cước, lệ phí 70.000 đồng một thẻ. Còn tài khoản định danh điện tử thì bác chuẩn bị thông tin định danh để xác minh; không còn thì bác vẫn đến cơ quan có thẩm quyền để được kiểm tra và xác minh thông tin. Thời hạn 07 ngày làm việc."
       },
       {
-        "q": ["người già có phải làm căn cước không", "bắt buộc không", "có phải làm không"],
-        "a": "Theo Luật Căn cước, công dân Việt Nam từ đủ 14 tuổi trở lên phải làm thủ tục cấp thẻ căn cước, không giới hạn tuổi trên. Bác chưa có thẻ thì nên đi làm."
+        "q": ["hết hạn thì đổi ở đâu", "đổi thẻ ở đâu", "thẻ hết hạn"],
+        "a": "Bác đổi tại cơ quan quản lý căn cước có thẩm quyền của công an nơi bác ở. Thẻ phải đổi khi đủ 14, 25, 40 và 60 tuổi; lệ phí cấp đổi 50.000 đồng một thẻ; đổi từ căn cước công dân sang thẻ căn cước 30.000 đồng một thẻ."
       },
       {
-        "q": ["có phải chụp ảnh lấy vân tay không", "chụp ảnh", "vân tay"],
-        "a": "Có. Khi đến cơ quan công an, cán bộ thu nhận ảnh chân dung, vân tay và mống mắt theo quy định, rồi cho bác kiểm tra lại thông tin trước khi xác nhận."
+        "q": ["đăng ký lịch ở đâu", "đăng ký trước thế nào", "đăng ký trực tuyến"],
+        "a": "Bác có thể đăng ký thời gian, địa điểm làm thủ tục qua hệ thống dịch vụ công hoặc ứng dụng định danh điện tử theo phương thức được cơ quan có thẩm quyền hỗ trợ. Có con cháu giúp thì đăng ký trước, đến sẽ không phải chờ lâu."
+      },
+      {
+        "q": ["chưa có thông tin trong cơ sở dữ liệu dân cư thì sao", "không rõ có trong dữ liệu dân cư", "chưa có số định danh"],
+        "a": "Bác có thể mang giấy tờ tuỳ thân hoặc thông tin liên quan đến cơ quan có thẩm quyền để được kiểm tra, cán bộ sẽ đối chiếu và hướng dẫn tiếp."
+      },
+      {
+        "q": ["thông tin sai thì làm sao", "ghi sai tên", "sai ngày sinh"],
+        "a": "Trước khi hoàn tất hồ sơ, bác kiểm tra lại các thông tin cá nhân. Nếu có thông tin sai, bác thông báo ngay cho cán bộ tiếp nhận để được kiểm tra và điều chỉnh theo quy định."
+      },
+      {
+        "q": ["người già có phải làm căn cước không", "già rồi có cần làm không"],
+        "a": "Công dân Việt Nam từ đủ 14 tuổi trở lên đều thuộc đối tượng cấp thẻ căn cước. Thẻ phải đổi khi đủ 14, 25, 40 và 60 tuổi; bác đã có thẻ còn hạn thì chưa cần làm gì."
       }
     ]
   },
   "source": {
-    "title": "Điều 19 và các quy định liên quan của Luật Căn cước số 26/2023/QH15; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
+    "title": "Luật Căn cước số 26/2023/QH15 và các văn bản hướng dẫn; thủ tục công bố trên Cổng Dịch vụ công Quốc gia",
     "url": "https://dichvucong.gov.vn/"
   },
-  "verified_by": "Mian — đối chiếu văn bản gốc, ghi trong tài liệu kho tri thức mục 5.6",
-  "verified_date": "2026-09-11"
+  "verified_by": "Mian — kho tri thức bản 17/09/2026 (file «Kho mới tri thức 6 thủ tục.xlsx», sheet THỦ TỤC 6)",
+  "verified_date": "2026-09-17"
 }

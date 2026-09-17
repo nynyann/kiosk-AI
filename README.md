@@ -34,8 +34,10 @@ Bác đứng trước kiosk:
    chọn: một thủ tục thì hỏi «đúng không ạ?», nhiều thủ tục thì hỏi «bác
    cần hỗ trợ thủ tục nào trước ạ?». Danh sách đủ 6 thủ tục chỉ hiện khi
    máy không hiểu hoặc bác bấm «không nói được».
-2. **Bước 1. Kiểm tra điều kiện** — kiosk hỏi từng câu một, bắt đầu từ tuổi
-   (rồi công dân, lương hưu, trợ cấp BHXH, hộ nghèo…). Mỗi câu kèm hướng dẫn
+2. **Bước 1. Kiểm tra điều kiện** — kiosk hỏi từng câu một, câu đầu là bác
+   muốn làm gì (xin mới, điều chỉnh, thôi hưởng; làm thẻ lần đầu, đổi, mất…),
+   rồi tới điều kiện (tuổi, công dân, lương hưu, trợ cấp BHXH, hộ nghèo…)
+   đúng theo kho tri thức bản 17/09. Mỗi câu kèm hướng dẫn
    cách trả lời («bác nói số tuổi, ví dụ "tôi bảy mươi sáu tuổi", hoặc bấm
    chọn»); bác bấm chọn hoặc trả lời bằng lời.
    - Đáp ứng → sang bước 2. Máy nói «bác có khả năng thuộc diện», không bao
@@ -49,13 +51,16 @@ Bác đứng trước kiosk:
    đã trả lời** (điều chỉnh trợ cấp thì hồ sơ khác xin mới), kèm lưu ý riêng.
    Bác bấm «Hỏi thêm» và nói; máy chỉ trả lời từ kho tri thức của thủ tục đó,
    không có thì mời hỏi cán bộ.
-4. **Bước 3. Nộp hồ sơ** — nộp ở đâu, cách nộp, giấy tờ mang theo, cơ quan xử
-   lý, thời hạn dự kiến, kết quả nhận được, nguồn văn bản.
+4. **Bước 3. Nộp hồ sơ** — bác chọn cách nộp (trực tiếp, trực tuyến, bưu
+   chính) và máy nói hướng dẫn riêng cho cách đó; kèm nộp ở đâu, giấy tờ mang
+   theo, cơ quan xử lý, thời hạn dự kiến, lệ phí, kết quả nhận được, nguồn.
 5. **Kết thúc** — tự về màn hình chính, xoá sạch trạng thái cho bác tiếp theo.
 
 Mọi câu hỏi, kết luận, hồ sơ nằm trong `data/kb/<thủ tục>.json` mục `flow`;
 `app/flow.py` chỉ là máy chạy. Sửa nội dung thì sửa JSON rồi gọi
-`POST /kb/reload`, không đụng code.
+`POST /kb/reload`, không đụng code. Bản gốc của kho là file Excel của Mian
+`data/kb-source/Kho moi tri thuc 6 thu tuc.xlsx` (bản 17/09/2026), mỗi sheet
+một thủ tục; JSON được chuyển tay từ đó, sửa gì thì sửa cả hai.
 
 ## Mô hình ngôn ngữ (FPT AI Marketplace)
 
