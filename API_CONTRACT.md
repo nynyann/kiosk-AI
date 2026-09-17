@@ -23,8 +23,8 @@ viết theo 1.0 vẫn chạy nguyên:
   JSON hoặc form tuỳ đường dẫn), máy chủ thay xưng hô trong mọi chuỗi trả
   về, kể cả `speech`. `/answer`, `/turn` trả thêm `candidates` (tối đa 3
   thủ tục có thể là điều bác cần, chắc nhất trước) để giao diện đưa ra cho
-  bác chọn. Kho tri thức thêm mục `flow.forms` (cách kê khai từng mục của
-  mẫu), mô hình đọc được khi bác hỏi «mẫu này điền thế nào».
+  bác chọn. (Mục `flow.forms` cách kê khai mẫu đã bỏ ngày 17/09 vì chưa
+  xác nhận được mẫu đúng.)
 - 2.3: `/flow/*` ở `stage: "submit"` trả thêm `submit_choices` (các cách
   nộp theo kho tri thức mới: trực tiếp, trực tuyến, bưu chính; mỗi cách có
   `label`, `say` và `speech`). Giao diện vẽ thành nút nhấp nháy, bấm thì máy

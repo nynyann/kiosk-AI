@@ -112,11 +112,20 @@ def test_khong_ro_thi_moi_gap_can_bo_chu_khong_ket_luan():
     assert st["stage"] == "stop" and st["verdict"] == "consult"
 
 
-def test_thu_tuc_khac_thi_goi_y_chuyen():
-    st = _answer("chung-thuc-ban-sao", {"what": "birth"}, "original", "no")
-    assert st["stage"] == "stop" and st["verdict"] == "redirect"
-    assert st["suggest_procedure_id"] == "cap-ban-sao-trich-luc-ho-tich"
-    assert st["suggest_procedure_name"]
+def test_khong_co_ban_chinh_thi_ket_luan_khong_goi_y_thu_tuc_khac():
+    """Feedback 17/09: chứng thực không hỏi loại giấy, không đẩy sang thủ tục
+    khác; không có bản chính thì kết luận theo đúng câu trong kho."""
+    st = _answer("chung-thuc-ban-sao", {}, "original", "no")
+    assert st["stage"] == "stop" and st["verdict"] == "ineligible"
+    assert st["suggest_procedure_id"] is None
+    assert "bản chính để đối chiếu" in st["reason"]
+
+
+def test_khong_thuoc_nhom_thi_chi_ket_luan_va_chi_ra_mot_cua():
+    st = _answer("tro-cap-xa-hoi-hang-thang", {"purpose": "new"}, "group", "none")
+    assert st["stage"] == "stop" and st["verdict"] == "ineligible"
+    assert st["suggest_procedure_id"] is None
+    assert "một cửa" in st["reason"] and "hưu trí" not in st["reason"]
 
 
 def test_can_cuoc_mat_the_thi_huong_dan_cap_lai_kem_le_phi():

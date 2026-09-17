@@ -238,8 +238,9 @@ def test_cau_ngoai_kho_thi_mo_hinh_tu_noi_loi_tu_te(fake_llm):
 # --- 3. Kho tri thức phẳng cho prompt -----------------------------------------
 def test_kb_context_du_moi_phan():
     t = llm.kb_context(kb.get(HUU_TRI))
-    for phan in ["THỦ TỤC:", "ĐIỀU KIỆN", "KẾT LUẬN", "HỒ SƠ:", "NƠI NỘP:", "THỜI HẠN:", "CÂU HỎI THƯỜNG GẶP", "NGUỒN:", "CÁCH KÊ KHAI"]:
+    for phan in ["THỦ TỤC:", "ĐIỀU KIỆN", "KẾT LUẬN", "HỒ SƠ:", "NƠI NỘP:", "THỜI HẠN:", "CÂU HỎI THƯỜNG GẶP", "NGUỒN:"]:
         assert phan in t, phan
     assert "10 ngày làm việc" in t
+    assert "CÁCH KÊ KHAI" not in t          # kho đã bỏ mục kê khai mẫu (chưa xác nhận mẫu đúng)
     ngan = llm.kb_context(kb.get(HUU_TRI), full=False)
-    assert "KẾT LUẬN" not in ngan and "CÁCH KÊ KHAI" in ngan and len(ngan) < len(t) * 0.75
+    assert "KẾT LUẬN" not in ngan and len(ngan) < len(t) * 0.75

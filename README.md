@@ -74,7 +74,7 @@ OpenAI) ở bốn chỗ, chỗ nào cũng có đường lùi về kho tĩnh:
 | Bác mở đầu «tôi 76 tuổi, không có lương hưu, sống một mình» | điền sẵn tuổi, lương hưu; nói «Cháu hiểu rồi ạ, bác 76 tuổi, chưa có lương hưu và sống một mình»; chỉ hỏi phần còn thiếu | điền sẵn bằng luật (số tuổi, cụm phủ định rõ), nói «Cháu ghi nhận: …» |
 | Câu nói không khớp từ khoá («tôi già rồi nhà nước có cho đồng nào không») | mô hình chọn thủ tục trong 6 thủ tục, máy hỏi lại «Nếu cháu hiểu đúng thì…» | chuyển cán bộ, đưa danh sách bấm chọn |
 | Trả lời câu bước 1 bằng lời mà so cụm từ không ra | mô hình ánh xạ sang một lựa chọn, không được tự bịa lựa chọn | mời bấm chọn |
-| Hỏi thêm ở bước 2, 3 diễn đạt khác FAQ, hoặc kể thêm hoàn cảnh | mô hình đọc toàn bộ kho tri thức của thủ tục (kể cả cách kê khai từng mục của mẫu) + những gì bác đã trả lời rồi viết câu trả lời, tối đa 3 câu | ý định chung (nộp đâu, bao lâu, phí, mang gì) hoặc mời hỏi cán bộ |
+| Hỏi thêm ở bước 2, 3 diễn đạt khác FAQ, hoặc kể thêm hoàn cảnh | mô hình đọc toàn bộ kho tri thức của thủ tục + những gì bác đã trả lời rồi viết câu trả lời, tối đa 3 câu | ý định chung (nộp đâu, bao lâu, phí, mang gì) hoặc mời hỏi cán bộ |
 | Câu ngoài kho, câu nghe không thành nghĩa («như nàng»), «cháu tên gì» | mô hình tự viết 1 đến 2 câu tử tế: cháu là máy hướng dẫn nên chỉ giúp về thủ tục này, hỏi cán bộ giúp, hoặc mời nói lại; không bịa | câu cứng «Câu này cháu chưa có trong kho…» |
 
 Nguyên tắc không đổi: prompt chỉ đưa kho tri thức của đúng thủ tục đó, mô

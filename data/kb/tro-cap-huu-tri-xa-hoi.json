@@ -65,142 +65,458 @@
           "id": "purpose",
           "text": "Bác đang muốn làm việc gì ạ?",
           "options": [
-            { "value": "new", "label": "Đăng ký hưởng trợ cấp lần đầu", "match": ["lần đầu", "đăng ký", "xin trợ cấp", "xin hưởng", "làm mới", "chưa hưởng", "có được nhận không", "có được hưởng không", "được hỗ trợ gì"] },
-            { "value": "adjust", "label": "Đang hưởng, muốn thay đổi thông tin hoặc nơi nhận", "match": ["thay đổi", "điều chỉnh", "đổi", "sửa", "chuyển nơi", "chuyển chỗ ở", "nơi nhận"] },
-            { "value": "stop", "label": "Đang hưởng, muốn thôi hưởng", "match": ["thôi hưởng", "thôi", "không nhận nữa", "dừng", "ngừng"] }
+            {
+              "value": "new",
+              "label": "Đăng ký hưởng trợ cấp lần đầu",
+              "match": [
+                "lần đầu",
+                "đăng ký",
+                "xin trợ cấp",
+                "xin hưởng",
+                "làm mới",
+                "chưa hưởng",
+                "có được nhận không",
+                "có được hưởng không",
+                "được hỗ trợ gì"
+              ]
+            },
+            {
+              "value": "adjust",
+              "label": "Đang hưởng, muốn thay đổi thông tin hoặc nơi nhận",
+              "match": [
+                "thay đổi",
+                "điều chỉnh",
+                "đổi",
+                "sửa",
+                "chuyển nơi",
+                "chuyển chỗ ở",
+                "nơi nhận"
+              ]
+            },
+            {
+              "value": "stop",
+              "label": "Đang hưởng, muốn thôi hưởng",
+              "match": [
+                "thôi hưởng",
+                "thôi",
+                "không nhận nữa",
+                "dừng",
+                "ngừng"
+              ]
+            }
           ]
         },
         {
           "id": "age",
           "text": "Bác năm nay bao nhiêu tuổi ạ?",
-          "ask_if": { "purpose": ["new"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ]
+          },
           "options": [
-            { "value": "lt70", "label": "Dưới 70 tuổi", "range": [0, 69], "match": ["dưới 70", "chưa 70", "chưa đến 70"] },
-            { "value": "70_74", "label": "Từ 70 đến dưới 75 tuổi", "range": [70, 74], "match": ["70 đến 75", "ngoài 70", "hơn 70"] },
-            { "value": "ge75", "label": "Từ 75 tuổi trở lên", "range": [75, 200], "match": ["trên 75", "hơn 75", "ngoài 75", "75 trở lên"] }
+            {
+              "value": "lt70",
+              "label": "Dưới 70 tuổi",
+              "range": [
+                0,
+                69
+              ],
+              "match": [
+                "dưới 70",
+                "chưa 70",
+                "chưa đến 70"
+              ]
+            },
+            {
+              "value": "70_74",
+              "label": "Từ 70 đến dưới 75 tuổi",
+              "range": [
+                70,
+                74
+              ],
+              "match": [
+                "70 đến 75",
+                "ngoài 70",
+                "hơn 70"
+              ]
+            },
+            {
+              "value": "ge75",
+              "label": "Từ 75 tuổi trở lên",
+              "range": [
+                75,
+                200
+              ],
+              "match": [
+                "trên 75",
+                "hơn 75",
+                "ngoài 75",
+                "75 trở lên"
+              ]
+            }
           ]
         },
         {
           "id": "citizen",
           "text": "Bác có phải là công dân Việt Nam không ạ?",
-          "ask_if": { "purpose": ["new"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ]
+          },
           "options": [
-            { "value": "yes", "label": "Có, tôi là công dân Việt Nam", "match": ["công dân việt nam", "người việt nam", "quốc tịch việt nam"] },
-            { "value": "no", "label": "Không phải" }
+            {
+              "value": "yes",
+              "label": "Có, tôi là công dân Việt Nam",
+              "match": [
+                "công dân việt nam",
+                "người việt nam",
+                "quốc tịch việt nam"
+              ]
+            },
+            {
+              "value": "no",
+              "label": "Không phải"
+            }
           ]
         },
         {
           "id": "pension",
           "text": "Hiện bác có đang hưởng lương hưu không ạ?",
-          "ask_if": { "purpose": ["new"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ]
+          },
           "options": [
-            { "value": "no", "label": "Không hưởng lương hưu", "match": ["không có lương hưu", "không lương hưu", "chưa có lương hưu", "không được lương hưu", "không nhận lương hưu"] },
-            { "value": "yes", "label": "Có, đang hưởng lương hưu", "match": ["có lương hưu", "đang nhận lương hưu", "đang hưởng lương hưu", "lương hưu rồi"] }
+            {
+              "value": "no",
+              "label": "Không hưởng lương hưu",
+              "match": [
+                "không có lương hưu",
+                "không lương hưu",
+                "chưa có lương hưu",
+                "không được lương hưu",
+                "không nhận lương hưu"
+              ]
+            },
+            {
+              "value": "yes",
+              "label": "Có, đang hưởng lương hưu",
+              "match": [
+                "có lương hưu",
+                "đang nhận lương hưu",
+                "đang hưởng lương hưu",
+                "lương hưu rồi"
+              ]
+            }
           ]
         },
         {
           "id": "pension_low",
           "text": "Mức lương hưu bác đang nhận có thấp hơn mức trợ cấp hưu trí xã hội theo quy định (500.000 đồng một tháng) không ạ?",
-          "ask_if": { "purpose": ["new"], "pension": ["yes"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ],
+            "pension": [
+              "yes"
+            ]
+          },
           "options": [
-            { "value": "yes", "label": "Có, thấp hơn", "match": ["thấp hơn", "ít hơn", "dưới"] },
-            { "value": "no", "label": "Không, cao hơn", "match": ["cao hơn", "nhiều hơn", "trên"] },
-            { "value": "unsure", "label": "Tôi không rõ", "match": ["không rõ", "không biết", "không nhớ"] }
+            {
+              "value": "yes",
+              "label": "Có, thấp hơn",
+              "match": [
+                "thấp hơn",
+                "ít hơn",
+                "dưới"
+              ]
+            },
+            {
+              "value": "no",
+              "label": "Không, cao hơn",
+              "match": [
+                "cao hơn",
+                "nhiều hơn",
+                "trên"
+              ]
+            },
+            {
+              "value": "unsure",
+              "label": "Tôi không rõ",
+              "match": [
+                "không rõ",
+                "không biết",
+                "không nhớ"
+              ]
+            }
           ]
         },
         {
           "id": "bhxh",
           "text": "Hiện bác có đang hưởng trợ cấp bảo hiểm xã hội hằng tháng không ạ?",
-          "ask_if": { "purpose": ["new"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ]
+          },
           "options": [
-            { "value": "no", "label": "Không hưởng", "match": ["không có trợ cấp bảo hiểm", "không nhận trợ cấp bảo hiểm", "không có bảo hiểm xã hội"] },
-            { "value": "yes", "label": "Có, đang hưởng", "match": ["có trợ cấp bảo hiểm", "đang nhận trợ cấp bảo hiểm"] }
+            {
+              "value": "no",
+              "label": "Không hưởng",
+              "match": [
+                "không có trợ cấp bảo hiểm",
+                "không nhận trợ cấp bảo hiểm",
+                "không có bảo hiểm xã hội"
+              ]
+            },
+            {
+              "value": "yes",
+              "label": "Có, đang hưởng",
+              "match": [
+                "có trợ cấp bảo hiểm",
+                "đang nhận trợ cấp bảo hiểm"
+              ]
+            }
           ]
         },
         {
           "id": "bhxh_low",
           "text": "Mức trợ cấp bảo hiểm xã hội bác đang nhận có thấp hơn mức trợ cấp hưu trí xã hội theo quy định (500.000 đồng một tháng) không ạ?",
-          "ask_if": { "purpose": ["new"], "bhxh": ["yes"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ],
+            "bhxh": [
+              "yes"
+            ]
+          },
           "options": [
-            { "value": "yes", "label": "Có, thấp hơn", "match": ["thấp hơn", "ít hơn", "dưới"] },
-            { "value": "no", "label": "Không, cao hơn", "match": ["cao hơn", "nhiều hơn", "trên"] },
-            { "value": "unsure", "label": "Tôi không rõ", "match": ["không rõ", "không biết", "không nhớ"] }
+            {
+              "value": "yes",
+              "label": "Có, thấp hơn",
+              "match": [
+                "thấp hơn",
+                "ít hơn",
+                "dưới"
+              ]
+            },
+            {
+              "value": "no",
+              "label": "Không, cao hơn",
+              "match": [
+                "cao hơn",
+                "nhiều hơn",
+                "trên"
+              ]
+            },
+            {
+              "value": "unsure",
+              "label": "Tôi không rõ",
+              "match": [
+                "không rõ",
+                "không biết",
+                "không nhớ"
+              ]
+            }
           ]
         },
         {
           "id": "poor",
           "text": "Bác từ 70 đến dưới 75 tuổi, vậy gia đình bác có thuộc hộ nghèo hoặc hộ cận nghèo không ạ?",
-          "ask_if": { "purpose": ["new"], "age": ["70_74"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ],
+            "age": [
+              "70_74"
+            ]
+          },
           "options": [
-            { "value": "yes", "label": "Có, thuộc hộ nghèo hoặc cận nghèo", "match": ["hộ nghèo", "cận nghèo", "nhà nghèo"] },
-            { "value": "no", "label": "Không thuộc" },
-            { "value": "unsure", "label": "Tôi không rõ", "match": ["không rõ", "không biết", "chưa rõ"] }
+            {
+              "value": "yes",
+              "label": "Có, thuộc hộ nghèo hoặc cận nghèo",
+              "match": [
+                "hộ nghèo",
+                "cận nghèo",
+                "nhà nghèo"
+              ]
+            },
+            {
+              "value": "no",
+              "label": "Không thuộc"
+            },
+            {
+              "value": "unsure",
+              "label": "Tôi không rõ",
+              "match": [
+                "không rõ",
+                "không biết",
+                "chưa rõ"
+              ]
+            }
           ]
         },
         {
           "id": "change_kind",
           "text": "Bác đang hưởng trợ cấp, vậy bác muốn thay đổi điều gì ạ?",
-          "ask_if": { "purpose": ["adjust"] },
+          "ask_if": {
+            "purpose": [
+              "adjust"
+            ]
+          },
           "options": [
-            { "value": "info", "label": "Thay đổi thông tin cá nhân (họ tên, định danh, thông tin hồ sơ)", "match": ["họ tên", "tên", "định danh", "thông tin cá nhân", "sai thông tin", "căn cước"] },
-            { "value": "move", "label": "Chuyển nơi cư trú, muốn nhận trợ cấp ở nơi mới", "match": ["chuyển nơi", "chuyển chỗ", "chuyển nhà", "nơi cư trú mới", "về quê", "lên thành phố"] },
-            { "value": "other", "label": "Trường hợp khác liên quan đến việc đang hưởng", "match": ["khác"] }
+            {
+              "value": "info",
+              "label": "Thay đổi thông tin cá nhân (họ tên, định danh, thông tin hồ sơ)",
+              "match": [
+                "họ tên",
+                "tên",
+                "định danh",
+                "thông tin cá nhân",
+                "sai thông tin",
+                "căn cước"
+              ]
+            },
+            {
+              "value": "move",
+              "label": "Chuyển nơi cư trú, muốn nhận trợ cấp ở nơi mới",
+              "match": [
+                "chuyển nơi",
+                "chuyển chỗ",
+                "chuyển nhà",
+                "nơi cư trú mới",
+                "về quê",
+                "lên thành phố"
+              ]
+            },
+            {
+              "value": "other",
+              "label": "Trường hợp khác liên quan đến việc đang hưởng",
+              "match": [
+                "khác"
+              ]
+            }
           ]
         },
         {
           "id": "stop_reason",
           "text": "Vì sao bác muốn thôi hưởng ạ?",
-          "ask_if": { "purpose": ["stop"] },
+          "ask_if": {
+            "purpose": [
+              "stop"
+            ]
+          },
           "options": [
-            { "value": "ineligible", "label": "Tôi không còn đủ điều kiện hưởng", "match": ["không còn đủ điều kiện", "có lương hưu rồi", "hết điều kiện"] },
-            { "value": "move", "label": "Tôi muốn chuyển nơi nhận trợ cấp", "match": ["chuyển nơi", "chuyển chỗ", "nơi khác"] },
-            { "value": "other", "label": "Trường hợp khác", "match": ["khác"] }
+            {
+              "value": "ineligible",
+              "label": "Tôi không còn đủ điều kiện hưởng",
+              "match": [
+                "không còn đủ điều kiện",
+                "có lương hưu rồi",
+                "hết điều kiện"
+              ]
+            },
+            {
+              "value": "move",
+              "label": "Tôi muốn chuyển nơi nhận trợ cấp",
+              "match": [
+                "chuyển nơi",
+                "chuyển chỗ",
+                "nơi khác"
+              ]
+            },
+            {
+              "value": "other",
+              "label": "Trường hợp khác",
+              "match": [
+                "khác"
+              ]
+            }
           ]
         }
       ],
       "outcomes": [
         {
-          "when": { "age": ["lt70"] },
+          "when": {
+            "age": [
+              "lt70"
+            ]
+          },
           "verdict": "ineligible",
           "reason": "Trợ cấp hưu trí xã hội dành cho người từ đủ 75 tuổi trở lên, hoặc từ đủ 70 tuổi nếu thuộc hộ nghèo, hộ cận nghèo (khoản 2 Điều 2 Nghị định 176/2025/NĐ-CP). Theo thông tin bác cung cấp, hiện bác chưa đến độ tuổi này nên chưa đáp ứng điều kiện. Bác chưa cần chuẩn bị hồ sơ."
         },
         {
-          "when": { "citizen": ["no"] },
+          "when": {
+            "citizen": [
+              "no"
+            ]
+          },
           "verdict": "ineligible",
           "reason": "Trợ cấp hưu trí xã hội áp dụng đối với công dân Việt Nam theo Điều 21 Luật Bảo hiểm xã hội và Điều 2 Nghị định 176/2025/NĐ-CP. Theo thông tin bác cung cấp, hiện bác chưa đáp ứng điều kiện này."
         },
         {
-          "when": { "pension_low": ["no"] },
+          "when": {
+            "pension_low": [
+              "no"
+            ]
+          },
           "verdict": "ineligible",
           "reason": "Người đang hưởng lương hưu bằng hoặc cao hơn mức trợ cấp hưu trí xã hội thì không thuộc diện hưởng trợ cấp này. Theo thông tin bác cung cấp, hiện bác chưa đáp ứng điều kiện."
         },
         {
-          "when": { "pension_low": ["unsure"] },
+          "when": {
+            "pension_low": [
+              "unsure"
+            ]
+          },
           "verdict": "consult",
           "reason": "Bác đang hưởng lương hưu nên cần đối chiếu mức hưởng với mức trợ cấp hưu trí xã hội theo quy định. Cháu chưa đủ thông tin để xác định, bác mang giấy tờ về lương hưu đến Uỷ ban nhân dân xã để cán bộ đối chiếu giúp."
         },
         {
-          "when": { "bhxh_low": ["no"] },
+          "when": {
+            "bhxh_low": [
+              "no"
+            ]
+          },
           "verdict": "ineligible",
           "reason": "Người đang hưởng trợ cấp bảo hiểm xã hội hằng tháng bằng hoặc cao hơn mức trợ cấp hưu trí xã hội thì không thuộc diện hưởng trợ cấp này. Theo thông tin bác cung cấp, hiện bác chưa đáp ứng điều kiện."
         },
         {
-          "when": { "bhxh_low": ["unsure"] },
+          "when": {
+            "bhxh_low": [
+              "unsure"
+            ]
+          },
           "verdict": "consult",
           "reason": "Bác đang hưởng trợ cấp bảo hiểm xã hội nên cần đối chiếu mức hưởng với mức trợ cấp hưu trí xã hội theo quy định. Cháu chưa đủ thông tin để xác định, bác mang giấy tờ về khoản trợ cấp đó đến Uỷ ban nhân dân xã để cán bộ đối chiếu giúp."
         },
         {
-          "when": { "poor": ["no"] },
+          "when": {
+            "poor": [
+              "no"
+            ]
+          },
           "verdict": "ineligible",
           "reason": "Bác từ 70 đến dưới 75 tuổi thì phải thuộc hộ nghèo hoặc hộ cận nghèo mới thuộc diện được hưởng (khoản 2 Điều 2 Nghị định 176/2025/NĐ-CP). Theo thông tin bác cung cấp, hiện bác chưa đáp ứng điều kiện về độ tuổi và hộ nghèo, cận nghèo. Khi bác đủ 75 tuổi thì có thể làm thủ tục này."
         },
         {
-          "when": { "poor": ["unsure"] },
+          "when": {
+            "poor": [
+              "unsure"
+            ]
+          },
           "verdict": "consult",
           "reason": "Bác từ 70 đến dưới 75 tuổi thì cần thuộc hộ nghèo hoặc hộ cận nghèo. Cháu chưa đủ thông tin để xác định, bác hỏi cán bộ Uỷ ban nhân dân xã để biết gia đình mình có thuộc hộ nghèo, cận nghèo không rồi quay lại làm hồ sơ."
         },
         {
-          "when": { "pension_low": ["yes"] },
+          "when": {
+            "pension_low": [
+              "yes"
+            ]
+          },
           "verdict": "eligible",
           "note": "Lương hưu bác đang nhận thấp hơn mức trợ cấp hưu trí xã hội, nên theo thông tin bác cung cấp, bác có khả năng thuộc diện được xem xét. Cơ quan có thẩm quyền sẽ đối chiếu mức hưởng cụ thể khi nhận hồ sơ.",
           "documents": [
@@ -209,7 +525,11 @@
           ]
         },
         {
-          "when": { "bhxh_low": ["yes"] },
+          "when": {
+            "bhxh_low": [
+              "yes"
+            ]
+          },
           "verdict": "eligible",
           "note": "Trợ cấp bảo hiểm xã hội bác đang nhận thấp hơn mức trợ cấp hưu trí xã hội, nên theo thông tin bác cung cấp, bác có khả năng thuộc diện được xem xét. Cơ quan có thẩm quyền sẽ đối chiếu mức hưởng cụ thể khi nhận hồ sơ.",
           "documents": [
@@ -218,7 +538,11 @@
           ]
         },
         {
-          "when": { "change_kind": ["info"] },
+          "when": {
+            "change_kind": [
+              "info"
+            ]
+          },
           "verdict": "eligible",
           "note": "Bác đang hưởng và muốn thay đổi thông tin cá nhân. Người đang hưởng dùng Mẫu số 01 để đề nghị thay đổi thông tin theo thủ tục hiện hành.",
           "documents": [
@@ -227,7 +551,11 @@
           ]
         },
         {
-          "when": { "change_kind": ["move"] },
+          "when": {
+            "change_kind": [
+              "move"
+            ]
+          },
           "verdict": "eligible",
           "note": "Bác đang hưởng trợ cấp và đã chuyển sang nơi cư trú mới. Bác đề nghị được nhận trợ cấp tại nơi cư trú mới bằng Mẫu số 01; cơ quan nơi cư trú cũ sẽ thôi chi trả tại địa bàn cũ và chuyển thông tin đến nơi mới, bác tiếp tục nhận trợ cấp ở nơi mới.",
           "documents": [
@@ -235,12 +563,20 @@
           ]
         },
         {
-          "when": { "change_kind": ["other"] },
+          "when": {
+            "change_kind": [
+              "other"
+            ]
+          },
           "verdict": "consult",
           "reason": "Trường hợp của bác liên quan đến việc đang hưởng nhưng chưa rõ thuộc loại nào. Bác đến Uỷ ban nhân dân xã nơi cư trú, cán bộ sẽ xác định và hướng dẫn đúng mẫu đề nghị."
         },
         {
-          "when": { "stop_reason": ["move"] },
+          "when": {
+            "stop_reason": [
+              "move"
+            ]
+          },
           "verdict": "eligible",
           "note": "Bác muốn chuyển nơi nhận trợ cấp thì không phải thôi hưởng, mà là đề nghị nhận trợ cấp tại nơi cư trú mới. Bác dùng Mẫu số 01 nộp tại nơi cư trú mới; nơi cũ sẽ thôi chi trả và chuyển thông tin sang nơi mới.",
           "documents": [
@@ -248,7 +584,12 @@
           ]
         },
         {
-          "when": { "stop_reason": ["ineligible", "other"] },
+          "when": {
+            "stop_reason": [
+              "ineligible",
+              "other"
+            ]
+          },
           "verdict": "eligible",
           "note": "Bác muốn thôi hưởng trợ cấp hưu trí xã hội. Thông tin của bác sẽ được chuyển đến Uỷ ban nhân dân xã xem xét, kết quả là Quyết định thôi hưởng trợ cấp hưu trí xã hội.",
           "documents": [
@@ -279,9 +620,18 @@
         "Gửi qua dịch vụ bưu chính"
       ],
       "choices": [
-        { "label": "Nộp trực tiếp", "say": "Bác mang Mẫu số 01 đến Uỷ ban nhân dân cấp xã nơi bác cư trú để nộp hồ sơ. Bác nhớ mang theo Văn bản đề nghị hưởng trợ cấp hưu trí xã hội theo Mẫu số 01." },
-        { "label": "Nộp trực tuyến", "say": "Kiosk hiện chỉ hướng dẫn. Bác có thể gửi hồ sơ trên Cổng Dịch vụ công theo phương thức được cơ quan có thẩm quyền công bố, có con cháu giúp thao tác thì thuận tiện hơn." },
-        { "label": "Gửi qua bưu chính", "say": "Bác có thể gửi Văn bản đề nghị theo Mẫu số 01 qua tổ chức bưu chính đến Uỷ ban nhân dân cấp xã nơi cư trú." }
+        {
+          "label": "Nộp trực tiếp",
+          "say": "Bác mang Mẫu số 01 đến Uỷ ban nhân dân cấp xã nơi bác cư trú để nộp hồ sơ. Bác nhớ mang theo Văn bản đề nghị hưởng trợ cấp hưu trí xã hội theo Mẫu số 01."
+        },
+        {
+          "label": "Nộp trực tuyến",
+          "say": "Kiosk hiện chỉ hướng dẫn. Bác có thể gửi hồ sơ trên Cổng Dịch vụ công theo phương thức được cơ quan có thẩm quyền công bố, có con cháu giúp thao tác thì thuận tiện hơn."
+        },
+        {
+          "label": "Gửi qua bưu chính",
+          "say": "Bác có thể gửi Văn bản đề nghị theo Mẫu số 01 qua tổ chức bưu chính đến Uỷ ban nhân dân cấp xã nơi cư trú."
+        }
       ],
       "bring": [
         "Văn bản đề nghị hưởng trợ cấp hưu trí xã hội theo Mẫu số 01"
@@ -291,59 +641,82 @@
     },
     "faq": [
       {
-        "q": ["nếu tôi được hưởng thì mỗi tháng được bao nhiêu", "được bao nhiêu tiền", "mức trợ cấp bao nhiêu", "mỗi tháng bao nhiêu", "bao nhiêu tiền một tháng"],
+        "q": [
+          "nếu tôi được hưởng thì mỗi tháng được bao nhiêu",
+          "được bao nhiêu tiền",
+          "mức trợ cấp bao nhiêu",
+          "mỗi tháng bao nhiêu",
+          "bao nhiêu tiền một tháng"
+        ],
         "a": "Mức trợ cấp hưu trí xã hội theo quy định hiện hành là 500.000 đồng một tháng. Mức thực tế và thời điểm chi trả thực hiện theo quyết định của cơ quan có thẩm quyền và quy định áp dụng tại địa phương; địa phương có thể hỗ trợ thêm."
       },
       {
-        "q": ["sau khi nộp hồ sơ tiếp theo làm gì", "nộp xong thì sao", "sau đó làm gì"],
+        "q": [
+          "sau khi nộp hồ sơ tiếp theo làm gì",
+          "nộp xong thì sao",
+          "sau đó làm gì"
+        ],
         "a": "Sau khi nhận hồ sơ, cơ quan có thẩm quyền kiểm tra thông tin của bác và đối chiếu với dữ liệu dân cư để xác định điều kiện hưởng, trong 10 ngày làm việc. Đủ điều kiện thì bác được quyết định hưởng và chi trả; không đủ thì được trả lời bằng văn bản nêu rõ lý do."
       },
       {
-        "q": ["mẫu số 01 điền thế nào", "kê khai thế nào", "điền đơn thế nào", "cách viết đơn", "mẫu số 01 là gì", "trong mẫu có những gì"],
+        "q": [
+          "mẫu số 01 điền thế nào",
+          "kê khai thế nào",
+          "điền đơn thế nào",
+          "cách viết đơn",
+          "mẫu số 01 là gì",
+          "trong mẫu có những gì"
+        ],
         "a": "Mẫu số 01 là văn bản đề nghị hưởng trợ cấp hưu trí xã hội. Bác điền họ tên, ngày sinh, số định danh, nơi ở, ghi rõ tình trạng lương hưu hay trợ cấp bảo hiểm xã hội, chọn nhận tiền mặt hay qua tài khoản, rồi ký tên. Chỗ nào không rõ bác để trống, cán bộ tại nơi nộp sẽ hướng dẫn hoặc điền giúp rồi đọc lại cho bác nghe."
       },
       {
-        "q": ["mẫu số 01 lấy ở đâu", "lấy mẫu ở đâu", "mẫu đơn ở đâu", "xin mẫu ở đâu"],
+        "q": [
+          "mẫu số 01 lấy ở đâu",
+          "lấy mẫu ở đâu",
+          "mẫu đơn ở đâu",
+          "xin mẫu ở đâu"
+        ],
         "a": "Mẫu số 01 ban hành kèm Nghị định 176/2025/NĐ-CP. Bác xin mẫu tại Uỷ ban nhân dân cấp xã nơi nộp hồ sơ, cán bộ sẽ hướng dẫn bác điền."
       },
       {
-        "q": ["đang nhận lương hưu thấp có được thêm không", "lương hưu thấp", "lương hưu ít"],
+        "q": [
+          "đang nhận lương hưu thấp có được thêm không",
+          "lương hưu thấp",
+          "lương hưu ít"
+        ],
         "a": "Nếu mức lương hưu bác đang nhận thấp hơn mức trợ cấp hưu trí xã hội theo quy định (500.000 đồng một tháng) thì bác có khả năng thuộc diện được xem xét; cơ quan có thẩm quyền sẽ đối chiếu mức hưởng cụ thể khi nhận hồ sơ."
       },
       {
-        "q": ["72 tuổi hộ nghèo có được không", "70 tuổi hộ nghèo", "chưa đủ 75 tuổi"],
+        "q": [
+          "72 tuổi hộ nghèo có được không",
+          "70 tuổi hộ nghèo",
+          "chưa đủ 75 tuổi"
+        ],
         "a": "Từ đủ 70 đến dưới 75 tuổi thì bác phải thuộc hộ nghèo hoặc hộ cận nghèo và không nhận lương hưu, trợ cấp bảo hiểm xã hội hằng tháng thì mới thuộc diện, theo khoản 2 Điều 2 Nghị định 176/2025/NĐ-CP."
       },
       {
-        "q": ["có phải mang sổ hộ khẩu không", "mang hộ khẩu", "giấy tờ cư trú"],
+        "q": [
+          "có phải mang sổ hộ khẩu không",
+          "mang hộ khẩu",
+          "giấy tờ cư trú"
+        ],
         "a": "Không cần. Cơ quan tiếp nhận xác thực thông tin của bác với Cơ sở dữ liệu quốc gia về dân cư. Hồ sơ chỉ có Văn bản đề nghị theo Mẫu số 01."
       },
       {
-        "q": ["có mất phí không", "lệ phí bao nhiêu", "tốn tiền không"],
+        "q": [
+          "có mất phí không",
+          "lệ phí bao nhiêu",
+          "tốn tiền không"
+        ],
         "a": "Thủ tục này không thu lệ phí."
       },
       {
-        "q": ["chuyển nhà thì nhận trợ cấp ở đâu", "chuyển nơi ở", "về quê ở thì sao"],
-        "a": "Bác đề nghị nhận trợ cấp tại nơi cư trú mới bằng Mẫu số 01, nộp tại Uỷ ban nhân dân xã nơi mới. Cơ quan nơi cũ sẽ thôi chi trả tại địa bàn cũ và chuyển thông tin đến nơi mới, bác tiếp tục nhận ở nơi mới."
-      }
-    ],
-    "forms": [
-      {
-        "name": "Mẫu số 01 (Văn bản đề nghị hưởng trợ cấp hưu trí xã hội, Nghị định 176/2025/NĐ-CP)",
-        "how": "Xin mẫu tại Uỷ ban nhân dân cấp xã, hoặc nhờ cán bộ in. Bác điền bằng bút mực, viết chữ in hoa cho rõ, chỗ nào không biết thì để trống rồi hỏi cán bộ, không đoán. Mắt kém hoặc không biết chữ thì nói với cán bộ, cán bộ điền giúp rồi đọc lại cho bác nghe trước khi ký.",
-        "fields": [
-          "Kính gửi: Chủ tịch Uỷ ban nhân dân xã, phường nơi bác đang ở",
-          "Họ và tên của bác, viết đúng như trên căn cước",
-          "Ngày tháng năm sinh, giới tính",
-          "Số định danh cá nhân (12 số trên căn cước)",
-          "Nơi cư trú hiện nay (thôn, xã, tỉnh)",
-          "Tình trạng hưởng lương hưu hoặc trợ cấp bảo hiểm xã hội hằng tháng: ghi «không» nếu bác không nhận, có nhận thì ghi mức",
-          "Trường hợp từ 70 đến dưới 75 tuổi: ghi thuộc hộ nghèo hay hộ cận nghèo",
-          "Nội dung đề nghị: hưởng mới, thay đổi thông tin, nhận tại nơi cư trú mới, hay thôi hưởng",
-          "Hình thức nhận trợ cấp: nhận tiền mặt tại xã hay chuyển vào tài khoản ngân hàng (ghi số tài khoản nếu chọn)",
-          "Cam đoan thông tin đúng sự thật, ký và ghi rõ họ tên, ghi ngày tháng"
+        "q": [
+          "chuyển nhà thì nhận trợ cấp ở đâu",
+          "chuyển nơi ở",
+          "về quê ở thì sao"
         ],
-        "note": "Các mục trên tóm tắt theo mẫu; mẫu in tại nơi nộp là bản chính thức, có mục nào khác thì bác làm theo mẫu in và hỏi cán bộ."
+        "a": "Bác đề nghị nhận trợ cấp tại nơi cư trú mới bằng Mẫu số 01, nộp tại Uỷ ban nhân dân xã nơi mới. Cơ quan nơi cũ sẽ thôi chi trả tại địa bàn cũ và chuyển thông tin đến nơi mới, bác tiếp tục nhận ở nơi mới."
       }
     ]
   },
@@ -352,6 +725,5 @@
     "url": "https://dichvucong.gov.vn/"
   },
   "verified_by": "Mian — kho tri thức bản 17/09/2026 (file «Kho mới tri thức 6 thủ tục.xlsx», sheet THỦ TỤC 1)",
-  "verified_date": "2026-09-17",
-  "forms_note": "Mục flow.forms tóm tắt các mục của mẫu ở mức người dân cần biết trước khi đến; Mian đối chiếu với mẫu in kèm Nghị định rồi ghi ngày kiểm chứng."
+  "verified_date": "2026-09-17"
 }

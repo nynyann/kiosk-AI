@@ -27,8 +27,8 @@
   ],
   "steps": [
     {
-      "title": "Xác định giấy cần chứng thực",
-      "detail": "Bác xem cần chứng thực giấy gì. Quan trọng nhất là bác phải có bản chính của giấy đó, còn nguyên vẹn, không tẩy xoá; không có bản chính thì không chứng thực được."
+      "title": "Xác định nhu cầu",
+      "detail": "Bác cần có bản chính của giấy tờ để đối chiếu. Không còn bản chính thì bác có thể cần làm thủ tục cấp lại hoặc cấp bản sao của giấy tờ đó trước."
     },
     {
       "title": "Chuẩn bị giấy tờ",
@@ -54,91 +54,129 @@
   "common_questions": [
     "Tôi chỉ có bản photo, mất bản chính rồi thì có chứng thực được không",
     "Giấy bị rách một góc có chứng thực được không",
-    "Chứng thực mất bao nhiêu tiền",
-    "Công chứng với chứng thực có giống nhau không"
+    "Chứng thực mất bao nhiêu tiền"
   ],
   "flow": {
     "check": {
-      "intro": "Cháu hỏi bác vài câu để biết bác cần mang bản chính nào và có chứng thực được không ạ.",
+      "intro": "Cháu hỏi bác vài câu để biết bác có chứng thực được không ạ.",
       "questions": [
-        {
-          "id": "what",
-          "text": "Bác muốn chứng thực bản sao của giấy tờ nào ạ?",
-          "options": [
-            { "value": "id", "label": "Căn cước / căn cước công dân", "match": ["căn cước", "cccd", "chứng minh"] },
-            { "value": "birth", "label": "Giấy khai sinh", "match": ["khai sinh"] },
-            { "value": "marriage", "label": "Giấy đăng ký kết hôn", "match": ["kết hôn", "hôn thú"] },
-            { "value": "degree", "label": "Bằng cấp, chứng chỉ", "match": ["bằng", "chứng chỉ", "bằng cấp", "tốt nghiệp"] },
-            { "value": "other", "label": "Giấy tờ khác (sổ đỏ, hợp đồng…)", "match": ["sổ đỏ", "nhà đất", "sổ hồng", "đất", "hợp đồng", "khác", "sổ"] }
-          ]
-        },
         {
           "id": "original",
           "text": "Bác hiện có bản chính của giấy tờ này không ạ?",
           "options": [
-            { "value": "yes", "label": "Có bản chính" },
-            { "value": "no", "label": "Không có, chỉ có bản photo", "match": ["không có", "mất", "chỉ có photo", "chỉ có bản sao"] }
+            {
+              "value": "yes",
+              "label": "Có bản chính"
+            },
+            {
+              "value": "no",
+              "label": "Không có, chỉ có bản photo",
+              "match": [
+                "không có",
+                "mất",
+                "chỉ có photo",
+                "chỉ có bản sao"
+              ]
+            }
           ]
         },
         {
           "id": "copy",
           "text": "Bác đã có bản photocopy (bản sao) của giấy tờ chưa ạ?",
-          "ask_if": { "original": ["yes"] },
+          "ask_if": {
+            "original": [
+              "yes"
+            ]
+          },
           "options": [
-            { "value": "yes", "label": "Tôi đã có bản sao", "match": ["có rồi", "photo rồi", "đã photo", "có bản sao"], "note": "Bác đã có bản sao: bác mang bản chính và bản sao đến nơi chứng thực để cán bộ đối chiếu." },
-            { "value": "no", "label": "Tôi chưa có bản sao", "match": ["chưa có", "chưa photo", "chưa"], "note": "Bác chưa có bản sao: bác xuất trình bản chính, nơi tiếp nhận có phương tiện chụp thì chụp từ bản chính để chứng thực; không có thì bác photo trước rồi mang cả hai." }
+            {
+              "value": "yes",
+              "label": "Tôi đã có bản sao",
+              "match": [
+                "có rồi",
+                "photo rồi",
+                "đã photo",
+                "có bản sao"
+              ],
+              "note": "Bác đã có bản sao: bác mang bản chính và bản sao đến nơi chứng thực để cán bộ đối chiếu."
+            },
+            {
+              "value": "no",
+              "label": "Tôi chưa có bản sao",
+              "match": [
+                "chưa có",
+                "chưa photo",
+                "chưa"
+              ],
+              "note": "Bác chưa có bản sao: bác xuất trình bản chính, nơi tiếp nhận có phương tiện chụp thì chụp từ bản chính để chứng thực; không có thì bác photo trước rồi mang cả hai."
+            }
           ]
         },
         {
           "id": "intact",
           "text": "Bản chính của bác có bị tẩy xoá, sửa chữa, thêm bớt nội dung hoặc có dấu hiệu không hợp lệ không ạ?",
-          "ask_if": { "original": ["yes"] },
+          "ask_if": {
+            "original": [
+              "yes"
+            ]
+          },
           "options": [
-            { "value": "no", "label": "Không, còn nguyên vẹn", "match": ["nguyên", "rõ", "còn tốt", "bình thường", "không"] },
-            { "value": "yes", "label": "Có bị tẩy xoá, sửa chữa, rách nát", "match": ["rách", "nát", "tẩy", "xoá", "mờ", "hỏng", "sửa", "không đọc được"] },
-            { "value": "unsure", "label": "Tôi không chắc", "match": ["không chắc", "không rõ", "không biết", "hơi"] }
+            {
+              "value": "no",
+              "label": "Không, còn nguyên vẹn",
+              "match": [
+                "nguyên",
+                "rõ",
+                "còn tốt",
+                "bình thường",
+                "không"
+              ]
+            },
+            {
+              "value": "yes",
+              "label": "Có bị tẩy xoá, sửa chữa, rách nát",
+              "match": [
+                "rách",
+                "nát",
+                "tẩy",
+                "xoá",
+                "mờ",
+                "hỏng",
+                "sửa",
+                "không đọc được"
+              ]
+            }
           ]
         }
       ],
       "outcomes": [
         {
-          "when": { "original": ["no"], "what": ["birth"] },
-          "verdict": "redirect",
-          "reason": "Thủ tục chứng thực bản sao từ bản chính cần có bản chính để đối chiếu. Bác không còn bản chính giấy khai sinh thì chưa chứng thực được; bác có thể xin cấp bản sao trích lục hộ tịch trước, bản sao do cơ quan hộ tịch cấp có giá trị sử dụng như bản chính.",
-          "suggest": "cap-ban-sao-trich-luc-ho-tich"
-        },
-        {
-          "when": { "original": ["no"], "what": ["marriage"] },
-          "verdict": "redirect",
-          "reason": "Thủ tục chứng thực bản sao từ bản chính cần có bản chính để đối chiếu. Bác không còn bản chính giấy đăng ký kết hôn thì chưa chứng thực được; bác có thể xin cấp bản sao trích lục kết hôn trước.",
-          "suggest": "cap-ban-sao-trich-luc-ho-tich"
-        },
-        {
-          "when": { "original": ["no"] },
+          "when": {
+            "original": [
+              "no"
+            ]
+          },
           "verdict": "ineligible",
-          "reason": "Thủ tục chứng thực bản sao từ bản chính cần có bản chính để đối chiếu. Nếu bác không còn bản chính, bác có thể cần thực hiện thủ tục cấp lại hoặc cấp bản sao của giấy tờ đó trước, rồi mới đi chứng thực."
+          "reason": "Thủ tục chứng thực bản sao từ bản chính cần có bản chính để đối chiếu. Nếu bác không còn bản chính, bác có thể cần thực hiện thủ tục cấp lại hoặc cấp bản sao của giấy tờ đó trước."
         },
         {
-          "when": { "intact": ["yes"] },
+          "when": {
+            "intact": [
+              "yes"
+            ]
+          },
           "verdict": "consult",
           "reason": "Bản chính có dấu hiệu tẩy xoá, sửa chữa hoặc không rõ tính hợp lệ có thể không đủ điều kiện để chứng thực. Bác nên mang bản chính đến cơ quan có thẩm quyền để được kiểm tra trước khi thực hiện."
-        },
-        {
-          "when": { "intact": ["unsure"] },
-          "verdict": "consult",
-          "reason": "Cháu chưa xác định được bản chính của bác có đủ điều kiện làm cơ sở chứng thực không. Bác cứ mang bản chính đến Uỷ ban nhân dân xã, cán bộ sẽ kiểm tra trực tiếp và cho bác biết."
         }
       ],
       "eligible": {
-        "note": "Bác có bản chính hợp lệ, nên có thể đi chứng thực bản sao."
+        "note": "Bác có bản chính để đối chiếu, nên có thể đi chứng thực bản sao."
       }
     },
     "prepare": {
       "say": "Bác cần mang bản chính giấy tờ cần chứng thực và bản sao cần chứng thực. Nếu chưa photo, bác xuất trình bản chính để nơi tiếp nhận chụp từ bản chính nếu có phương tiện.",
       "tips": [
-        "Phí tại Uỷ ban nhân dân cấp xã: 2.000 đồng một trang đối với 2 trang đầu; từ trang thứ 3 là 1.000 đồng một trang; tối đa 200.000 đồng một bản. Tính theo số trang của bản chính.",
-        "Bản chính không được dùng để chứng thực nếu bị tẩy xoá, sửa chữa, thêm bớt nội dung, hư hỏng đến mức không đọc được, có dấu mật hoặc ghi rõ không được sao chụp.",
-        "Photo đủ số bản cần dùng, vì mỗi bản chứng thực tính phí riêng."
+        "Phí tại Uỷ ban nhân dân cấp xã: 2.000 đồng một trang đối với 2 trang đầu; từ trang thứ 3 là 1.000 đồng một trang; tối đa 200.000 đồng một bản. Tính theo số trang của bản chính."
       ]
     },
     "submit": {
@@ -153,8 +191,10 @@
         "Chứng thực bản sao điện tử từ bản chính trong môi trường điện tử theo quy định áp dụng, nếu nơi tiếp nhận cung cấp"
       ],
       "choices": [
-        { "label": "Đến Uỷ ban nhân dân xã", "say": "Bác mang bản chính và bản sao đến Uỷ ban nhân dân cấp xã. Cán bộ kiểm tra bản chính, đối chiếu với bản sao rồi chứng thực. Thường xong trong ngày; tiếp nhận sau 15 giờ thì có thể sang ngày làm việc tiếp theo." },
-        { "label": "Đến văn phòng công chứng", "say": "Tổ chức hành nghề công chứng cũng chứng thực bản sao từ bản chính được. Bác mang bản chính và bản sao đến, mức phí theo quy định của nơi đó." }
+        {
+          "label": "Đến Uỷ ban nhân dân xã",
+          "say": "Bác mang bản chính và bản sao đến Uỷ ban nhân dân cấp xã. Cán bộ kiểm tra bản chính, đối chiếu với bản sao rồi chứng thực. Thường xong trong ngày; tiếp nhận sau 15 giờ thì có thể sang ngày làm việc tiếp theo."
+        }
       ],
       "bring": [
         "Bản chính của giấy tờ cần chứng thực",
@@ -166,31 +206,45 @@
     },
     "faq": [
       {
-        "q": ["sau khi nộp hồ sơ bao lâu sẽ có kết quả", "bao lâu thì xong", "mấy ngày"],
+        "q": [
+          "sau khi nộp hồ sơ bao lâu sẽ có kết quả",
+          "bao lâu thì xong",
+          "mấy ngày"
+        ],
         "a": "Nếu thông tin đầy đủ và giải quyết được ngay, kết quả trả trong ngày. Trường hợp nhiều loại giấy tờ, nhiều trang, số lượng bản sao lớn hoặc nội dung phức tạp, thời gian có thể kéo dài thêm không quá 02 ngày làm việc; kéo dài hơn phải có thoả thuận theo quy định."
       },
       {
-        "q": ["chứng thực mất bao nhiêu tiền", "phí bao nhiêu", "mất bao nhiêu tiền", "lệ phí", "có mất phí không"],
+        "q": [
+          "chứng thực mất bao nhiêu tiền",
+          "phí bao nhiêu",
+          "mất bao nhiêu tiền",
+          "lệ phí",
+          "có mất phí không"
+        ],
         "a": "Tại Uỷ ban nhân dân cấp xã: 2.000 đồng một trang đối với 2 trang đầu; từ trang thứ 3 là 1.000 đồng một trang; tối đa 200.000 đồng một bản. Phí tính theo số trang của bản chính."
       },
       {
-        "q": ["chỉ có bản photo mất bản chính có được không", "mất bản chính", "không có bản chính"],
+        "q": [
+          "chỉ có bản photo mất bản chính có được không",
+          "mất bản chính",
+          "không có bản chính"
+        ],
         "a": "Không được. Chứng thực bản sao từ bản chính cần có bản chính để đối chiếu. Bác cần làm thủ tục cấp lại hoặc cấp bản sao của giấy tờ đó trước, rồi mới đi chứng thực."
       },
       {
-        "q": ["giấy bị rách một góc có được không", "bị rách", "hơi cũ"],
-        "a": "Bản chính có dấu hiệu tẩy xoá, sửa chữa hoặc không rõ tính hợp lệ có thể không đủ điều kiện để chứng thực. Nếu vẫn đọc rõ, xác định được nội dung thì cán bộ vẫn có thể chứng thực; bác nên mang bản chính đến để cán bộ kiểm tra trước."
+        "q": [
+          "giấy bị rách một góc có được không",
+          "bị rách",
+          "hơi cũ"
+        ],
+        "a": "Bản chính có dấu hiệu tẩy xoá, sửa chữa hoặc không rõ tính hợp lệ có thể không đủ điều kiện để chứng thực. Bác nên mang bản chính đến cơ quan có thẩm quyền để được kiểm tra trước khi thực hiện."
       },
       {
-        "q": ["ở xã khác nơi tôi ở có được không", "xã khác", "không đúng xã"],
-        "a": "Được. Bác chứng thực ở bất kỳ Uỷ ban nhân dân xã nào hoặc tổ chức hành nghề công chứng, không bắt buộc đúng nơi cư trú."
-      },
-      {
-        "q": ["công chứng với chứng thực có giống nhau không", "công chứng", "khác nhau"],
-        "a": "Người dân hay gọi chung là công chứng, nhưng việc xác nhận bản photo đúng với bản chính gọi là chứng thực bản sao. Uỷ ban nhân dân xã làm được, văn phòng công chứng cũng làm được."
-      },
-      {
-        "q": ["chưa photo thì sao", "chưa có bản sao", "photo ở đâu"],
+        "q": [
+          "chưa photo thì sao",
+          "chưa có bản sao",
+          "photo ở đâu"
+        ],
         "a": "Bác có thể xuất trình bản chính để cơ quan thực hiện chứng thực chụp từ bản chính nếu nơi tiếp nhận có phương tiện chụp. Không có thì bác photo trước rồi mang cả bản chính và bản photo đến."
       }
     ]

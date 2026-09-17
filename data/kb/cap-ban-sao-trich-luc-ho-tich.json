@@ -48,8 +48,7 @@
   ],
   "documents": [
     "Tờ khai đề nghị cấp bản sao Giấy khai sinh hoặc bản sao Trích lục hộ tịch theo mẫu quy định",
-    "Thông tin về người có sự kiện hộ tịch: họ tên, ngày sinh, nơi và khoảng năm đã đăng ký, để cơ quan hộ tịch tra cứu",
-    "Căn cước của bác để xác nhận danh tính, và giấy tờ liên quan chỉ khi cán bộ cần đối chiếu"
+    "Thông tin về người có sự kiện hộ tịch để cơ quan hộ tịch tra cứu"
   ],
   "where_to_submit": "Cơ quan đăng ký hộ tịch có thẩm quyền, tiếp nhận tại Trung tâm Phục vụ hành chính công cấp xã. Nộp trực tiếp, trực tuyến hoặc qua dịch vụ bưu chính theo phương thức được công bố.",
   "fee": "8.000 đồng một bản sao; có các trường hợp được miễn, giảm theo quy định.",
@@ -57,7 +56,6 @@
   "validity": null,
   "common_questions": [
     "Tôi mất giấy khai sinh thì phải làm thế nào",
-    "Giấy khai sinh đăng ký ở quê, tôi đang ở thành phố thì xin ở đâu",
     "Xin bản sao mất bao nhiêu tiền",
     "Chưa từng đăng ký khai sinh thì có xin được không"
   ],
@@ -69,66 +67,117 @@
           "id": "doc",
           "text": "Bác muốn xin bản sao giấy tờ hộ tịch nào ạ?",
           "options": [
-            { "value": "birth", "label": "Bản sao Giấy khai sinh", "match": ["khai sinh"] },
-            { "value": "extract", "label": "Bản sao Trích lục hộ tịch (kết hôn, khai tử, nhận cha mẹ con…)", "match": ["trích lục", "kết hôn", "khai tử", "chứng tử", "nhận cha", "nhận con", "cải chính", "thay đổi hộ tịch", "hộ tịch"] }
-          ]
-        },
-        {
-          "id": "kind",
-          "text": "Giấy đó đã được đăng ký từ trước và bác chỉ cần bản sao, hay chưa từng đăng ký và cần đăng ký lại ạ?",
-          "options": [
-            { "value": "copy", "label": "Đã đăng ký rồi, chỉ cần bản sao", "match": ["bản sao", "đã đăng ký", "có rồi", "mất", "xin lại"] },
-            { "value": "reregister", "label": "Chưa từng đăng ký / cần đăng ký lại", "match": ["chưa từng", "chưa đăng ký", "đăng ký lại", "không có dữ liệu"] }
+            {
+              "value": "birth",
+              "label": "Bản sao Giấy khai sinh",
+              "match": [
+                "khai sinh"
+              ]
+            },
+            {
+              "value": "extract",
+              "label": "Bản sao Trích lục hộ tịch (kết hôn, khai tử, nhận cha mẹ con…)",
+              "match": [
+                "trích lục",
+                "kết hôn",
+                "khai tử",
+                "chứng tử",
+                "nhận cha",
+                "nhận con",
+                "cải chính",
+                "thay đổi hộ tịch",
+                "hộ tịch"
+              ]
+            }
           ]
         },
         {
           "id": "extract_kind",
           "text": "Bác cần bản sao của thông tin hộ tịch nào ạ?",
-          "ask_if": { "doc": ["extract"], "kind": ["copy"] },
+          "ask_if": {
+            "doc": [
+              "extract"
+            ]
+          },
           "options": [
-            { "value": "marriage", "label": "Đăng ký kết hôn", "match": ["kết hôn", "hôn thú", "giấy hôn"] },
-            { "value": "death", "label": "Khai tử", "match": ["khai tử", "chứng tử", "mất", "qua đời"] },
-            { "value": "parent", "label": "Nhận cha, mẹ, con", "match": ["nhận cha", "nhận mẹ", "nhận con"] },
-            { "value": "change", "label": "Thay đổi, cải chính hộ tịch", "match": ["thay đổi", "cải chính", "sửa"] }
+            {
+              "value": "marriage",
+              "label": "Đăng ký kết hôn",
+              "match": [
+                "kết hôn",
+                "hôn thú",
+                "giấy hôn"
+              ]
+            },
+            {
+              "value": "death",
+              "label": "Khai tử",
+              "match": [
+                "khai tử",
+                "chứng tử",
+                "mất",
+                "qua đời"
+              ]
+            },
+            {
+              "value": "parent",
+              "label": "Nhận cha, mẹ, con",
+              "match": [
+                "nhận cha",
+                "nhận mẹ",
+                "nhận con"
+              ]
+            },
+            {
+              "value": "change",
+              "label": "Thay đổi, cải chính hộ tịch",
+              "match": [
+                "thay đổi",
+                "cải chính",
+                "sửa"
+              ]
+            }
           ]
         },
         {
           "id": "whom",
           "text": "Bác xin bản sao cho ai ạ?",
-          "ask_if": { "kind": ["copy"] },
           "options": [
-            { "value": "self", "label": "Cho chính tôi", "match": ["cho tôi", "của tôi", "chính tôi", "bản thân"] },
-            { "value": "relative", "label": "Cho con, cháu hoặc người thân", "match": ["cho con", "cho cháu", "người thân", "cho bố", "cho mẹ", "cho chồng", "cho vợ"], "note": "Bác xin cho người thân: bác cung cấp họ tên, ngày sinh và thông tin đăng ký của người đó; cán bộ tiếp nhận sẽ hướng dẫn nếu cần thêm giấy tờ chứng minh quan hệ." }
-          ]
-        },
-        {
-          "id": "remember",
-          "text": "Bác còn nhớ thông tin về việc đăng ký đó không ạ? Ví dụ họ tên người trên giấy, nơi đăng ký, khoảng năm đăng ký.",
-          "ask_if": { "kind": ["copy"] },
-          "options": [
-            { "value": "yes", "label": "Nhớ đầy đủ" },
-            { "value": "partly", "label": "Nhớ một phần", "match": ["một phần", "nhớ sơ", "không hết", "mang máng"], "note": "Bác chỉ nhớ một phần: bác ghi ra những gì nhớ được, cán bộ có thể tra cứu theo họ tên và ngày sinh của người trên giấy." },
-            { "value": "no", "label": "Không nhớ", "note": "Bác không nhớ thông tin đăng ký: bác cố hỏi người thân về nơi và khoảng năm đăng ký, hoặc nhờ cán bộ tra cứu theo họ tên, ngày sinh. Thiếu thông tin thì có thể phải xác minh, mất thêm thời gian." }
+            {
+              "value": "self",
+              "label": "Cho chính tôi",
+              "match": [
+                "cho tôi",
+                "của tôi",
+                "chính tôi",
+                "bản thân"
+              ]
+            },
+            {
+              "value": "relative",
+              "label": "Cho con, cháu hoặc người thân",
+              "match": [
+                "cho con",
+                "cho cháu",
+                "người thân",
+                "cho bố",
+                "cho mẹ",
+                "cho chồng",
+                "cho vợ"
+              ]
+            }
           ]
         }
       ],
-      "outcomes": [
-        {
-          "when": { "kind": ["reregister"] },
-          "verdict": "redirect",
-          "reason": "Trường hợp chưa từng đăng ký, hoặc mất giấy mà không còn dữ liệu và cần đăng ký lại, là một thủ tục khác (ví dụ đăng ký lại khai sinh), không phải cấp bản sao trích lục. Kho hướng dẫn hiện chưa có thủ tục đó, bác gặp cán bộ hộ tịch tại Uỷ ban nhân dân xã để được hướng dẫn đúng."
-        }
-      ],
+      "outcomes": [],
       "eligible": {
-        "note": "Bác chỉ cần bản sao của giấy đã đăng ký, nên bác có thể yêu cầu cấp bản sao. Bác cần cung cấp thông tin để cơ quan hộ tịch tra cứu và cấp bản sao."
+        "note": "Bác cần cung cấp thông tin để cơ quan hộ tịch tra cứu và cấp bản sao."
       }
     },
     "prepare": {
       "say": "Bác cần chuẩn bị Tờ khai đề nghị cấp bản sao Giấy khai sinh hoặc Trích lục hộ tịch theo mẫu quy định, cùng thông tin về người có giấy tờ và về việc đăng ký. Nếu làm trực tuyến, bác kê khai thông tin trên hệ thống và cung cấp các thông tin cần thiết để cơ quan hộ tịch tra cứu.",
       "tips": [
-        "Lệ phí cấp bản sao hiện là 8.000 đồng một bản sao; có các trường hợp được miễn, giảm theo quy định.",
-        "Không cần về đúng nơi đã đăng ký ngày xưa: bác có quyền yêu cầu cơ quan quản lý Cơ sở dữ liệu hộ tịch cấp bản sao, không phụ thuộc nơi cư trú.",
-        "Giấy tờ liên quan chỉ cần mang khi cơ quan tiếp nhận yêu cầu đối chiếu trong trường hợp cụ thể."
+        "Lệ phí cấp bản sao hiện là 8.000 đồng một bản sao; có các trường hợp được miễn, giảm theo quy định."
       ]
     },
     "submit": {
@@ -142,14 +191,22 @@
         "Gửi qua dịch vụ bưu chính, tuỳ phương thức được công bố"
       ],
       "choices": [
-        { "label": "Nộp trực tiếp", "say": "Bác mang tờ khai, căn cước và thông tin về giấy cần xin đến Trung tâm Phục vụ hành chính công để nộp. Cán bộ tra cứu dữ liệu hộ tịch, thông tin đầy đủ thì thường cấp bản sao ngay trong ngày." },
-        { "label": "Nộp trực tuyến", "say": "Bác đăng nhập Cổng Dịch vụ công Quốc gia, chọn cơ quan quản lý Cơ sở dữ liệu hộ tịch có thẩm quyền, kê khai thông tin theo yêu cầu và gửi yêu cầu cấp bản sao. Có con cháu giúp thao tác thì thuận tiện hơn." },
-        { "label": "Gửi qua bưu chính", "say": "Bác có thể gửi tờ khai và thông tin cần thiết qua dịch vụ bưu chính đến cơ quan đăng ký hộ tịch có thẩm quyền, và nhận kết quả theo phương thức được công bố." }
+        {
+          "label": "Nộp trực tiếp",
+          "say": "Bác mang tờ khai và thông tin về giấy cần xin đến Trung tâm Phục vụ hành chính công để nộp. Cán bộ tra cứu dữ liệu hộ tịch, thông tin đầy đủ thì thường cấp bản sao ngay trong ngày."
+        },
+        {
+          "label": "Nộp trực tuyến",
+          "say": "Bác đăng nhập Cổng Dịch vụ công Quốc gia, chọn cơ quan quản lý Cơ sở dữ liệu hộ tịch có thẩm quyền, kê khai thông tin theo yêu cầu và gửi yêu cầu cấp bản sao. Có con cháu giúp thao tác thì thuận tiện hơn."
+        },
+        {
+          "label": "Gửi qua bưu chính",
+          "say": "Bác có thể gửi tờ khai và thông tin cần thiết qua dịch vụ bưu chính đến cơ quan đăng ký hộ tịch có thẩm quyền, và nhận kết quả theo phương thức được công bố."
+        }
       ],
       "bring": [
         "Tờ khai đề nghị cấp bản sao theo mẫu quy định",
-        "Căn cước của bác",
-        "Thông tin về người có tên trên giấy: họ tên, ngày sinh; nơi và khoảng năm đã đăng ký",
+        "Thông tin về người có sự kiện hộ tịch để cơ quan hộ tịch tra cứu",
         "Lệ phí 8.000 đồng một bản sao, trừ trường hợp được miễn, giảm"
       ],
       "agency": "Cơ quan đăng ký hộ tịch có thẩm quyền kiểm tra thông tin và tra cứu dữ liệu hộ tịch.",
@@ -157,47 +214,28 @@
     },
     "faq": [
       {
-        "q": ["sau khi nộp hồ sơ bao lâu sẽ có kết quả", "bao lâu có giấy", "mấy ngày có"],
+        "q": [
+          "sau khi nộp hồ sơ bao lâu sẽ có kết quả",
+          "bao lâu có giấy",
+          "mấy ngày có"
+        ],
         "a": "Cơ quan hộ tịch kiểm tra thông tin và tra cứu dữ liệu hộ tịch. Nếu thông tin đầy đủ và giải quyết được ngay, kết quả trả trong ngày. Nếu tiếp nhận sau 15 giờ và chưa giải quyết được ngay, kết quả trả vào ngày làm việc tiếp theo; cần xác minh thì có thể lâu hơn theo quy định."
       },
       {
-        "q": ["xin bản sao mất bao nhiêu tiền", "lệ phí bao nhiêu", "phí bao nhiêu", "có mất phí không"],
+        "q": [
+          "xin bản sao mất bao nhiêu tiền",
+          "lệ phí bao nhiêu",
+          "phí bao nhiêu",
+          "có mất phí không"
+        ],
         "a": "Lệ phí cấp bản sao hiện là 8.000 đồng một bản sao. Có các trường hợp được miễn, giảm theo quy định, bác hỏi cán bộ khi nộp."
       },
       {
-        "q": ["đăng ký ở quê đang ở thành phố thì xin ở đâu", "đăng ký ở quê", "có phải về đúng xã ngày xưa không", "về quê xin"],
-        "a": "Không cần về quê. Bác có quyền yêu cầu cấp bản sao không phụ thuộc nơi cư trú, đến Trung tâm Phục vụ hành chính công gần bác hoặc làm trực tuyến trên Cổng Dịch vụ công Quốc gia."
-      },
-      {
-        "q": ["chưa từng đăng ký khai sinh thì có xin được không", "chưa từng đăng ký", "không có dữ liệu"],
-        "a": "Nếu chưa từng đăng ký hoặc không còn dữ liệu thì không cấp bản sao được, mà phải làm thủ tục đăng ký lại. Đó là thủ tục khác, bác gặp cán bộ hộ tịch để được hướng dẫn."
-      },
-      {
-        "q": ["mất giấy khai sinh thì phải làm thế nào", "mất giấy khai sinh"],
-        "a": "Nếu giấy khai sinh đã đăng ký từ trước thì bác xin cấp bản sao, cán bộ tra trên Cơ sở dữ liệu hộ tịch rồi cấp bản sao cho bác. Bác chuẩn bị tờ khai, căn cước, họ tên, ngày sinh và nơi, năm đăng ký; lệ phí 8.000 đồng một bản."
-      },
-      {
-        "q": ["xin cho người thân được không", "xin cho con", "xin cho cháu", "xin cho bố mẹ", "người khác"],
-        "a": "Được. Bác cung cấp thông tin của người có tên trên giấy (họ tên, ngày sinh) và thông tin về việc đăng ký. Cán bộ tiếp nhận sẽ hướng dẫn nếu cần thêm giấy tờ chứng minh quan hệ."
-      },
-      {
-        "q": ["tờ khai điền thế nào", "kê khai thế nào", "trong tờ khai có những gì"],
-        "a": "Tờ khai đề nghị cấp bản sao theo mẫu quy định: bác điền họ tên, số định danh của bác; họ tên, ngày sinh của người có giấy; loại giấy cần xin; nơi và khoảng năm đã đăng ký; số bản cần cấp; rồi ký tên. Chỗ nào không rõ bác để trống, cán bộ sẽ hướng dẫn hoặc điền giúp."
-      }
-    ],
-    "forms": [
-      {
-        "name": "Tờ khai đề nghị cấp bản sao Giấy khai sinh, bản sao Trích lục hộ tịch (theo mẫu quy định)",
-        "how": "Xin mẫu tại Trung tâm Phục vụ hành chính công, hoặc kê khai trực tuyến trên Cổng Dịch vụ công Quốc gia. Điền bằng bút mực, chữ in hoa; chỗ nào không rõ để trống rồi hỏi cán bộ. Mắt kém hoặc không biết chữ thì nói với cán bộ, cán bộ điền giúp rồi đọc lại cho bác nghe trước khi ký.",
-        "fields": [
-          "Họ và tên, số định danh cá nhân của người yêu cầu (bác)",
-          "Họ và tên, ngày tháng năm sinh của người có sự kiện hộ tịch (chính bác hay người thân)",
-          "Loại giấy cần cấp bản sao: Giấy khai sinh, hay Trích lục kết hôn, khai tử, nhận cha mẹ con, thay đổi cải chính",
-          "Nơi đã đăng ký và khoảng năm đăng ký, nếu nhớ",
-          "Số bản sao cần cấp",
-          "Cam đoan, ký và ghi rõ họ tên, ghi ngày tháng"
+        "q": [
+          "mất giấy khai sinh thì phải làm thế nào",
+          "mất giấy khai sinh"
         ],
-        "note": "Các mục trên tóm tắt theo mẫu; mẫu in tại nơi nộp là bản chính thức, có mục nào khác thì bác làm theo mẫu in và hỏi cán bộ."
+        "a": "Nếu giấy khai sinh đã đăng ký từ trước thì bác xin cấp bản sao, cán bộ tra trên Cơ sở dữ liệu hộ tịch rồi cấp bản sao cho bác. Bác chuẩn bị tờ khai theo mẫu và thông tin để cơ quan hộ tịch tra cứu; lệ phí 8.000 đồng một bản."
       }
     ]
   },
@@ -206,6 +244,5 @@
     "url": "https://dichvucong.gov.vn/"
   },
   "verified_by": "Mian — kho tri thức bản 17/09/2026 (file «Kho mới tri thức 6 thủ tục.xlsx», sheet THỦ TỤC 4)",
-  "verified_date": "2026-09-17",
-  "forms_note": "Mục flow.forms tóm tắt các mục của mẫu ở mức người dân cần biết trước khi đến; Mian đối chiếu với mẫu in rồi ghi ngày kiểm chứng."
+  "verified_date": "2026-09-17"
 }

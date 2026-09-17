@@ -230,8 +230,9 @@ Mỗi file có hai phần:
   (xin mới, điều chỉnh, thôi hưởng; làm thẻ lần đầu, đổi, mất…) rồi mới tới
   điều kiện; tổng 30 câu hỏi và 31 quy tắc kết luận cho 6 thủ tục; lời dẫn
   bước 2 và bước 3; 16 nút chọn cách nộp ở bước 3 (trực tiếp, trực tuyến,
-  bưu chính, mỗi nút một câu máy nói); 46 mục FAQ; 4 mục cách kê khai mẫu.
-  Cách viết ghi ở `data/kb/_SCHEMA.md`.
+  bưu chính, mỗi nút một câu máy nói); FAQ. Mục cách kê khai mẫu đã bỏ
+  ngày 17/09 vì chưa có mẫu in nào được đối chiếu. Cách viết ghi ở
+  `data/kb/_SCHEMA.md`.
 
 Kho bản 17/09 khác bản 11/09 ở chỗ: có mã thủ tục và lệ phí cụ thể; hưu trí
 và trợ cấp hằng tháng có thêm nhánh điều chỉnh và thôi hưởng; BHYT thêm
@@ -627,6 +628,8 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 29 commit từ 07/09 đến 17/09/2
 | 7af3aa2 | Giao diện bản 3: trang chủ có menu và góp ý, chọn xưng hô, trợ lý AI bên trái, thủ tục gợi ý để chọn, mic luôn hiện và nhấp nháy; xưng hô theo lựa chọn; mô hình tự nói câu ngoài kho; kho thêm cách kê khai mẫu; API 2.2; 64 test |
 | b80e0a5 | Xưng hô trung tính «bác», bỏ bước chọn; chốt cứng con số trong câu trả lời phải có trong kho; prompt gọn hơn 40%; 66 test |
 | 8487c31 | Lắp kho tri thức bản 17/09 của Mian (Excel 6 sheet) vào 6 file JSON: mã thủ tục, lệ phí, mức trợ cấp, nhánh điều chỉnh và thôi hưởng, căn cước gộp lần đầu, đổi, mất; bước 3 có nút chọn cách nộp; API 2.3; sinh lại kho mp3; 66 test |
+| a3d3276 | Bổ sung mã thủ tục hộ tịch 2.000635 và căn cước 2.000200 |
+| (17/09, lần 4) | Sửa kho theo rà soát của Lia: bỏ mọi mục kê khai mẫu; trợ cấp hằng tháng không thuộc nhóm thì chỉ kết luận và chỉ ra một cửa; BHYT bỏ lựa chọn «chưa biết chọn gì»; hộ tịch bỏ hai câu hỏi và lưu ý không có trong kho, hồ sơ không đòi căn cước; chứng thực không hỏi loại giấy, không đẩy sang thủ tục khác; căn cước đổi theo tuổi 25, 40, 60; 67 test |
 
 Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 
@@ -726,7 +729,7 @@ Lần cập nhật 17/09/2026 (lần 3, kho tri thức mới của Mian) thay đ
 | Chạy `eval.wer` trên tập tự thu, ghi WER và tỷ lệ bắt đúng cụm hành chính | Lia | `results/` | cao |
 | Bổ sung `HARD_FIXES` từ cụm nghe nhầm thật, chạy `eval.rescore`, ghi chuỗi số cải thiện | Lia | `app/normalize.py` | cao, là nội dung mục 4.3 |
 | Đọc lại 30 câu hỏi bước 1 và 31 kết luận trong JSON, đối chiếu với sheet Excel bản 17/09 xem chuyển có sót ý nào | Mian | `data/kb/*.json` mục `flow.check`, `data/kb-source/` | cao |
-| Đối chiếu ba mục kê khai mẫu (`flow.forms`) với mẫu in kèm Nghị định, sửa mục nào sai, ghi ngày kiểm chứng | Mian | `data/kb/*.json` mục `flow.forms`, `forms_note` | cao, nhóm tự viết theo Nghị định, chưa đối chiếu mẫu in |
+| Khi có mẫu in đã đối chiếu thì thêm lại mục kê khai mẫu (`flow.forms`) vào kho | Mian | `data/kb/*.json` | vừa, đã bỏ ngày 17/09 vì chưa xác nhận |
 | Thay hòm thư và số điện thoại góp ý trên trang chủ bằng của địa phương đặt kiosk | Kns | `web/index.html`, khối `#contact` | vừa |
 | Thêm FAQ sau mỗi buổi thử với người thật | Mian | `flow.faq` | vừa |
 | Sau mỗi lần sửa kho tri thức: chạy `python scripts/build_tts_cache.py` rồi commit cả `data/tts/` | Lia | `scripts/build_tts_cache.py` | cao, quên là câu mới không có tiếng |

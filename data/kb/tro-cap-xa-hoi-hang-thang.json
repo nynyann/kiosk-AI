@@ -59,8 +59,7 @@
     "Tôi già rồi có được tiền trợ cấp hằng tháng của nhà nước không",
     "Nếu tôi được hưởng thì mỗi tháng được bao nhiêu",
     "Đang nhận trợ cấp muốn đổi thông tin thì làm sao",
-    "Tôi muốn thôi không nhận trợ cấp nữa thì làm thế nào",
-    "Trợ cấp này khác trợ cấp hưu trí xã hội chỗ nào"
+    "Tôi muốn thôi không nhận trợ cấp nữa thì làm thế nào"
   ],
   "flow": {
     "check": {
@@ -70,50 +69,201 @@
           "id": "purpose",
           "text": "Bác đang muốn làm việc gì ạ?",
           "options": [
-            { "value": "new", "label": "Đăng ký hưởng trợ cấp xã hội hằng tháng lần đầu", "match": ["lần đầu", "đăng ký", "xin trợ cấp", "làm mới", "chưa nhận", "có được không", "có được hưởng không"] },
-            { "value": "adjust", "label": "Đang hưởng, muốn thay đổi mức hưởng, thông tin hoặc thôi hưởng", "match": ["thay đổi", "điều chỉnh", "đổi", "sửa", "chuyển nơi", "thôi hưởng", "thôi", "không nhận nữa", "dừng"] }
+            {
+              "value": "new",
+              "label": "Đăng ký hưởng trợ cấp xã hội hằng tháng lần đầu",
+              "match": [
+                "lần đầu",
+                "đăng ký",
+                "xin trợ cấp",
+                "làm mới",
+                "chưa nhận",
+                "có được không",
+                "có được hưởng không"
+              ]
+            },
+            {
+              "value": "adjust",
+              "label": "Đang hưởng, muốn thay đổi mức hưởng, thông tin hoặc thôi hưởng",
+              "match": [
+                "thay đổi",
+                "điều chỉnh",
+                "đổi",
+                "sửa",
+                "chuyển nơi",
+                "thôi hưởng",
+                "thôi",
+                "không nhận nữa",
+                "dừng"
+              ]
+            }
           ]
         },
         {
           "id": "group",
           "text": "Bác đang thuộc trường hợp nào dưới đây ạ?",
           "hint": "Bác bấm chọn nhóm giống hoàn cảnh mình nhất; không thấy nhóm nào giống thì chọn «Không thuộc nhóm nào» hoặc «Tôi không rõ».",
-          "ask_if": { "purpose": ["new"] },
+          "ask_if": {
+            "purpose": [
+              "new"
+            ]
+          },
           "options": [
-            { "value": "elderly", "label": "Người cao tuổi thuộc hộ nghèo, không có người phụng dưỡng (hoặc người phụng dưỡng cũng đang hưởng trợ cấp)", "match": ["người cao tuổi", "già", "hộ nghèo không có ai", "không có người phụng dưỡng", "không ai nuôi", "sống một mình"], "note": "Nhóm người cao tuổi thuộc hộ nghèo không có người phụng dưỡng (khoản 5 Điều 5 Nghị định 20/2021/NĐ-CP): dùng Mẫu số 1d." },
-            { "value": "disabled", "label": "Người khuyết tật nặng hoặc đặc biệt nặng", "match": ["khuyết tật", "tàn tật", "liệt", "mù", "điếc"], "note": "Nhóm người khuyết tật nặng, đặc biệt nặng (khoản 6 Điều 5): dùng Mẫu số 1đ, kèm giấy xác nhận khuyết tật." },
-            { "value": "single_parent", "label": "Người thuộc hộ nghèo, cận nghèo đơn thân đang nuôi con", "match": ["đơn thân", "một mình nuôi con", "goá", "chồng mất", "vợ mất", "nuôi con"], "note": "Nhóm người đơn thân nghèo đang nuôi con (khoản 4 Điều 5): dùng Mẫu số 1c." },
-            { "value": "child", "label": "Trẻ em dưới 16 tuổi không có nguồn nuôi dưỡng, hoặc trẻ dưới 3 tuổi thuộc hộ nghèo vùng đặc biệt khó khăn", "match": ["trẻ em", "cháu bé", "mồ côi", "không có nguồn nuôi dưỡng", "dưới 3 tuổi"], "note": "Nhóm trẻ em (khoản 1, khoản 2 hoặc khoản 7 Điều 5): dùng Mẫu số 1a, kèm giấy khai sinh của trẻ." },
-            { "value": "hiv", "label": "Người nhiễm HIV/AIDS thuộc hộ nghèo, không có thu nhập ổn định", "match": ["hiv", "aids", "nhiễm h"], "note": "Nhóm người nhiễm HIV/AIDS thuộc hộ nghèo (khoản 3 hoặc khoản 8 Điều 5): dùng Mẫu số 1b, kèm giấy tờ xác nhận tình trạng theo quy định." },
-            { "value": "none", "label": "Không thuộc nhóm nào ở trên", "match": ["không thuộc", "không có", "không phải"] },
-            { "value": "unsure", "label": "Tôi không rõ", "match": ["không rõ", "không biết", "chưa rõ"] }
+            {
+              "value": "elderly",
+              "label": "Người cao tuổi thuộc hộ nghèo, không có người phụng dưỡng (hoặc người phụng dưỡng cũng đang hưởng trợ cấp)",
+              "match": [
+                "người cao tuổi",
+                "già",
+                "hộ nghèo không có ai",
+                "không có người phụng dưỡng",
+                "không ai nuôi",
+                "sống một mình"
+              ],
+              "note": "Nhóm người cao tuổi thuộc hộ nghèo không có người phụng dưỡng (khoản 5 Điều 5 Nghị định 20/2021/NĐ-CP): dùng Mẫu số 1d."
+            },
+            {
+              "value": "disabled",
+              "label": "Người khuyết tật nặng hoặc đặc biệt nặng",
+              "match": [
+                "khuyết tật",
+                "tàn tật",
+                "liệt",
+                "mù",
+                "điếc"
+              ],
+              "note": "Nhóm người khuyết tật nặng, đặc biệt nặng (khoản 6 Điều 5): dùng Mẫu số 1đ, kèm giấy xác nhận khuyết tật."
+            },
+            {
+              "value": "single_parent",
+              "label": "Người thuộc hộ nghèo, cận nghèo đơn thân đang nuôi con",
+              "match": [
+                "đơn thân",
+                "một mình nuôi con",
+                "goá",
+                "chồng mất",
+                "vợ mất",
+                "nuôi con"
+              ],
+              "note": "Nhóm người đơn thân nghèo đang nuôi con (khoản 4 Điều 5): dùng Mẫu số 1c."
+            },
+            {
+              "value": "child",
+              "label": "Trẻ em dưới 16 tuổi không có nguồn nuôi dưỡng, hoặc trẻ dưới 3 tuổi thuộc hộ nghèo vùng đặc biệt khó khăn",
+              "match": [
+                "trẻ em",
+                "cháu bé",
+                "mồ côi",
+                "không có nguồn nuôi dưỡng",
+                "dưới 3 tuổi"
+              ],
+              "note": "Nhóm trẻ em (khoản 1, khoản 2 hoặc khoản 7 Điều 5): dùng Mẫu số 1a, kèm giấy khai sinh của trẻ."
+            },
+            {
+              "value": "hiv",
+              "label": "Người nhiễm HIV/AIDS thuộc hộ nghèo, không có thu nhập ổn định",
+              "match": [
+                "hiv",
+                "aids",
+                "nhiễm h"
+              ],
+              "note": "Nhóm người nhiễm HIV/AIDS thuộc hộ nghèo (khoản 3 hoặc khoản 8 Điều 5): dùng Mẫu số 1b, kèm giấy tờ xác nhận tình trạng theo quy định."
+            },
+            {
+              "value": "none",
+              "label": "Không thuộc nhóm nào ở trên",
+              "match": [
+                "không thuộc",
+                "không có",
+                "không phải"
+              ]
+            },
+            {
+              "value": "unsure",
+              "label": "Tôi không rõ",
+              "match": [
+                "không rõ",
+                "không biết",
+                "chưa rõ"
+              ]
+            }
           ]
         },
         {
           "id": "change_kind",
           "text": "Bác đang hưởng trợ cấp xã hội hằng tháng và muốn thay đổi điều gì ạ?",
-          "ask_if": { "purpose": ["adjust"] },
+          "ask_if": {
+            "purpose": [
+              "adjust"
+            ]
+          },
           "options": [
-            { "value": "info", "label": "Thay đổi thông tin cá nhân (họ tên, định danh, thông tin hồ sơ)", "match": ["họ tên", "tên", "định danh", "thông tin cá nhân", "sai thông tin", "căn cước"] },
-            { "value": "move", "label": "Chuyển nơi cư trú, muốn nhận trợ cấp ở nơi mới", "match": ["chuyển nơi", "chuyển chỗ", "chuyển nhà", "nơi cư trú mới", "về quê", "lên thành phố", "nơi khác"] },
-            { "value": "stop", "label": "Thôi hưởng trợ cấp", "match": ["thôi hưởng", "thôi", "không nhận nữa", "dừng", "ngừng", "không còn đủ điều kiện", "điều kiện thay đổi"] }
+            {
+              "value": "info",
+              "label": "Thay đổi thông tin cá nhân (họ tên, định danh, thông tin hồ sơ)",
+              "match": [
+                "họ tên",
+                "tên",
+                "định danh",
+                "thông tin cá nhân",
+                "sai thông tin",
+                "căn cước"
+              ]
+            },
+            {
+              "value": "move",
+              "label": "Chuyển nơi cư trú, muốn nhận trợ cấp ở nơi mới",
+              "match": [
+                "chuyển nơi",
+                "chuyển chỗ",
+                "chuyển nhà",
+                "nơi cư trú mới",
+                "về quê",
+                "lên thành phố",
+                "nơi khác"
+              ]
+            },
+            {
+              "value": "stop",
+              "label": "Thôi hưởng trợ cấp",
+              "match": [
+                "thôi hưởng",
+                "thôi",
+                "không nhận nữa",
+                "dừng",
+                "ngừng",
+                "không còn đủ điều kiện",
+                "điều kiện thay đổi"
+              ]
+            }
           ]
         }
       ],
       "outcomes": [
         {
-          "when": { "group": ["none"] },
-          "verdict": "redirect",
-          "reason": "Theo thông tin bác cung cấp, bác chưa thuộc nhóm đối tượng được hưởng trợ cấp xã hội hằng tháng theo Điều 5 Nghị định 20/2021/NĐ-CP. Nếu bác từ đủ 75 tuổi (hoặc từ 70 tuổi và thuộc hộ nghèo, cận nghèo) mà không có lương hưu, bác có thể xem thủ tục Trợ cấp hưu trí xã hội.",
-          "suggest": "tro-cap-huu-tri-xa-hoi"
+          "when": {
+            "group": [
+              "none"
+            ]
+          },
+          "verdict": "ineligible",
+          "reason": "Theo thông tin bác cung cấp, bác chưa thuộc nhóm đối tượng được hưởng trợ cấp xã hội hàng tháng. Bác có thể đến bộ phận một cửa của Uỷ ban nhân dân xã để được cán bộ trao đổi trực tiếp."
         },
         {
-          "when": { "group": ["unsure"] },
+          "when": {
+            "group": [
+              "unsure"
+            ]
+          },
           "verdict": "consult",
-          "reason": "Kiosk chưa đủ thông tin để xác định bác thuộc nhóm nào. Bác có thể xem lại câu trả lời, hoặc đến bộ phận một cửa của Uỷ ban nhân dân xã để cán bộ Lao động – Xã hội xác định trường hợp cụ thể trước khi làm hồ sơ."
+          "reason": "Kiosk chưa đủ thông tin để xác định. Bác có thể xem lại câu trả lời hoặc chọn hỗ trợ trực tiếp tại bộ phận một cửa."
         },
         {
-          "when": { "change_kind": ["info"] },
+          "when": {
+            "change_kind": [
+              "info"
+            ]
+          },
           "verdict": "eligible",
           "note": "Bác đang hưởng và muốn thay đổi thông tin cá nhân. Bác cần văn bản hoặc tờ khai đề nghị điều chỉnh trợ cấp xã hội hằng tháng theo trường hợp của mình, kèm giấy tờ chứng minh điều kiện thay đổi nếu thủ tục yêu cầu. Kết quả là Quyết định điều chỉnh trợ cấp xã hội hằng tháng nếu thuộc trường hợp phải ban hành quyết định.",
           "documents": [
@@ -122,7 +272,11 @@
           ]
         },
         {
-          "when": { "change_kind": ["move"] },
+          "when": {
+            "change_kind": [
+              "move"
+            ]
+          },
           "verdict": "eligible",
           "note": "Bác đang hưởng trợ cấp và đã chuyển sang nơi cư trú mới. Bác đề nghị nhận trợ cấp tại nơi cư trú mới theo mẫu quy định; cơ quan nơi cư trú cũ sẽ thôi chi trả tại địa bàn cũ và chuyển thông tin đến nơi mới, bác tiếp tục nhận ở nơi mới. Đây không phải thôi hưởng.",
           "documents": [
@@ -130,7 +284,11 @@
           ]
         },
         {
-          "when": { "change_kind": ["stop"] },
+          "when": {
+            "change_kind": [
+              "stop"
+            ]
+          },
           "verdict": "eligible",
           "note": "Bác muốn thôi hưởng hoặc điều kiện hưởng của bác thay đổi. Cơ quan có thẩm quyền sẽ xem xét và quyết định việc thôi hưởng hoặc điều chỉnh mức hưởng theo quy định, kiosk không tự quyết định việc dừng trợ cấp. Thời gian thôi hưởng hoặc điều chỉnh tính từ tháng ngay sau tháng không còn đủ điều kiện hoặc thay đổi điều kiện.",
           "documents": [
@@ -162,9 +320,18 @@
         "Gửi qua dịch vụ bưu chính"
       ],
       "choices": [
-        { "label": "Nộp trực tiếp", "say": "Bác nộp hồ sơ tại Trung tâm Phục vụ hành chính công cấp xã hoặc địa điểm tiếp nhận hồ sơ thuộc Uỷ ban nhân dân cấp xã nơi cư trú. Bác nhớ mang tờ khai đúng mẫu và giấy tờ chứng minh điều kiện nếu nhóm của bác cần." },
-        { "label": "Nộp trực tuyến", "say": "Kiosk hiện chỉ hướng dẫn. Bác có thể gửi hồ sơ trên Cổng Dịch vụ công theo phương thức được cơ quan có thẩm quyền công bố, có con cháu giúp thao tác thì thuận tiện hơn." },
-        { "label": "Gửi qua bưu chính", "say": "Bác có thể gửi tờ khai và giấy tờ kèm theo qua tổ chức bưu chính đến Uỷ ban nhân dân cấp xã nơi cư trú." }
+        {
+          "label": "Nộp trực tiếp",
+          "say": "Bác nộp hồ sơ tại Trung tâm Phục vụ hành chính công cấp xã hoặc địa điểm tiếp nhận hồ sơ thuộc Uỷ ban nhân dân cấp xã nơi cư trú. Bác nhớ mang tờ khai đúng mẫu và giấy tờ chứng minh điều kiện nếu nhóm của bác cần."
+        },
+        {
+          "label": "Nộp trực tuyến",
+          "say": "Kiosk hiện chỉ hướng dẫn. Bác có thể gửi hồ sơ trên Cổng Dịch vụ công theo phương thức được cơ quan có thẩm quyền công bố, có con cháu giúp thao tác thì thuận tiện hơn."
+        },
+        {
+          "label": "Gửi qua bưu chính",
+          "say": "Bác có thể gửi tờ khai và giấy tờ kèm theo qua tổ chức bưu chính đến Uỷ ban nhân dân cấp xã nơi cư trú."
+        }
       ],
       "bring": [
         "Tờ khai đúng mẫu với nhóm của bác (Mẫu số 1a, 1b, 1c, 1d hoặc 1đ)",
@@ -175,52 +342,64 @@
     },
     "faq": [
       {
-        "q": ["nếu tôi được hưởng thì mỗi tháng được bao nhiêu", "được bao nhiêu tiền", "mức trợ cấp bao nhiêu", "mỗi tháng bao nhiêu"],
+        "q": [
+          "nếu tôi được hưởng thì mỗi tháng được bao nhiêu",
+          "được bao nhiêu tiền",
+          "mức trợ cấp bao nhiêu",
+          "mỗi tháng bao nhiêu"
+        ],
         "a": "Mức chuẩn trợ giúp xã hội hiện là 500.000 đồng một tháng. Mức bác được nhận bằng mức chuẩn nhân với hệ số của nhóm đối tượng, do cơ quan có thẩm quyền quyết định; địa phương có thể quy định mức cao hơn. Bác hỏi cán bộ để biết hệ số của trường hợp mình."
       },
       {
-        "q": ["sau khi nộp hồ sơ tiếp theo làm gì", "nộp xong thì sao", "sau đó làm gì"],
+        "q": [
+          "sau khi nộp hồ sơ tiếp theo làm gì",
+          "nộp xong thì sao",
+          "sau đó làm gì"
+        ],
         "a": "Sau khi nhận hồ sơ, Chủ tịch Uỷ ban nhân dân cấp xã xem xét, xác thực thông tin với dữ liệu dân cư và quyết định trong 10 ngày làm việc. Đủ điều kiện thì bác được hưởng và chi trả, tính từ tháng ký quyết định; không đủ thì được trả lời bằng văn bản nêu rõ lý do."
       },
       {
-        "q": ["tờ khai điền thế nào", "kê khai thế nào", "mẫu nào", "trong tờ khai có những gì", "điền đơn thế nào", "mẫu 1d là gì"],
+        "q": [
+          "tờ khai điền thế nào",
+          "kê khai thế nào",
+          "mẫu nào",
+          "trong tờ khai có những gì",
+          "điền đơn thế nào",
+          "mẫu 1d là gì"
+        ],
         "a": "Mỗi nhóm có một mẫu riêng: 1a trẻ em, 1b người nhiễm HIV, 1c người đơn thân nghèo nuôi con, 1d người cao tuổi, 1đ người khuyết tật. Trong tờ khai bác điền họ tên, ngày sinh, số định danh, nơi ở, hoàn cảnh gia đình, tình trạng trợ cấp đang nhận, nội dung đề nghị, cách nhận tiền, rồi ký tên. Chỗ nào không rõ bác để trống, cán bộ sẽ hướng dẫn hoặc điền giúp."
       },
       {
-        "q": ["khác trợ cấp hưu trí xã hội chỗ nào", "khác hưu trí xã hội", "trợ cấp hưu trí"],
-        "a": "Trợ cấp hưu trí xã hội dành cho người từ đủ 75 tuổi (hoặc từ 70 tuổi thuộc hộ nghèo, cận nghèo) không có lương hưu, mức 500.000 đồng một tháng. Trợ cấp xã hội hằng tháng dành cho các nhóm bảo trợ xã hội theo Nghị định 20/2021, ví dụ người cao tuổi thuộc hộ nghèo không có người phụng dưỡng, người khuyết tật nặng, mức bằng mức chuẩn 500.000 đồng nhân hệ số. Thuộc cả hai diện thì hưởng chế độ có mức cao hơn."
-      },
-      {
-        "q": ["đổi số tài khoản", "thay đổi tài khoản nhận tiền", "đổi cách nhận tiền"],
+        "q": [
+          "đổi số tài khoản",
+          "thay đổi tài khoản nhận tiền",
+          "đổi cách nhận tiền"
+        ],
         "a": "Đây là trường hợp điều chỉnh. Bác làm văn bản hoặc tờ khai đề nghị điều chỉnh trợ cấp xã hội hằng tháng, nêu rõ nội dung muốn thay đổi, rồi nộp tại Uỷ ban nhân dân xã nơi cư trú."
       },
       {
-        "q": ["thôi không nhận nữa", "không muốn nhận nữa", "dừng trợ cấp"],
+        "q": [
+          "thôi không nhận nữa",
+          "không muốn nhận nữa",
+          "dừng trợ cấp"
+        ],
         "a": "Bác làm văn bản đề nghị thôi hưởng nộp tại Uỷ ban nhân dân xã nơi cư trú. Chủ tịch Uỷ ban nhân dân cấp xã xem xét và quyết định thôi hưởng hoặc điều chỉnh mức hưởng; thời gian thôi hưởng tính từ tháng ngay sau tháng không còn đủ điều kiện."
       },
       {
-        "q": ["có phải mang sổ hộ khẩu không", "mang hộ khẩu", "giấy cư trú"],
+        "q": [
+          "có phải mang sổ hộ khẩu không",
+          "mang hộ khẩu",
+          "giấy cư trú"
+        ],
         "a": "Không cần. Thông tin cư trú cơ quan tiếp nhận khai thác từ Cơ sở dữ liệu quốc gia về dân cư. Chỉ khi không khai thác được, cán bộ mới yêu cầu bác cung cấp giấy tờ chứng minh cư trú."
       },
       {
-        "q": ["có mất phí không", "lệ phí bao nhiêu", "tốn tiền không"],
-        "a": "Thủ tục này không thu lệ phí."
-      }
-    ],
-    "forms": [
-      {
-        "name": "Tờ khai của đối tượng (Mẫu số 1a, 1b, 1c, 1d, 1đ ban hành kèm Nghị định 20/2021/NĐ-CP, mỗi nhóm đối tượng một mẫu)",
-        "how": "Xin đúng mẫu tại Uỷ ban nhân dân xã: bác nói rõ mình xin mới, điều chỉnh hay thôi hưởng và thuộc nhóm nào, cán bộ đưa đúng mẫu (người cao tuổi dùng Mẫu số 1d, người khuyết tật dùng Mẫu số 1đ). Điền bằng bút mực, chữ in hoa; chỗ nào không rõ để trống rồi hỏi cán bộ. Mắt kém hoặc không biết chữ thì nói với cán bộ, cán bộ điền giúp rồi đọc lại cho bác nghe trước khi ký.",
-        "fields": [
-          "Họ và tên, ngày tháng năm sinh, giới tính, viết đúng như trên căn cước",
-          "Số định danh cá nhân, nơi cư trú hiện nay",
-          "Hoàn cảnh gia đình: sống cùng ai, có người phụng dưỡng không, thuộc hộ nghèo hay cận nghèo",
-          "Tình trạng hưởng lương hưu, trợ cấp bảo hiểm xã hội hoặc trợ cấp khác",
-          "Nội dung đề nghị: hưởng mới, điều chỉnh (ghi rõ nội dung cần điều chỉnh) hay thôi hưởng",
-          "Hình thức nhận trợ cấp: tiền mặt hay tài khoản ngân hàng",
-          "Cam đoan, ký và ghi rõ họ tên, ghi ngày tháng"
+        "q": [
+          "có mất phí không",
+          "lệ phí bao nhiêu",
+          "tốn tiền không"
         ],
-        "note": "Các mục trên tóm tắt theo mẫu; mẫu in tại nơi nộp là bản chính thức, có mục nào khác thì bác làm theo mẫu in và hỏi cán bộ."
+        "a": "Thủ tục này không thu lệ phí."
       }
     ]
   },
@@ -229,6 +408,5 @@
     "url": "https://dichvucong.gov.vn/"
   },
   "verified_by": "Mian — kho tri thức bản 17/09/2026 (file «Kho mới tri thức 6 thủ tục.xlsx», sheet THỦ TỤC 2)",
-  "verified_date": "2026-09-17",
-  "forms_note": "Mục flow.forms tóm tắt các mục của mẫu ở mức người dân cần biết trước khi đến; Mian đối chiếu với mẫu in kèm Nghị định rồi ghi ngày kiểm chứng."
+  "verified_date": "2026-09-17"
 }
