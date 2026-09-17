@@ -1,4 +1,4 @@
-# Cách viết file thủ tục — hướng dẫn cho Mian
+# Cách viết file thủ tục json (save lại sau nếu cần bổ sung thủ tục)
 
 Mỗi thủ tục một file `.json` trong thư mục này. **Tên file chính là mã thủ tục**,
 viết không dấu, nối bằng gạch ngang: `xac-nhan-cu-tru.json`.
@@ -104,7 +104,7 @@ số (tuổi, số bản) thì ghi `range` `[thấp, cao]`, máy đọc số tro
 càng nhiều cách hỏi càng tốt. Không có thì máy nói «chưa có trong kho, bác hỏi
 cán bộ» — **máy không bịa**, nên câu nào hay bị hỏi thì thêm vào đây.
 
-## Ba quy tắc không được phá
+## Ba quy tắc bắt buộc
 
 1. **Không có nguồn thì không viết.** Mọi câu trong `steps` và `documents`
    phải truy được về văn bản trong `source`. Máy chỉ đọc lại đúng cái ta viết
