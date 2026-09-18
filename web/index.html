@@ -738,13 +738,13 @@ function renderPrepare(st){
 }
 function renderSubmit(st){
   const meta = [["Cơ quan xử lý", st.agency], ["Thời hạn", st.processing_time], ["Kết quả", st.result], ["Phí", st.fee]].filter(([,v]) => v).map(([k,v]) => `<div class="meta"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`).join("");
-  aiSay(`<span class="stephead">Bước 3 · Nộp hồ sơ</span><p>${esc(st.prompt)}</p>`, { hint: "Nơi nộp, giấy tờ mang theo và thời hạn ở bên phải. Còn thắc mắc thì bấm micro hỏi thêm.", speech: st.speech });
+  aiSay(`<span class="stephead">Bước 3 · Nộp hồ sơ</span><p>${esc(st.prompt)}</p>`, { hint: "Nơi nộp, giấy tờ yêu cầu và thời hạn ở bên phải. Còn thắc mắc thì bấm micro hỏi thêm.", speech: st.speech });
   const choices = st.submit_choices || [];
   setPanel(`${choices.length ? `<div class="card"><h3>${esc(pronoun.charAt(0).toUpperCase() + pronoun.slice(1))} định nộp theo cách nào? Bấm để nghe hướng dẫn</h3>
       <div class="options">${choices.map((c, i) => `<button class="opt-btn glow" data-c="${i}">${esc(c.label)}</button>`).join("")}</div></div>` : ""}
-    <div class="card"><h3>Nộp ở đâu</h3>${bullets(st.places)}<h3 style="margin-top:10px">Cách nộp</h3>${bullets(st.methods)}</div>
-    <div class="card"><h3>Khi đi mang theo</h3>${checklist(st.bring)}</div>
-    ${(st.notes || []).length ? `<div class="card"><h3>Lưu ý theo trường hợp của ${esc(pronoun)}</h3>${checklist(st.notes, "notes", true)}</div>` : ""}
+    <div class="card"><h3>Nơi nộp hồ sơ</h3>${bullets(st.places)}<h3 style="margin-top:10px">Cách nộp</h3>${bullets(st.methods)}</div>
+    <div class="card"><h3>Hồ sơ cần đem theo</h3>${bullets(st.bring)}</div>
+    ${(st.notes || []).length ? `<div class="card"><h3>Lưu ý theo trường hợp của ${esc(pronoun)}</h3>${bullets(st.notes)}</div>` : ""}
     <div class="card"><h3>Quá trình xử lý và thời hạn</h3>${meta}${st.source && st.source.title ? `<a class="source" href="${esc(st.source.url || "#")}" target="_blank" rel="noopener">Nguồn: ${esc(st.source.title)}</a>` : ""}</div>
     <div class="row">${btn("replayBtn", "outline", "🔊 Nghe lại")}${btn("otherBtn", "outline", "Làm thủ tục khác")}${btn("nextBtn", "green glow", "Đã rõ, kết thúc", ICON_CHECK)}</div>`);
   $("replayBtn").addEventListener("click", () => speak(lastSpeech)); $("nextBtn").addEventListener("click", nextStage);
