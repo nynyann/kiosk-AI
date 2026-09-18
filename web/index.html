@@ -112,6 +112,7 @@
     background: radial-gradient(circle at 35% 30%, #4c86ff, var(--indigo) 70%);
     display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;
     box-shadow: 0 12px 28px rgba(47,111,235,.28);
+    #avatar img{ width:100%; height:100%; border-radius:50%; object-fit:cover; }
   }
   #avatar svg{ width:58%; height:58%; }
   #avatar.talking{ animation: breathe 1.6s ease-in-out infinite; }
@@ -256,7 +257,7 @@
   <section id="session" hidden>
     <aside id="left">
       <div id="aiBubble"><p>…</p></div>
-      <div id="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="12" rx="4"/><circle cx="9" cy="13" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.4" fill="currentColor" stroke="none"/><path d="M9 16.5c1.6 1 4.4 1 6 0"/><path d="M12 7V4"/><circle cx="12" cy="3" r="1"/></svg></div>
+      <div id="avatar"><img src="assets/canary.png" alt="Trợ lý ViKiosk"></div>
       <div id="avatarName">Trợ lý ViKiosk</div>
       <div id="heard" hidden></div>
       <details id="history" hidden><summary>Xem lại cuộc trò chuyện</summary><div id="historyList"></div></details>
