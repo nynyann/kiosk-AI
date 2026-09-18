@@ -170,14 +170,14 @@
   #micDock .micLead{ flex:1; font-size:var(--fs-label); color:var(--ink-soft); line-height:1.4; }
   #micDock .micLead b{ color:var(--ink); font-size:var(--fs-body); display:block; }
   #micBtn{
-    flex-shrink:0; width: width: clamp(64px, 10vw, 88px); height: clamp(64px, 10vw, 88px); border-radius:50%; border:none;
+    flex-shrink:0; width: clamp(64px, 10vw, 88px); height: clamp(64px, 10vw, 88px); border-radius:50%; border:none;
     background: radial-gradient(circle at 35% 30%, #4c86ff, var(--indigo) 70%);
     box-shadow: 0 8px 20px rgba(47,111,235,.3);
     display:flex; align-items:center; justify-content:center; transition: opacity .2s;
   }
   #micBtn svg{ width:48%; height:48%; }
   #micBtn.dim{ opacity:.35; }
-  #micBtn.rec{ background: radial-gradient(circle at 35% 30%, #c85142, var(--brick) 70%); animation:pulse 1.5s ease-in-out infinite; transform: scale(var(--level, 1)); }
+  #micBtn.rec{ background: radial-gradient(circle at 35% 30%, #ff7a70, var(--brick) 70%); animation:pulse 1.5s ease-in-out infinite; transform: scale(var(--level, 1)); }
   @keyframes pulse{ 0%,100%{ box-shadow:0 0 0 0 rgba(167,63,46,.35);} 50%{ box-shadow:0 0 0 22px rgba(167,63,46,0);} }
   #stopBtn{ flex-shrink:0; }
   #timerText{ font-variant-numeric:tabular-nums; font-weight:800; color:var(--brick); font-size:var(--fs-title); }
@@ -234,7 +234,7 @@
   <!-- ===== CÁC TRANG TĨNH TRÊN MENU ===== -->
   <section class="page" id="page-procedures" hidden><div class="inner"><h2>6 thủ tục ViKiosk hỗ trợ</h2><ul id="procList"></ul><p><button class="btn primary" data-page="home">← Về trang chủ</button></p></div></section>
   <section class="page" id="page-guide" hidden><div class="inner">
-    <h2>Hướng dân sử dụng</h2>
+    <h2>Hướng dẫn sử dụng</h2>
     <ul>
       <li>Bấm <b>Bắt đầu</b>.</li>
       <li>Bấm nút <b>micro</b>. Khi micro nhấp nháy, nói thông tin thủ tục cần hỗ trợ, sau đó bấm <b>Nói xong rồi</b>. Ví dụ: "Tôi 76 tuổi, không có lương hưu thì được hỗ trợ gì?"</li>
