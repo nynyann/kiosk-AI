@@ -352,9 +352,33 @@ def explain(text: str) -> Dict[str, object]:
     }
 
 
+# Chữ viết tắt hành chính: giọng đọc đánh vần từng chữ cái nghe không hiểu.
+_SPEECH_ABBR = [
+    (r"\bBHXH\b", "bảo hiểm xã hội"),
+    (r"\bBHYT\b", "bảo hiểm y tế"),
+    (r"\bUBND\b", "Uỷ ban nhân dân"),
+    (r"\bCCCD\b", "căn cước công dân"),
+    (r"\bCSDL\b", "cơ sở dữ liệu"),
+    (r"\bDVCQG\b", "Dịch vụ công Quốc gia"),
+    (r"\bVNeID\b", "V N E I D"),
+    (r"\bVssID\b", "V S S I D"),
+]
+
+
 def for_speech(text: str) -> str:
-    """Chuẩn bị chuỗi để đọc thành tiếng: bỏ ký hiệu, số thành chữ, giãn nhịp."""
-    t = text.replace("/", " trên ").replace("-", " ")
+    """Chuẩn bị chuỗi để đọc thành tiếng: bỏ ký hiệu, số thành chữ, giãn nhịp.
+
+    Ngày «30/06/2025» đọc «ngày ba mươi tháng sáu năm …»; số hiệu văn bản
+    «176/2025/NĐ-CP» bỏ đuôi «NĐ-CP», «41/2024/QH15» đọc «Quốc hội khoá 15»;
+    chữ viết tắt (BHXH, UBND…) đọc đủ chữ."""
+    t = text
+    for pat, rep in _SPEECH_ABBR:
+        t = re.sub(pat, rep, t)
+    t = re.sub(r"(ngày\s+)?(\d{1,2})/(\d{1,2})/(\d{4})", r"ngày \2 tháng \3 năm \4", t)
+    t = re.sub(r"/(NĐ-CP|NĐ|TT-BTC|QĐ-TTg)\b", "", t)
+    t = re.sub(r"/QH(\d+)\b", r" Quốc hội khoá \1", t)
+    t = re.sub(r"(đồng)/(tháng|bản|thẻ|trang|lần|người)", r"\1 mỗi \2", t)
+    t = t.replace("/", " trên ").replace("-", " ")
     t = re.sub(r"\s+", " ", t)
     return digits_to_words(t).strip()
 

@@ -78,6 +78,12 @@ def test_chu_so_thanh_chu_de_doc():
     assert digits_to_words("70.000 đồng") == "bảy mươi nghìn đồng"
     assert digits_to_words("tối đa 200.000 đồng/bản") == "tối đa hai trăm nghìn đồng/bản"
     assert "nghìn" not in digits_to_words("1.014027").split(".")[0]
+    # Ngày, số hiệu văn bản, chữ viết tắt đọc cho ra tiếng người (rà 18/09).
+    assert for_speech("ngày 30/06/2025") == "ngày ba mươi tháng sáu năm hai nghìn hai mươi lăm"
+    assert for_speech("Nghị định 176/2025/NĐ-CP").endswith("hai nghìn hai mươi lăm")
+    assert for_speech("41/2024/QH15").endswith("Quốc hội khoá mười lăm")
+    assert for_speech("nộp tại UBND xã, trợ cấp BHXH") == "nộp tại Uỷ ban nhân dân xã, trợ cấp bảo hiểm xã hội"
+    assert for_speech("500.000 đồng/tháng") == "năm trăm nghìn đồng mỗi tháng"
 
 
 def test_khong_pha_cau_da_dung():

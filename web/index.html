@@ -224,8 +224,7 @@
     <!-- Thông tin góp ý: thay bằng địa chỉ của địa phương đặt kiosk. -->
     <div id="contact">
       <b>Góp ý, phản ánh</b>
-      Hòm thư: <a href="mailto:gopy@xa.gov.vn">gopy@xa.gov.vn</a><br>
-      Điện thoại: <a href="tel:1022">1022</a> (giờ hành chính)
+      Hòm thư: <a href="mailto:gopy@xa.gov.vn">gopy@xa.gov.vn</a>
     </div>
   </section>
 
@@ -238,13 +237,13 @@
       <li>Bấm nút <b>micro</b> khi nó nhấp nháy, nói điều mình cần rồi bấm <b>Nói xong rồi</b>. Ví dụ: «Tôi 76 tuổi, không có lương hưu thì được hỗ trợ gì?»</li>
       <li>Máy đưa ra thủ tục phù hợp, hỏi từng câu để kiểm tra điều kiện, rồi cho biết cần chuẩn bị gì và nộp ở đâu.</li>
       <li>Nút nào <b>nhấp nháy</b> là nút cần bấm tiếp theo. Không nói được thì bấm chọn trên màn hình.</li>
-      <li>Có gì chưa rõ thì bấm <b>Hỏi thêm</b> rồi hỏi bằng lời.</li>
+      <li>Ở bước 2 và bước 3, có gì chưa rõ thì bấm <b>micro</b> rồi hỏi bằng lời.</li>
     </ul>
     <p><button class="btn primary" data-page="home">← Về trang chủ</button></p>
   </div></section>
   <section class="page" id="page-feedback" hidden><div class="inner">
     <h2>Góp ý, phản ánh</h2>
-    <p>Hòm thư: <a href="mailto:gopy@xa.gov.vn">gopy@xa.gov.vn</a><br>Điện thoại: <a href="tel:1022">1022</a> (giờ hành chính)</p>
+    <p>Hòm thư: <a href="mailto:gopy@xa.gov.vn">gopy@xa.gov.vn</a></p>
     <p>Kiosk chỉ hướng dẫn theo thông tin thủ tục đã công bố trên Cổng Dịch vụ công Quốc gia; không thay cán bộ quyết định hồ sơ.</p>
     <p><button class="btn primary" data-page="home">← Về trang chủ</button></p>
   </div></section>
@@ -730,7 +729,7 @@ function renderPrepare(st){
     ${(st.tips || []).length ? `<div class="card"><h3>Thông tin thêm</h3>${bullets(st.tips)}</div>` : ""}
     <div class="row">${btn("replayBtn", "outline", "🔊 Nghe lại")}${btn("nextBtn", "primary glow", "Đã rõ, sang bước 3 →")}</div>`);
   $("replayBtn").addEventListener("click", () => speak(lastSpeech)); $("nextBtn").addEventListener("click", nextStage);
-  setMic("ask", "Có gì chưa rõ, bấm micro hỏi thêm", "Ví dụ: «Mẫu này điền thế nào?», «Con tôi nộp thay được không?»");
+  setMic("ask", "Có gì chưa rõ, bấm micro hỏi thêm", "Ví dụ: «Nộp ở đâu?», «Có mất tiền không?»");
 }
 function renderSubmit(st){
   const meta = [["Cơ quan xử lý", st.agency], ["Thời hạn", st.processing_time], ["Kết quả", st.result], ["Phí", st.fee]].filter(([,v]) => v).map(([k,v]) => `<div class="meta"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`).join("");

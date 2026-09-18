@@ -76,17 +76,18 @@ npm, không cơ sở dữ liệu.
       |
       v
     data/kb/*.json          6 thủ tục, mỗi thủ tục một file
-    data/tts/*.mp3          112 câu đã sinh sẵn tiếng, đi theo repo
+    data/tts/*.mp3          153 câu đã sinh sẵn tiếng, đi theo repo
+    data/kb-source/*.xlsx   kho tri thức gốc của Mian, bản 17/09/2026
 
-Kích thước mã nguồn (đếm ngày 16/09/2026): backend `app/` 2.752 dòng Python,
-giao diện `web/index.html` 981 dòng, công cụ đo `eval/` 875 dòng, kịch bản
-`scripts/` 3 file, test 4 file với 64 test. Tổng khoảng 5.600 dòng.
+Kích thước mã nguồn (đếm ngày 18/09/2026): backend `app/` 3.116 dòng Python,
+giao diện `web/index.html` 845 dòng, công cụ đo `eval/` 875 dòng, kịch bản
+`scripts/` 3 file, test 4 file với 70 test. Tổng khoảng 5.900 dòng.
 
 Thư viện chính (ghim phiên bản trong `requirements.txt`): fastapi 0.115.6,
 uvicorn 0.34.0, faster-whisper 1.1.1, ctranslate2 4.8.2, edge-tts 7.2.8,
 httpx 0.28.1 (gọi mô hình ngôn ngữ).
 
-Giao kèo API viết ở `API_CONTRACT.md`, phiên bản 2.2. Mọi phản hồi đều có
+Giao kèo API viết ở `API_CONTRACT.md`, phiên bản 2.3. Mọi phản hồi đều có
 trường `ok`; lỗi thì có `error` là câu tiếng Việt hiển thị thẳng cho người
 dân được.
 
@@ -409,7 +410,7 @@ bước 1, micro khi tới lượt bác nói, nút sang bước tiếp).
 Trình tự màn hình:
 
 0. Trang chủ: thanh menu (Trang chủ, Thủ tục, Hướng dẫn, Góp ý); góc dưới
-   trái là hòm thư và số điện thoại góp ý; giữa là nút Bắt đầu (cái chạm
+   trái là hòm thư góp ý; giữa là nút Bắt đầu (cái chạm
    này mở khoá tiếng, xem mục 5).
 1. Máy chào bằng chữ và bằng tiếng: "Xin chào bác! Cháu là máy hướng dẫn
    làm thủ tục hành chính. Bác cần làm gì ạ?" kèm cách nói; micro nhấp nháy.
@@ -542,7 +543,35 @@ máy chủ sinh sẵn), 18 test mô hình ngôn ngữ và xưng hô với mô h�
 
 ---
 
-## 10. Triển khai
+## 10. Triển khai và hạ tầng
+
+### 10.1 Hạ tầng tóm tắt (để điền vào bản đề xuất)
+
+| Thành phần | Dùng gì | Chạy ở đâu | Chi phí |
+|---|---|---|---|
+| Máy chủ ứng dụng | Python 3.10, FastAPI + uvicorn, một tiến trình | Render Web Service gói Free (512 MB RAM, dưới 1 nhân CPU), ảnh Docker | 0 đồng |
+| Nhận dạng giọng nói | PhoWhisper (VinAI) chạy bằng faster-whisper / CTranslate2 trên CPU, int8; bản base trên Render, bản small trên máy nhà | trong tiến trình máy chủ, model nướng sẵn vào ảnh Docker | 0 đồng, không gửi tiếng nói ra ngoài |
+| Mô hình ngôn ngữ | gemma-4-31B-it qua FPT AI Marketplace, API kiểu OpenAI, khoá trong biến môi trường `FPT_API_KEY` | dịch vụ ngoài, gọi HTTPS, hết hạn 12 giây thì về kho tĩnh | theo token; đo thực tế khoảng 2.500 token một lượt hỏi thêm, 0,3 đến 1,1 giây |
+| Giọng đọc | edge-tts (giọng vi-VN-HoaiMyNeural); 153 câu sinh sẵn thành mp3 đi theo repo, câu mới của mô hình mới gọi mạng | mp3 trong ảnh Docker, còn lại gọi dịch vụ Microsoft Edge | 0 đồng |
+| Kho tri thức | 6 file JSON trong `data/kb/`, gốc Excel của Mian trong `data/kb-source/` | nạp vào bộ nhớ lúc khởi động, `POST /kb/reload` nạp nóng | không có cơ sở dữ liệu |
+| Giao diện | một file `web/index.html`, không framework, không build | máy chủ phục vụ luôn ở `/`, cùng tên miền với API | |
+| Mã nguồn, triển khai | GitHub `nynyann/kiosk-backend`, nhánh `main`; Render build từ Dockerfile, Auto-Deploy đang tắt nên đẩy code xong phải bấm Manual Deploy | | |
+| Kiểm thử | 70 test pytest, không cần mạng, không cần model | chạy trên máy nhà trước khi đẩy | |
+
+Luồng dữ liệu một lượt nói: trình duyệt ghi âm webm/opus → `POST /turn` →
+ffmpeg đổi sang wav 16 kHz → PhoWhisper → chuẩn hoá chữ → tra kho (từ khoá;
+lạ thì hỏi mô hình chọn thủ tục) → JSON trả về gồm `answer` (chữ) và
+`speech` (chuỗi để đọc) → trình duyệt gọi `POST /tts` lấy mp3 → phát. Máy
+chủ không giữ phiên: mọi câu bác đã trả lời do trình duyệt gửi lại mỗi lượt,
+nên máy chủ khởi động lại giữa chừng cũng không mất trạng thái.
+
+Yêu cầu phần cứng khi tự đặt máy: máy chạy kiosk chỉ cần trình duyệt Chrome
+hoặc Edge, micro, loa; máy chủ cần 2 GB RAM nếu dùng PhoWhisper-small, 1 GB
+nếu dùng base, không cần GPU. Dữ liệu tiếng nói xử lý trên máy chủ của mình,
+chỉ phần chữ (câu nói đã thành văn bản và kho tri thức của thủ tục) gửi lên
+mô hình ngôn ngữ.
+
+### 10.2 Ghi chú triển khai
 
 - Docker, một ảnh, model nướng sẵn vào ảnh lúc build (Render xoá ổ đĩa mỗi
   lần ngủ dậy nên không tải lúc chạy). Kho mp3 `data/tts/` cũng nằm trong
@@ -633,7 +662,8 @@ Repo `nynyann/kiosk-backend`, nhánh `main`, 29 commit từ 07/09 đến 17/09/2
 | a3d3276 | Bổ sung mã thủ tục hộ tịch 2.000635 và căn cước 2.000200 |
 | dbd391b | Sửa kho theo rà soát của Lia: bỏ mọi mục kê khai mẫu; trợ cấp hằng tháng không thuộc nhóm thì chỉ kết luận và chỉ ra một cửa; BHYT bỏ lựa chọn «chưa biết chọn gì»; hộ tịch bỏ hai câu hỏi và lưu ý không có trong kho, hồ sơ không đòi căn cước; chứng thực không hỏi loại giấy, không đẩy sang thủ tục khác; căn cước đổi theo tuổi 25, 40, 60; 67 test |
 | 73c1c1d | Máy im ở bước 2: kết luận «đủ điều kiện» từng áp dụng ngay khi chọn mục đích nên bỏ qua câu hỏi riêng của nhánh, và câu bước 2 theo tổ hợp lựa chọn không có sẵn tiếng; nay hỏi hết câu của nhánh rồi mới kết luận, liệt kê tiếng sẵn cho mọi đường trả lời (50 câu kết thúc), tiền «70.000 đồng» đọc thành «bảy mươi nghìn», giao diện thử lại /tts một lần; 69 test |
-| (17/09, lần 6) | Câu không ứng với thủ tục nào ở màn «bác cần làm gì» («đúng rồi hướng dẫn tôi từng bước», «cháu tên gì»): mô hình đáp lại rồi lái về hỏi bác cần thủ tục gì, chỉ được nhắc 6 thủ tục, thay câu cứng «cháu chưa được học»; mốc đổi thẻ căn cước 25, 40, 60 (14 là mốc cấp lần đầu); 70 test |
+| 5627d39 | Câu không ứng với thủ tục nào ở màn «bác cần làm gì» («đúng rồi hướng dẫn tôi từng bước», «cháu tên gì»): mô hình đáp lại rồi lái về hỏi bác cần thủ tục gì, chỉ được nhắc 6 thủ tục, thay câu cứng «cháu chưa được học»; mốc đổi thẻ căn cước 25, 40, 60 (14 là mốc cấp lần đầu); 70 test |
+| (18/09) | Rà toàn bộ: giọng đọc đọc ngày «30/06/2025» thành ngày tháng năm, bỏ đuôi «NĐ-CP», «QH15» thành «Quốc hội khoá 15», BHXH, BHYT, UBND, CCCD đọc đủ chữ, «đồng/tháng» thành «đồng mỗi tháng»; bỏ số điện thoại ở mục góp ý, chỉ giữ hòm thư; sửa câu hướng dẫn còn nhắc nút «Hỏi thêm» đã bỏ; thêm mục 10.1 hạ tầng |
 
 Lần cập nhật 14/09/2026 (e95a025, df008fd) thay đổi gì:
 
@@ -734,7 +764,7 @@ Lần cập nhật 17/09/2026 (lần 3, kho tri thức mới của Mian) thay đ
 | Bổ sung `HARD_FIXES` từ cụm nghe nhầm thật, chạy `eval.rescore`, ghi chuỗi số cải thiện | Lia | `app/normalize.py` | cao, là nội dung mục 4.3 |
 | Đọc lại 30 câu hỏi bước 1 và 31 kết luận trong JSON, đối chiếu với sheet Excel bản 17/09 xem chuyển có sót ý nào | Mian | `data/kb/*.json` mục `flow.check`, `data/kb-source/` | cao |
 | Khi có mẫu in đã đối chiếu thì thêm lại mục kê khai mẫu (`flow.forms`) vào kho | Mian | `data/kb/*.json` | vừa, đã bỏ ngày 17/09 vì chưa xác nhận |
-| Thay hòm thư và số điện thoại góp ý trên trang chủ bằng của địa phương đặt kiosk | Kns | `web/index.html`, khối `#contact` | vừa |
+| Thay hòm thư góp ý trên trang chủ bằng của địa phương đặt kiosk | Kns | `web/index.html`, khối `#contact` | vừa |
 | Thêm FAQ sau mỗi buổi thử với người thật | Mian | `flow.faq` | vừa |
 | Sau mỗi lần sửa kho tri thức: chạy `python scripts/build_tts_cache.py` rồi commit cả `data/tts/` | Lia | `scripts/build_tts_cache.py` | cao, quên là câu mới không có tiếng |
 | Đặt `FPT_API_KEY` vào Environment trên Render (máy nhà đã có trong `.env`) | Lia | Render, Environment | cao nhất, không có thì bản trên mạng chạy kho tĩnh |

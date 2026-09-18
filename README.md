@@ -24,7 +24,7 @@ trái là trợ lý AI với ô thoại trên đầu, bên phải là việc bá
 Bác đứng trước kiosk:
 
 0. Trang chủ: thanh menu (Trang chủ, Thủ tục, Hướng dẫn, Góp ý), góc dưới
-   trái là hòm thư và số điện thoại góp ý, giữa là nút **Bắt đầu** (cái
+   trái là hòm thư góp ý, giữa là nút **Bắt đầu** (cái
    chạm này cũng là thứ trình duyệt cần để cho phép phát tiếng).
 0b. Máy chào: «Xin chào bác! … Bác cần làm gì ạ?» kèm hướng dẫn cách nói,
    micro nhấp nháy. Xưng hô để trung tính «bác» cho mọi người (nhóm quyết
