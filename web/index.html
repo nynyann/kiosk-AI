@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Kiosk hướng dẫn thủ tục hành chính</title>
+<title>ViKiosk - Trợ lý Hướng dẫn Thủ tục Thông minh Bằng giọng nói</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#1f1d1a; --ink-soft:#5b564c;
-    --paper:#f7f1e3; --paper-raised:#fffdf7; --line:#e2d8c0;
-    --indigo:#1f3a5f; --indigo-dark:#152a45; --indigo-soft:#e6ecf5;
+    --ink:#14213d; --ink-soft:#5b6a8c;
+    --paper:#eef4ff; --paper-raised:#ffffff; --line:#d3e2fd;
+    --indigo:#2f6feb; --indigo-dark:#1a3f91; --indigo-soft:#e6efff;
     --ochre:#c9922e; --ochre-dark:#9a6c17; --ochre-soft:#fbf1dc;
-    --brick:#a73f2e; --brick-dark:#87301f; --brick-soft:#f8e4df;
-    --green:#3e6b4f; --green-soft:#e2eee5;
-    --r-lg:26px; --r-md:16px;
-    --fs-title: clamp(1.35rem, 3.2vw, 1.9rem);
-    --fs-body: clamp(1.12rem, 2.3vw, 1.4rem);
-    --fs-label: clamp(0.95rem, 1.7vw, 1.06rem);
-    --fs-button: clamp(1.1rem, 2.3vw, 1.35rem);
+    --brick:#f0453a; --brick-dark:#a3241c; --brick-soft:#fdeceb;
+    --green:#12b76a; --green-soft:#e7f9ef;
+    --r-lg:22px; --r-md:14px;
+    --fs-title: clamp(1.15rem, 2vw, 1.4rem);
+    --fs-body: clamp(1rem, 1.4vw, 1.12rem);
+    --fs-label: clamp(0.85rem, 1.1vw, 0.95rem);
+    --fs-button: clamp(0.95rem, 1.3vw, 1.05rem);
   }
   @media (prefers-reduced-motion: reduce){
     *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
@@ -27,7 +27,7 @@
   *{ box-sizing:border-box; }
   [hidden]{ display:none !important; }
   html,body{ height:100%; }
-  body{ margin:0; font-family:'Be Vietnam Pro', -apple-system, 'Segoe UI', Roboto, sans-serif; background:var(--paper); color:var(--ink); overflow:hidden; -webkit-tap-highlight-color:transparent; }
+  body{ margin:0; font-family:'Be Vietnam Pro', -apple-system, 'Segoe UI', Roboto, sans-serif; background:radial-gradient(1100px 480px at 100% -10%, #dbe9ff 0%, transparent 60%), radial-gradient(900px 420px at -10% 110%, #e3edff 0%, transparent 55%), var(--paper); color:var(--ink); overflow:hidden; -webkit-tap-highlight-color:transparent; }
   button{ font-family:inherit; cursor:pointer; }
   button:focus-visible{ outline:4px solid var(--ochre); outline-offset:3px; }
   #app{ height:100vh; display:flex; flex-direction:column; }
@@ -39,7 +39,7 @@
     background:var(--indigo); color:#fff;
   }
   #menubar .brand{ font-weight:800; font-size:var(--fs-label); display:flex; align-items:center; gap:10px; user-select:none; }
-  #menubar .brand .dot{ width:10px; height:10px; border-radius:50%; background:#9a9483; }
+  #menubar .brand .dot{ width:10px; height:10px; border-radius:50%; background:#b7c3de; }
   #menubar .brand .dot.ok{ background:#7fd39a; } #menubar .brand .dot.bad{ background:#ff8a76; } #menubar .brand .dot.warn{ background:#ffd166; }
   #menubar nav{ display:flex; gap:4px; margin-left:auto; flex-wrap:wrap; }
   #menubar nav button{
@@ -51,11 +51,12 @@
 
   /* ---------- trang chủ ---------- */
   #home{ flex:1; min-height:0; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: clamp(16px,3vh,32px) clamp(16px,4vw,48px); }
-  #home h1{ font-size: clamp(1.7rem, 4.5vw, 2.8rem); font-weight:800; color:var(--indigo); margin:0 0 10px; line-height:1.2; max-width: 22ch; }
+  #home h1{ font-size: clamp(1.4rem, 3vw, 2rem); font-weight:800; color:var(--indigo); margin:0 0 10px; line-height:1.2; max-width: 22ch; }
   #home p.sub{ font-size:var(--fs-body); color:var(--ink-soft); max-width:40ch; margin:0 0 clamp(20px,4vh,36px); line-height:1.45; }
   #startBtn{
     border:none; background:var(--indigo); color:#fff; font-weight:800;
-    font-size: clamp(1.3rem, 3vw, 1.8rem); padding: 22px 56px; border-radius:999px;
+    font-size: clamp(1.05rem, 1.6vw, 1.3rem); padding: 18px 44px; border-radius:999px;
+    box-shadow:0 10px 24px rgba(47,111,235,.3);
     display:inline-flex; align-items:center; gap:14px;
   }
   #startBtn svg{ width:1.2em; height:1.2em; }
@@ -93,7 +94,8 @@
   }
   #aiBubble{
     position:relative; width:100%; max-width:520px;
-    background:#fff; border:2px solid var(--indigo); border-radius:var(--r-lg);
+    background:#fff; border:1px solid var(--line); border-radius:var(--r-lg);
+    box-shadow: 0 8px 24px rgba(26,63,145,.10);
     padding:14px 18px; font-size:var(--fs-body); line-height:1.5; text-align:left;
     animation: rise .25s ease both;
     max-height: 46vh; overflow-y:auto;
@@ -106,10 +108,10 @@
   .stephead{ display:inline-flex; align-items:center; gap:8px; font-size:var(--fs-label); font-weight:800; color:var(--indigo); background:var(--indigo-soft); padding:5px 12px; border-radius:999px; margin-bottom:8px; }
   .stephead.bad{ color:var(--brick-dark); background:var(--brick-soft); } .stephead.warn{ color:var(--ochre-dark); background:var(--ochre-soft); } .stephead.ok{ color:var(--green); background:var(--green-soft); }
   #avatar{
-    margin-top:22px; width: min(34vw, 170px); height: min(34vw, 170px); border-radius:50%;
-    background: radial-gradient(circle at 35% 30%, #2c4a72, var(--indigo) 70%);
+    margin-top:22px; width: min(30vw, 150px); height: min(30vw, 150px); border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #4c86ff, var(--indigo) 70%);
     display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0;
-    box-shadow: 0 12px 30px rgba(31,58,95,.25);
+    box-shadow: 0 12px 28px rgba(47,111,235,.28);
   }
   #avatar svg{ width:58%; height:58%; }
   #avatar.talking{ animation: breathe 1.6s ease-in-out infinite; }
@@ -149,7 +151,7 @@
   .btn.primary{ background:var(--indigo); color:#fff; } .btn.primary:active{ background:var(--indigo-dark); }
   .btn.green{ background:var(--green); color:#fff; } .btn.danger{ background:var(--brick); color:#fff; }
   .btn.outline{ background:#fff; color:var(--indigo); border:2px solid var(--indigo); }
-  .btn.link{ background:transparent; color:var(--ink-soft); text-decoration:underline; font-size:var(--fs-label); padding:8px 14px; font-weight:600; }
+  .btn.link{ background:transparent; box-shadow:0 4px 14px rgba(26,63,145,.06); color:var(--ink-soft); text-decoration:underline; font-size:var(--fs-label); padding:8px 14px; font-weight:600; }
   .card{ background:#fff; border:1px solid var(--line); border-radius:var(--r-md); padding:12px 14px; margin-bottom:12px; text-align:left; }
   .card h3{ margin:0 0 8px; font-size:var(--fs-label); text-transform:uppercase; letter-spacing:.4px; color:var(--ink-soft); }
   .card p{ margin:0 0 8px; font-size:var(--fs-body); line-height:1.45; } .card p:last-child{ margin-bottom:0; }
@@ -168,8 +170,9 @@
   #micDock .micLead{ flex:1; font-size:var(--fs-label); color:var(--ink-soft); line-height:1.4; }
   #micDock .micLead b{ color:var(--ink); font-size:var(--fs-body); display:block; }
   #micBtn{
-    flex-shrink:0; width: clamp(72px, 12vw, 100px); height: clamp(72px, 12vw, 100px); border-radius:50%; border:none;
-    background: radial-gradient(circle at 35% 30%, #2c4a72, var(--indigo) 70%); color:#fff;
+    flex-shrink:0; width: width: clamp(64px, 10vw, 88px); height: clamp(64px, 10vw, 88px); border-radius:50%; border:none;
+    background: radial-gradient(circle at 35% 30%, #4c86ff, var(--indigo) 70%);
+    box-shadow: 0 8px 20px rgba(47,111,235,.3);
     display:flex; align-items:center; justify-content:center; transition: opacity .2s;
   }
   #micBtn svg{ width:48%; height:48%; }
@@ -206,16 +209,16 @@
     <span id="statusText">Đang kết nối…</span>
     <nav>
       <button data-page="home" class="on">Trang chủ</button>
-      <button data-page="procedures">Thủ tục</button>
-      <button data-page="guide">Hướng dẫn</button>
+      <button data-page="procedures">Các loại thủ tục</button>
+      <button data-page="guide">Hướng dẫn sử dụng</button>
       <button data-page="feedback">Góp ý</button>
     </nav>
   </header>
 
   <!-- ===== TRANG CHỦ ===== -->
   <section id="home">
-    <h1>Kiosk hướng dẫn thủ tục hành chính</h1>
-    <p class="sub">Máy sẽ hỏi chuyện và hướng dẫn từng bước: kiểm tra điều kiện, chuẩn bị hồ sơ, nộp ở đâu. Không cần biết tên thủ tục, cứ nói điều mình cần.</p>
+    <h1>Chào mừng bạn đến với ViKiosk!</h1>
+    <p class="sub">Trợ lý ảo sẽ nói chuyện và hướng dẫn người dân xử lý thủ tục theo từng bước: kiểm tra điều kiện, chuẩn bị hồ sơ và phương thức nộp hồ sơ.</p>
     <button id="startBtn" class="glow">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
       Bắt đầu
@@ -223,28 +226,29 @@
     <div id="homeStatus">Đang kết nối máy chủ…</div>
     <!-- Thông tin góp ý: thay bằng địa chỉ của địa phương đặt kiosk. -->
     <div id="contact">
-      <b>Góp ý, phản ánh</b>
-      Hòm thư: <a href="mailto:gopy@xa.gov.vn">gopy@xa.gov.vn</a>
+      <b>Góp ý & phản ánh</b>
+      Hòm thư: <a href="mailto:vikiosk_canary@gmail.com">vikiosk_canary@gmail.com</a>
     </div>
   </section>
 
   <!-- ===== CÁC TRANG TĨNH TRÊN MENU ===== -->
-  <section class="page" id="page-procedures" hidden><div class="inner"><h2>6 thủ tục kiosk hỗ trợ</h2><ul id="procList"></ul><p><button class="btn primary" data-page="home">← Về trang chủ</button></p></div></section>
+  <section class="page" id="page-procedures" hidden><div class="inner"><h2>6 thủ tục ViKiosk hỗ trợ</h2><ul id="procList"></ul><p><button class="btn primary" data-page="home">← Về trang chủ</button></p></div></section>
   <section class="page" id="page-guide" hidden><div class="inner">
-    <h2>Cách dùng</h2>
+    <h2>Hướng dân sử dụng</h2>
     <ul>
-      <li>Bấm <b>Bắt đầu</b>. Máy gọi chung mọi người là «bác» cho thân mật.</li>
-      <li>Bấm nút <b>micro</b> khi nó nhấp nháy, nói điều mình cần rồi bấm <b>Nói xong rồi</b>. Ví dụ: «Tôi 76 tuổi, không có lương hưu thì được hỗ trợ gì?»</li>
-      <li>Máy đưa ra thủ tục phù hợp, hỏi từng câu để kiểm tra điều kiện, rồi cho biết cần chuẩn bị gì và nộp ở đâu.</li>
-      <li>Nút nào <b>nhấp nháy</b> là nút cần bấm tiếp theo. Không nói được thì bấm chọn trên màn hình.</li>
-      <li>Ở bước 2 và bước 3, có gì chưa rõ thì bấm <b>micro</b> rồi hỏi bằng lời.</li>
+      <li>Bấm <b>Bắt đầu</b>.</li>
+      <li>Bấm nút <b>micro</b>. Khi micro nhấp nháy, nói thông tin thủ tục cần hỗ trợ, sau đó bấm <b>Nói xong rồi</b>. Ví dụ: "Tôi 76 tuổi, không có lương hưu thì được hỗ trợ gì?"</li>
+      <li>Trợ lý sẽ đưa ra thủ tục phù hợp, hỏi thêm các câu hỏi để kiểm tra điều kiện, giúp người dân biết hồ sơ cần chuẩn bị cùng địa chỉ nộp hồ sơ liên quan.</li>
+      <li>Bấm nút <b>nhấp nháy</b> để chuyển sang bước tiếp theo. Nếu không nói được, người dân có thể bấm chọn theo các bước trên màn hình.</li>
+      <li>Bấm nút <b>micro</b> để hỏi trong trường hợp có thắc mắc.</li>
     </ul>
     <p><button class="btn primary" data-page="home">← Về trang chủ</button></p>
   </div></section>
   <section class="page" id="page-feedback" hidden><div class="inner">
-    <h2>Góp ý, phản ánh</h2>
-    <p>Hòm thư: <a href="mailto:gopy@xa.gov.vn">gopy@xa.gov.vn</a></p>
-    <p>Kiosk chỉ hướng dẫn theo thông tin thủ tục đã công bố trên Cổng Dịch vụ công Quốc gia; không thay cán bộ quyết định hồ sơ.</p>
+    <h2>Góp ý & phản ánh</h2>
+    <p>Hòm thư: <a href="mailto:vikiosk_canary@gmail.com">vikiosk_canary@gmail.com</a></p>
+    <p>ViKiosk chỉ hướng dẫn theo thông tin thủ tục đã công bố trên Cổng Dịch vụ công Quốc gia.</p>
+    <p>Các thông tin chi tiết về các thủ tục và tiếp nhận hồ sơ, người dân vui lòng đến cơ sở dịch vụ công gần nhất để được hỗ trợ.</p>
     <p><button class="btn primary" data-page="home">← Về trang chủ</button></p>
   </div></section>
 
@@ -253,7 +257,7 @@
     <aside id="left">
       <div id="aiBubble"><p>…</p></div>
       <div id="avatar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="12" rx="4"/><circle cx="9" cy="13" r="1.4" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1.4" fill="currentColor" stroke="none"/><path d="M9 16.5c1.6 1 4.4 1 6 0"/><path d="M12 7V4"/><circle cx="12" cy="3" r="1"/></svg></div>
-      <div id="avatarName">Trợ lý thủ tục</div>
+      <div id="avatarName">Trợ lý ViKiosk</div>
       <div id="heard" hidden></div>
       <details id="history" hidden><summary>Xem lại cuộc trò chuyện</summary><div id="historyList"></div></details>
     </aside>
@@ -501,10 +505,10 @@ function greet(text){
   const q = text || GREETING_2;
   aiSay(`<p>${esc(personalize(GREETING_1))}</p><p class="qtext">${esc(personalize(q))}</p>`,
         { hint: GREETING_HINT, speech: text ? `${text} ${GREETING_HINT}` : GREETING_SPEECH });
-  setPanel(`<p class="lead">Bấm micro đang nhấp nháy rồi nói. Nói xong bấm «Nói xong rồi».</p>
-    <div class="row">${btn("noVoiceBtn", "link", "Không nói được? Bấm đây để chọn thủ tục bằng tay")}</div>`);
+  setPanel(`<p class="lead">Bấm nút micro đang nhấp nháy để đưa ra yêu cầu. Bấm nút «Nói xong rồi» để kết thúc yêu cầu.</p>
+    <div class="row">${btn("noVoiceBtn", "link", "Chọn thủ tục trong danh sách thủ tục tại đây")}</div>`);
   $("noVoiceBtn").addEventListener("click", offerProcedureList);
-  setMic("query", "Bấm micro rồi nói điều bác cần", "Ví dụ: «Tôi muốn xin lại giấy khai sinh».");
+  setMic("query", "Bấm micro để đưa ra yêu cầu cần hỗ trợ về thủ tục", "Ví dụ: «Tôi muốn xin lại giấy khai sinh».");
 }
 
 /* --- Danh sách thủ tục, chỉ đưa ra khi máy không hiểu hoặc bác không nói được --- */
@@ -516,7 +520,7 @@ async function loadProcedures(){
 }
 async function offerProcedureList(){
   await loadProcedures();
-  aiSay(`<p class="qtext">${esc(personalize("Bác bấm chọn việc bác cần làm ạ."))}</p>`, { speech: "Bác bấm chọn việc bác cần làm trên màn hình ạ." });
+  aiSay(`<p class="qtext">${esc(personalize("Bác bấm chọn thủ tục cần làm ạ."))}</p>`, { speech: "Bác bấm chọn việc bác cần làm trên màn hình ạ." });
   renderCandidates(procedures, false);
 }
 
@@ -587,7 +591,7 @@ async function sendTurn(blob){
   if (asr.no_speech || !asr.text){
     aiSay(`<p class="qtext">${esc(answer.answer || personalize("Cháu chưa nghe rõ ạ. Bác nói lại giúp cháu một lần nữa."))}</p>`,
           { hint: "Nói to, rõ, gần micro. Nói xong bấm «Nói xong rồi».", speech: answer.speech || answer.answer });
-    setPanel(`<div class="row">${btn("noVoiceBtn", "link", "Không nói được? Bấm đây để chọn thủ tục bằng tay")}</div>`);
+    setPanel(`<div class="row">${btn("noVoiceBtn", "link", "Chọn thủ tục trong danh sách thủ tục tại đây")}</div>`);
     $("noVoiceBtn").addEventListener("click", offerProcedureList);
     setMic("query", "Bấm micro rồi nói lại", "");
     return;
@@ -602,7 +606,7 @@ async function sendTurn(blob){
   const lead = answer.via_llm ? "Nếu cháu hiểu đúng thì bác đang cần" : "Cháu hiểu bác đang cần";
   if (cands.length === 1){
     aiSay(`<p>${esc(personalize(lead))} thủ tục:</p><p class="qtext">${esc(cands[0].name)}</p><p>${esc(personalize("Đúng không ạ?"))}</p>`,
-          { hint: "Bấm «Đúng rồi» để máy hướng dẫn từng bước, hoặc «Không phải» để nói lại.",
+          { hint: "Bấm «Đúng rồi» để trợ lý hướng dẫn từng bước, hoặc «Không phải» để nói lại.",
             speech: answer.confirm || `${lead} thủ tục ${cands[0].name}. Đúng không ạ?` });
   } else {
     aiSay(`<p>${esc(personalize(lead))} một trong các thủ tục sau.</p><p class="qtext">${esc(personalize("Bác cần hỗ trợ thủ tục nào trước ạ?"))}</p>`,
@@ -613,11 +617,11 @@ async function sendTurn(blob){
 }
 
 function renderCandidates(list, isGuess){
-  setPanel(`<h2 class="ptitle">${isGuess ? (list.length === 1 ? "Thủ tục máy hiểu" : "Máy hiểu là một trong các thủ tục này") : "Chọn thủ tục"}</h2>
+  setPanel(`<h2 class="ptitle">${isGuess ? (list.length === 1 ? "Thủ tục đề xuất" : "Trợ lý hiểu là một trong các thủ tục này") : "Chọn thủ tục"}</h2>
     <div class="options">${list.map(p => `<button class="opt-btn glow" data-id="${esc(p.id)}">${esc(p.name)}${p.short ? `<span class="sub">${esc(p.short)}</span>` : ""}</button>`).join("")}</div>
     <div class="row">${isGuess ? btn("noBtn", "outline", "Không phải, tôi nói lại") : ""}${isGuess && list.length < procedures.length ? btn("allBtn", "link", "Xem cả 6 thủ tục") : ""}</div>`);
   panel.querySelectorAll("[data-id]").forEach(b => b.addEventListener("click", () => { const p = list.find(x => x.id === b.dataset.id); userSaid(p ? p.name : b.dataset.id); startFlow(b.dataset.id); }));
-  if ($("noBtn")) $("noBtn").addEventListener("click", () => { userSaid("Không phải"); greet("Vậy bác nói lại giúp cháu, bác cần làm gì ạ?"); });
+  if ($("noBtn")) $("noBtn").addEventListener("click", () => { userSaid("Không phải"); greet("Vậy bác nói lại giúp cháu, bác cần hỗ trợ thủ tục gì ạ?"); });
   if ($("allBtn")) $("allBtn").addEventListener("click", async () => { await loadProcedures(); renderCandidates(procedures, false); });
   setMic("query", "Hoặc bấm micro nói lại", "");
 }
@@ -635,7 +639,7 @@ async function startFlow(procedureId){
       const chips = (st.prefilled || []).map(x => `<li><span class="box">${ICON_CHECK}</span><span>${esc(x.question)} <b>${esc(x.label)}</b></span></li>`).join("");
       // Ghi vào lịch sử rồi mới tới câu hỏi; trên ô thoại hiện gộp.
       historyItems.push({ who:"ai", text: st.ack }); renderHistory();
-      st._ackHtml = `<span class="stephead ok">Máy đã hiểu</span><p>${esc(st.ack)}</p>${chips ? `<ul class="checklist notes">${chips}</ul>` : ""}`;
+      st._ackHtml = `<span class="stephead ok">Trợ lý đã hiểu</span><p>${esc(st.ack)}</p>${chips ? `<ul class="checklist notes">${chips}</ul>` : ""}`;
     }
     applyState(st);
   } catch(e){ showError(e.message); }
@@ -657,17 +661,17 @@ function applyState(st, opts = {}){
 function renderQuestion(st, opts){
   const q = st.question || {};
   let html = st._ackHtml || "";
-  if (st.intro) html += `<span class="stephead">Bước 1 · Kiểm tra điều kiện</span><p>${esc(st.intro)}</p>`;
-  if (st.matched === false && st.message) html += `<p>${st.asr && st.asr.text ? `Máy nghe là: «${esc(st.asr.text)}». ` : ""}${esc(st.message)}</p>`;
+  if (st.intro) html += `<span class="stephead">Bước 1 · Kiểm tra điều kiện thủ tục</span><p>${esc(st.intro)}</p>`;
+  if (st.matched === false && st.message) html += `<p>${st.asr && st.asr.text ? `Trợ lý nghe là: «${esc(st.asr.text)}». ` : ""}${esc(st.message)}</p>`;
   else html += `<p class="qtext">${esc(q.text)}</p>`;
   aiSay(html, { hint: q.hint, speech: opts.silent ? null : st.speech });
-  setPanel(`<p class="lead">Câu ${q.index || 1}/${q.total || 1} · Bấm chọn một ô, hoặc bấm micro rồi nói</p>
+  setPanel(`<p class="lead">Câu ${q.index || 1}/${q.total || 1} · Bấm chọn một ô hoặc bấm micro để yêu cầu</p>
     <div class="options">${(q.options || []).map(o => `<button class="opt-btn glow" data-v="${esc(o.value)}">${esc(o.label)}</button>`).join("")}</div>
     <div class="row">${btn("replayBtn", "outline", "🔊 Nghe lại")}${answerOrder.length ? btn("backBtn", "link", "← Quay lại câu trước") : ""}</div>`);
   panel.querySelectorAll("[data-v]").forEach(b => b.addEventListener("click", () => chooseOption(q, b.dataset.v, b.textContent)));
   $("replayBtn").addEventListener("click", () => speak(lastSpeech));
   if ($("backBtn")) $("backBtn").addEventListener("click", goBackOneQuestion);
-  setMic("answer", "Hoặc bấm micro rồi trả lời bằng lời", q.hint || "");
+  setMic("answer", "Hoặc bấm micro để trả lời", q.hint || "");
 }
 async function chooseOption(q, value, label){
   if (!flowState) return;
@@ -705,16 +709,16 @@ async function goBackOneQuestion(){
 /* --- Kết luận bước 1 --- */
 function renderStop(st){
   const cls = { ineligible:"bad", consult:"warn", redirect:"warn" }[st.verdict] || "bad";
-  aiSay(`<span class="stephead ${cls}">${esc(st.title || "Chưa đủ điều kiện")}</span><p>${esc(st.reason || st.prompt)}</p>`, { speech: st.speech });
+  aiSay(`<span class="stephead ${cls}">${esc(st.title || "Chưa đủ điều kiện thực hiện thủ tục")}</span><p>${esc(st.reason || st.prompt)}</p>`, { speech: st.speech });
   setPanel(`<div class="row">
     ${st.suggest_procedure_id ? btn("suggestBtn", "primary glow", "Xem thủ tục: " + esc(st.suggest_procedure_name || "")) : ""}
     ${btn("replayBtn", "outline", "🔊 Nghe lại")}${btn("restartBtn", "outline", "↺ Làm lại từ đầu")}${btn("otherBtn", "outline", "Làm thủ tục khác")}${btn("endBtn", "link", "Kết thúc")}</div>`);
   if ($("suggestBtn")) $("suggestBtn").addEventListener("click", () => { userSaid("Xem thủ tục " + st.suggest_procedure_name); startFlow(st.suggest_procedure_id); });
   $("replayBtn").addEventListener("click", () => speak(lastSpeech));
   $("restartBtn").addEventListener("click", () => { userSaid("Làm lại từ đầu"); startFlow(st.procedure_id); });
-  $("otherBtn").addEventListener("click", () => greet("Bác cần làm thêm gì nữa ạ?"));
+  $("otherBtn").addEventListener("click", () => greet("Bác cần hỗ trợ thêm thủ tục gì nữa không ạ?"));
   $("endBtn").addEventListener("click", goHome);
-  setMic("off", "Micro", "Bấm một nút ở trên ạ.");
+  setMic("off", "Thủ tục chưa được thực hiện do không đủ điều kiện", "Bấm nút để thực hiện lại thủ tục hoặc thực hiện thủ tục mới");
 }
 
 /* --- Bước 2, 3 --- */
@@ -723,13 +727,13 @@ const bullets = (items) => `<ul class="bullets">${(items || []).map(t => `<li>${
 
 function renderPrepare(st){
   aiSay(`<span class="stephead ok">Bước 1 xong</span><p>${esc(st.note || "")}</p><span class="stephead">Bước 2 · Chuẩn bị hồ sơ</span><p>${esc(st.prompt)}</p>`,
-        { hint: "Danh sách giấy tờ ở bên phải. Chưa rõ gì thì bấm micro hỏi thêm. Xong bấm «Sang bước 3».", speech: st.speech });
+        { hint: "Danh sách giấy tờ cần chuẩn bị ở bên phải. Chưa rõ gì thì bấm micro hỏi thêm. Xong bấm «Sang bước 3».", speech: st.speech });
   setPanel(`<div class="card"><h3>Giấy tờ cần chuẩn bị</h3>${checklist(st.documents)}</div>
     ${(st.notes || []).length ? `<div class="card"><h3>Lưu ý theo trường hợp của ${esc(pronoun)}</h3>${checklist(st.notes, "notes", true)}</div>` : ""}
     ${(st.tips || []).length ? `<div class="card"><h3>Thông tin thêm</h3>${bullets(st.tips)}</div>` : ""}
     <div class="row">${btn("replayBtn", "outline", "🔊 Nghe lại")}${btn("nextBtn", "primary glow", "Đã rõ, sang bước 3 →")}</div>`);
   $("replayBtn").addEventListener("click", () => speak(lastSpeech)); $("nextBtn").addEventListener("click", nextStage);
-  setMic("ask", "Có gì chưa rõ, bấm micro hỏi thêm", "Ví dụ: «Nộp ở đâu?», «Có mất tiền không?»");
+  setMic("ask", "Bấm nút micro để yêu cầu thêm", "Ví dụ: «Nộp ở đâu?», «Có mất tiền không?»");
 }
 function renderSubmit(st){
   const meta = [["Cơ quan xử lý", st.agency], ["Thời hạn", st.processing_time], ["Kết quả", st.result], ["Phí", st.fee]].filter(([,v]) => v).map(([k,v]) => `<div class="meta"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`).join("");
@@ -752,7 +756,7 @@ function renderSubmit(st){
     panel.querySelectorAll("[data-c]").forEach(x => x.classList.remove("glow")); b.classList.add("chosen");
     aiSay(`<span class="stephead">${esc(c.label)}</span><p class="qtext">${esc(c.say)}</p>`, { hint: "Xong thì bấm «Đã rõ, kết thúc», hoặc bấm micro hỏi thêm.", speech: c.speech || c.say });
   }));
-  setMic("ask", "Còn thắc mắc, bấm micro hỏi thêm", "Ví dụ: «Mất bao lâu thì có kết quả?»");
+  setMic("ask", "Bấm nút micro để yêu cầu thêm", "Ví dụ: «Mất bao lâu thì có kết quả?»");
 }
 async function nextStage(){
   if (!flowState) return;
@@ -775,12 +779,12 @@ async function sendAsk(blob){
   try{ d = await api("/flow/ask", { method:"POST", body: fd }); } catch(e){ showError(e.message); return; }
   const heard = d.question || (d.asr && d.asr.text) || "";
   if (heard){ userSaid(heard); if (d.answer) askHistory.push({ q: heard, a: d.answer }); }
-  aiSay(`<p class="qtext">${esc(d.answer)}</p>`, { hint: stage === "prepare" ? "Xong thì bấm «Sang bước 3» ở bên phải, hoặc hỏi tiếp." : "Xong thì bấm «Kết thúc», hoặc hỏi tiếp.", speech: d.speech || d.answer });
+  aiSay(`<p class="qtext">${esc(d.answer)}</p>`, { hint: stage === "prepare" ? "Bấm nút «Sang bước 3» để tiếp tục hoặc bấm nút micro để yêu cầu thêm." : "Bấm nút «Kết thúc» để kết thúc quá trình hoặc bấm nút micro để yêu cầu thêm.", speech: d.speech || d.answer });
   if (d.switch_to){
     setPanel(`<div class="row">${btn("switchBtn", "primary glow", "Chuyển sang: " + esc(d.switch_name || d.switch_to))}${btn("stayBtn", "outline", "Không, tiếp tục thủ tục này")}</div>`);
     $("switchBtn").addEventListener("click", () => { userSaid("Chuyển sang " + d.switch_name); startFlow(d.switch_to); });
     $("stayBtn").addEventListener("click", () => applyState(stBefore, { silent:true }));
-    setMic("ask", "Hoặc hỏi tiếp", "");
+    setMic("ask", "Bấm nút micro để yêu cầu thêm", "");
     return;
   }
   // Giữ bảng bước 2/3 để bác thấy hồ sơ; chỉ ô thoại đổi.
@@ -794,7 +798,7 @@ function renderDone(st){
   setPanel(`<div class="row">${btn("otherBtn", "primary glow", "Làm thủ tục khác")}${btn("homeBtn", "outline", "Xong, về trang chủ")}</div>`);
   $("otherBtn").addEventListener("click", () => { clearTimeout(doneTimer); greet("Bác cần làm thêm gì nữa ạ?"); });
   $("homeBtn").addEventListener("click", goHome);
-  setMic("off", "Micro", "");
+  setMic("off", "Thủ tục đã được hoàn tất", "");
   clearTimeout(doneTimer); doneTimer = setTimeout(goHome, DONE_AUTO_HOME_MS);
 }
 function showError(message){
@@ -802,7 +806,7 @@ function showError(message){
   setPanel(`<div class="row">${btn("retryBtn", "primary", "Thử lại")}${btn("homeBtn", "link", "Về trang chủ")}</div>`);
   $("retryBtn").addEventListener("click", () => { if (flowState) applyState(flowState, { silent:true }); else greet("Bác nói lại giúp cháu, bác cần làm gì ạ?"); });
   $("homeBtn").addEventListener("click", goHome);
-  setMic("off", "Micro", "");
+  setMic("off", "Thủ tục chưa được thực hiện do có lỗi xảy ra", "");
 }
 
 /* ---------------------------------------------------------------------
@@ -815,12 +819,12 @@ async function pollHealth(){
   try{
     const data = await (await fetch(BASE + "/health")).json();
     serverTtsReady = !!data.tts_ready;
-    setStatus(data.mock ? "warn" : "ok", (data.mock ? "Máy chủ giả (demo)" : "Đã kết nối") + (data.llm_enabled ? " · có mô hình ngôn ngữ" : ""));
+    setStatus(data.mock ? "warn" : "ok", (data.mock ? "Máy chủ giả (demo)" : "Đã kết nối") + (data.llm_enabled ? " · Sẵn sàng trả lời" : ""));
     ready = !!data.asr_ready;
   } catch(e){ setStatus("bad", "Không kết nối được máy chủ"); $("homeStatus").textContent = "Không kết nối được máy chủ. Kiểm tra máy chủ đã chạy chưa rồi tải lại trang."; }
   if (ready || Date.now() - healthWaitStart > HEALTH_MAX_WAIT_MS){
     serverReady = true; prefetchSpeech(GREETING_SPEECH); loadProcedures();
-    $("homeStatus").textContent = "Máy đã sẵn sàng. Bấm Bắt đầu.";
+    $("homeStatus").textContent = "Trợ lý đã sẵn sàng hỗ trợ. Bấm Bắt đầu.";
     return;
   }
   $("homeStatus").textContent = "Máy đang khởi động, đợi một chút…";
