@@ -358,7 +358,13 @@ async function prefetchSpeech(text){
   } catch(e){}
 }
 let blockedSpeech = null;
-function loadVoices(){ const v = window.speechSynthesis ? speechSynthesis.getVoices() : []; viVoice = v.find(x => x.lang && x.lang.toLowerCase().startsWith("vi")) || null; }
+function loadVoices(){
+  // Giọng dự phòng của trình duyệt (chỉ dùng khi máy chủ không đọc được): ưu tiên
+  // giọng nữ cho khớp giọng HoaiMy của máy chủ; Windows hay xếp giọng nam NamMinh lên đầu.
+  const v = (window.speechSynthesis ? speechSynthesis.getVoices() : []).filter(x => x.lang && x.lang.toLowerCase().startsWith("vi"));
+  const rank = x => /hoaimy|female|nữ/i.test(x.name) ? 0 : /google/i.test(x.name) ? 1 : /namminh|male|nam/i.test(x.name) ? 3 : 2;
+  viVoice = v.sort((a, b) => rank(a) - rank(b))[0] || null;
+}
 if (window.speechSynthesis){ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }
 function setTalking(on){ $("avatar").classList.toggle("talking", !!on); }
 
